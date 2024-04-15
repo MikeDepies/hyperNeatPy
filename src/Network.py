@@ -1,7 +1,11 @@
-from NetworkGenome import NodeType, ActivationFunction, NetworkGenome
+import json
+import torch
+from NetworkGenome import ConnectionGenome, NodeGenome, NodeType, ActivationFunction, NetworkGenome
 from typing import Callable, List, Dict
 from math import exp, tanh, sin, cos
 ActivationFunctionType = Callable[[float], float]
+
+
 class Node:
     def __init__(self, id: int, type: NodeType, activation_function: ActivationFunctionType, bias: float):
         self.id = id
@@ -215,3 +219,100 @@ class NetworkGenomeTester:
 
     def get_child_node_ids(self, node_id, genome):
         return [connection.output_node for connection in genome.connection_genes if connection.input_node == node_id and connection.enabled]
+
+class CPPNConnectionQuery:
+    def __init__(self, networkProcessor : NetworkProcessor, connection_magnitude_multiplier : float, connection_threshold : float):
+        self.networkProcessor = networkProcessor
+        self.connection_magnitude_multiplier = connection_magnitude_multiplier
+        self.connection_threshold = connection_threshold
+
+    def query(self, x1, y1, z1, x2, y2, z2):
+        # Just a dummy implementation for demonstration
+        # Real implementation should consider 3D distance or another metric
+        input_values = [x1, y1, z1, x2, y2, z2]
+        output_values = self.networkProcessor.feedforward(input_values)
+        sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
+        output_abs = abs(output_values[0])
+        if output_abs > self.connection_threshold:
+            normalized_output = (output_abs - self.connection_threshold) / (1 - self.connection_threshold)
+            connection_magnitude = self.connection_magnitude_multiplier * normalized_output * sign
+        else:
+            connection_magnitude = 0
+        return connection_magnitude
+
+
+class Substrate:
+    def __init__(self, input_coords, hidden_coords, output_coords):
+        """
+        Initialize the substrate with 3D coordinates for input, hidden, and output layers.
+        """
+        self.input_coords = input_coords
+        self.hidden_coords = hidden_coords
+        self.output_coords = output_coords
+
+    def get_layer_connections(self, layer1_coords, layer2_coords, cppn_query):
+        """
+        Generate a matrix of connections (weights) between two layers using 3D coordinates.
+        """
+        weights = torch.zeros((len(layer1_coords), len(layer2_coords)))
+        for i, coord1 in enumerate(layer1_coords):
+            for j, coord2 in enumerate(layer2_coords):
+                weight = cppn_query.query(*coord1, *coord2)
+                weights[i, j] = weight if abs(weight) > 1e-5 else 0.0  # Apply thresholding
+        return torch.nn.Parameter(weights, requires_grad=True)
+class TaskNetwork(torch.nn.Module):
+    def __init__(self, substrate : Substrate, cppn_query : CPPNConnectionQuery):
+        super(TaskNetwork, self).__init__()
+        self.substrate = substrate
+
+        # Get connection matrices with weights potentially being zero
+        self.input_hidden_weights = substrate.get_layer_connections(substrate.input_coords, substrate.hidden_coords, cppn_query)
+        self.hidden_output_weights = substrate.get_layer_connections(substrate.hidden_coords, substrate.output_coords, cppn_query)
+
+    def forward(self, inputs):
+        # print(inputs)
+        # Inputs should be a tensor of shape [batch_size, num_inputs]
+        # Apply input to hidden connections
+        hidden_activations = torch.matmul(inputs, self.input_hidden_weights)
+        hidden_activations = torch.sigmoid(hidden_activations)  # Activation function
+
+        # Apply hidden to output connections
+        outputs = torch.matmul(hidden_activations, self.hidden_output_weights)
+
+        return outputs
+
+
+
+def json_to_network_genome(data) -> NetworkGenome:
+    network_genome = data["networkGenome"]
+    node_genomes = list(map(lambda d: NodeGenome(d["id"], parse_node_type(d["type"]), parse_activation_function(d["activationFunction"]), d["bias"]), network_genome["nodeGenomes"]))
+    connection_genes = list(map(lambda d: ConnectionGenome(d["id"], d["inputNode"], d["outputNode"], d["weight"], d["enabled"]), network_genome["connectionGenes"]))
+    fitness = data.get('fitness')
+    shared_fitness = data.get('sharedFitness')
+    species_id = data.get('speciesId')
+    return NetworkGenome(node_genomes, connection_genes, fitness, shared_fitness, species_id)
+
+def json_to_network(json_data, network_builder: NetworkBuilder) -> Network:
+    network_genome = json_to_network_genome(json_data)
+    return network_builder.build_network_from_genome(network_genome)
+
+def parse_activation_function(activation_function_name: str) -> ActivationFunction:
+    return {
+        "IDENTITY": ActivationFunction.IDENTITY,
+        "SIGMOID": ActivationFunction.SIGMOID,
+        "TANH": ActivationFunction.TANH,
+        "RELU": ActivationFunction.RELU,
+        "GAUSSIAN": ActivationFunction.GAUSSIAN,
+        "SINE": ActivationFunction.SINE,
+        "COS": ActivationFunction.COS,
+        "ABS": ActivationFunction.ABS,
+        "STEP": ActivationFunction.STEP
+    }.get(activation_function_name, ActivationFunction.IDENTITY)
+
+def parse_node_type(node_type_name: str) -> NodeType:
+    return {
+        "INPUT": NodeType.INPUT,
+        "HIDDEN": NodeType.HIDDEN,
+        "OUTPUT": NodeType.OUTPUT
+    }.get(node_type_name, NodeType.INPUT)
+
