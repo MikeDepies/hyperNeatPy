@@ -38,14 +38,14 @@ def simulate_environment(
     height = 15
 
     input_coords = [
-        (x, y, 0) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
+        (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
     hidden_coords = [
-        (x, y, 0.5)
+        (x, y, 0.0)
         for x in np.linspace(-1, 1, width)
         for y in np.linspace(-1, 1, height)
     ]
-    output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12)]
+    output_coords = [(x, y, 1) for x in np.linspace(-1, 1, 4) for y in np.linspace(-1, 1, 3)]
     substrate = Substrate(input_coords, hidden_coords, output_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork(substrate, cppn_query_instance)
@@ -58,7 +58,7 @@ def simulate_environment(
     for step in range(20 * 200):
         image = rescale(rgb2gray(state), 1 / 16)
         action = torch.argmax(
-            network.forward(torch.from_numpy(image.flatten()).float())
+            network.forward(torch.from_numpy(image.flatten()).float()).flatten()
         )
         state, reward, done, info = env.step(action.item())
         cum_reward += reward
@@ -181,9 +181,9 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(10):
 
-            p = Process(target=simulation, args=(queue, i < 2))
+            p = Process(target=simulation, args=(queue, i < 1))
             p.start()
             processes.append(p)
 
