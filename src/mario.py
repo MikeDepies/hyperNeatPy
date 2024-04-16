@@ -68,7 +68,7 @@ def simulate_environment(
             no_movement_count += 1
         else:
             no_movement_count = 0
-        if no_movement_count >= 100:
+        if no_movement_count >= 20*20:
             break
         x_pos_prev = x_pos
         y_pos_prev = y_pos
