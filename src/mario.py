@@ -138,7 +138,7 @@ def simulation(queue: Queue, render: bool):
         # print(info)
         
         requests.post(
-            "http://localhost:8080/score",
+            "http://192.168.0.100:8080/score",
             json={
                 "id": data[0],
                 "x": int(info["x_pos"]),
@@ -167,7 +167,7 @@ def rgb2gray(rgb):
 if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(20)
-    api_url = "http://localhost:8080/networkGenome"
+    api_url = "http://192.168.0.100:8080/networkGenome"
     queueProcess = Process(
         target=fetch_network_genome,
         args=(
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(15):
+        for i in range(30):
 
             p = Process(target=simulation, args=(queue, i < 2))
             p.start()
