@@ -42,8 +42,8 @@ def simulate_environment(
     ]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, width/2)
-        for y in np.linspace(-1, 1, height/2)
+        for x in np.linspace(-1, 1, round(width/2))
+        for y in np.linspace(-1, 1, round(height/2))
     ]
     output_coords = [(x, y, 1) for x in np.linspace(-1, 1, 4) for y in np.linspace(-1, 1, 3)]
     substrate = Substrate(input_coords, hidden_coords, output_coords)
@@ -57,8 +57,11 @@ def simulate_environment(
     cum_reward = 0
     for step in range(20 * 200):
         image = rescale(rgb2gray(state), 1 / 16)
+        action_values = network.forward(torch.from_numpy(image.flatten()).float()).flatten()
+        softmax = torch.nn.Softmax(dim=0)
+        action_probabilities = softmax(action_values)
         action = torch.argmax(
-            network.forward(torch.from_numpy(image.flatten()).float()).flatten()
+            action_probabilities
         )
         state, reward, done, info = env.step(action.item())
         cum_reward += reward
