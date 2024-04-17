@@ -40,13 +40,14 @@ def simulate_environment(
     input_coords = [
         (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
+    previous_outputs = [(x, 0, -1) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
         (x, y, 0.0)
         for x in np.linspace(-1, 1, round(30))
         for y in np.linspace(-1, 1, round(30))
     ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
-    substrate = Substrate(input_coords, hidden_coords, output_coords)
+    substrate = Substrate(input_coords + previous_outputs, hidden_coords, output_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
@@ -55,10 +56,12 @@ def simulate_environment(
     y_pos_prev = 0
     no_movement_count = 0
     cum_reward = 0
+    action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200):
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image)
-        action_values = network.forward(torch.from_numpy(image.flatten()).float()).flatten()
+        torch_input = torch.from_numpy(image.flatten()).float()
+        action_values = network.forward(torch.cat((torch_input, action_values))).flatten()
         softmax = torch.nn.Softmax(dim=0)
         action_probabilities = softmax(action_values)
         action = torch.argmax(
