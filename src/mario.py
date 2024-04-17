@@ -42,12 +42,12 @@ def simulate_environment(
     ]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, width)
-        for y in np.linspace(-1, 1, height)
+        for x in np.linspace(-1, 1, width/2)
+        for y in np.linspace(-1, 1, height/2)
     ]
     output_coords = [(x, y, 1) for x in np.linspace(-1, 1, 4) for y in np.linspace(-1, 1, 3)]
     substrate = Substrate(input_coords, hidden_coords, output_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.6)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -130,7 +130,7 @@ def simulation(queue: Queue, render: bool):
         # print("Building network " + str(data[0]))
         network_builder = NetworkBuilder(DefaultActivationFunctionMapper())
         network_processor_factory = NetworkProcessorFactory(
-            network_builder, False, 10, 0.01
+            network_builder, False, 1, 0.01
         )
         network_processor = network_processor_factory.createProcessor(network_genome)
         # print("starting simulation " + str(data[0]))
@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
         for i in range(10):
 
-            p = Process(target=simulation, args=(queue, i < 1))
+            p = Process(target=simulation, args=(queue, i < 0))
             p.start()
             processes.append(p)
 
