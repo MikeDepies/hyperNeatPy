@@ -227,8 +227,7 @@ class CPPNConnectionQuery:
         self.connection_threshold = connection_threshold
 
     def query(self, x1, y1, z1, x2, y2, z2):
-        # Just a dummy implementation for demonstration
-        # Real implementation should consider 3D distance or another metric
+        
         input_values = [x1, y1, z1, x2, y2, z2]
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
@@ -258,8 +257,8 @@ class Substrate:
         for i, coord1 in enumerate(layer1_coords):
             for j, coord2 in enumerate(layer2_coords):
                 weight = cppn_query.query(*coord1, *coord2)
-                weights[i, j] = weight if abs(weight) > 1e-5 else 0.0  # Apply thresholding
-        return torch.nn.Parameter(weights, requires_grad=True)
+                weights[i, j] = weight #if abs(weight) > 1e-5 else 0.0  # Apply thresholding
+        return torch.nn.Parameter(weights, requires_grad=False)
 class TaskNetwork(torch.nn.Module):
     def __init__(self, substrate : Substrate, cppn_query : CPPNConnectionQuery):
         super(TaskNetwork, self).__init__()
@@ -274,11 +273,14 @@ class TaskNetwork(torch.nn.Module):
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
         hidden_activations = torch.matmul(inputs, self.input_hidden_weights)
+        # print(inputs)
+        # print(hidden_activations)
+        # print(self.input_hidden_weights)
         hidden_activations = torch.sigmoid(hidden_activations)  # Activation function
 
         # Apply hidden to output connections
         outputs = torch.matmul(hidden_activations, self.hidden_output_weights)
-
+        outputs = torch.sigmoid(outputs)
         return outputs
 
 

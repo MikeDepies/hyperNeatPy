@@ -42,12 +42,12 @@ def simulate_environment(
     ]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, round(width/2))
-        for y in np.linspace(-1, 1, round(height/2))
+        for x in np.linspace(-1, 1, round(10))
+        for y in np.linspace(-1, 1, round(10))
     ]
-    output_coords = [(x, y, 1) for x in np.linspace(-1, 1, 4) for y in np.linspace(-1, 1, 3)]
+    output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.6)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -56,18 +56,24 @@ def simulate_environment(
     no_movement_count = 0
     cum_reward = 0
     for step in range(20 * 200):
-        image = rescale(rgb2gray(state), 1 / 16)
+        image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
+        # print(image)
         action_values = network.forward(torch.from_numpy(image.flatten()).float()).flatten()
         softmax = torch.nn.Softmax(dim=0)
         action_probabilities = softmax(action_values)
         action = torch.argmax(
             action_probabilities
         )
+        # if (action_probabilities[action.item()] < 0.5):
+            # if render:
+            #     print("action < 0.5")
+            # action = torch.tensor(0)
         state, reward, done, info = env.step(action.item())
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        if x_pos == x_pos_prev and y_pos == y_pos_prev:
+        # and y_pos == y_pos_prev
+        if x_pos == x_pos_prev :
             no_movement_count += 1
         else:
             no_movement_count = 0
@@ -80,6 +86,11 @@ def simulate_environment(
             break
         # print(render)
         if render:
+            # print(network.input_hidden_weights)
+            # print(network.hidden_output_weights)
+            print(action)
+            print(action_probabilities[action.item()])
+            print(action_probabilities)
             env.render()
 
     return info, cum_reward
@@ -169,7 +180,7 @@ def rgb2gray(rgb):
 
 if __name__ == "__main__":
     manager = Manager()
-    queue = manager.Queue(20)
+    queue = manager.Queue(30)
     api_url = "http://192.168.0.100:8080/networkGenome"
     queueProcess = Process(
         target=fetch_network_genome,
@@ -184,9 +195,9 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(10):
+        for i in range(20):
 
-            p = Process(target=simulation, args=(queue, i < 0))
+            p = Process(target=simulation, args=(queue, i < 1))
             p.start()
             processes.append(p)
 
