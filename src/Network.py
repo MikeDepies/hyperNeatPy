@@ -2,7 +2,7 @@ import json
 import torch
 from NetworkGenome import ConnectionGenome, NodeGenome, NodeType, ActivationFunction, NetworkGenome
 from typing import Callable, List, Dict
-from math import exp, tanh, sin, cos
+from math import exp, tanh, sin, cos, sqrt
 ActivationFunctionType = Callable[[float], float]
 
 
@@ -32,15 +32,15 @@ class Network:
 class DefaultActivationFunctionMapper:
     def map(self, activationFunction: ActivationFunction) -> ActivationFunctionType:
         return {
-            ActivationFunction.IDENTITY: lambda x: x,
-            ActivationFunction.SIGMOID: lambda x: 1 / (1 + exp(-x)),
-            ActivationFunction.TANH: lambda x: tanh(x),
-            ActivationFunction.RELU: lambda x: max(0.0, x),
-            ActivationFunction.GAUSSIAN: lambda x: exp(-x ** 2.0),
-            ActivationFunction.SINE: lambda x: sin(x),
-            ActivationFunction.COS: lambda x: cos(x),
-            ActivationFunction.ABS: lambda x: abs(x),
-            ActivationFunction.STEP: lambda x: 0.0 if x < 0 else 1.0
+            ActivationFunction.IDENTITY: lambda x: max(-1.0, min(1.0, x)),
+            ActivationFunction.SIGMOID: lambda x: max(-1.0, min(1.0, 1 / (1 + exp(-x)))),
+            ActivationFunction.TANH: lambda x: max(-1.0, min(1.0, tanh(x))),
+            ActivationFunction.RELU: lambda x: max(-1.0, min(1.0, max(0.0, x))),
+            ActivationFunction.GAUSSIAN: lambda x: max(-1.0, min(1.0, exp(-x ** 2.0))),
+            ActivationFunction.SINE: lambda x: max(-1.0, min(1.0, sin(x))),
+            ActivationFunction.COS: lambda x: max(-1.0, min(1.0, cos(x))),
+            ActivationFunction.ABS: lambda x: max(-1.0, min(1.0, abs(x))),
+            ActivationFunction.STEP: lambda x: max(-1.0, min(1.0, 0.0 if x < 0 else 1.0))
         }[activationFunction]
 
 class NetworkBuilder:
@@ -226,9 +226,9 @@ class CPPNConnectionQuery:
         self.connection_magnitude_multiplier = connection_magnitude_multiplier
         self.connection_threshold = connection_threshold
 
-    def query(self, x1, y1, z1, x2, y2, z2):
+    def query(self, x1, y1, z1, x2, y2, z2, d):
         
-        input_values = [x1, y1, z1, x2, y2, z2]
+        input_values = [x1, y1, z1, x2, y2, z2, d]
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
         output_abs = abs(output_values[0])
@@ -239,15 +239,17 @@ class CPPNConnectionQuery:
             connection_magnitude = 0
         return connection_magnitude
 
-
+def distance(coord1, coord2):
+    return sqrt((coord1[0] - coord2[0])**2 + (coord1[1] - coord2[1])**2 + (coord1[2] - coord2[2])**2)
 class Substrate:
-    def __init__(self, input_coords, hidden_coords, output_coords):
+    def __init__(self, input_coords, hidden_coords, output_coords, bias_coords):
         """
         Initialize the substrate with 3D coordinates for input, hidden, and output layers.
         """
         self.input_coords = input_coords
         self.hidden_coords = hidden_coords
         self.output_coords = output_coords
+        self.bias_coords = bias_coords
 
     def get_layer_connections(self, layer1_coords, layer2_coords, cppn_query):
         """
@@ -256,7 +258,7 @@ class Substrate:
         weights = torch.zeros((len(layer1_coords), len(layer2_coords)))
         for i, coord1 in enumerate(layer1_coords):
             for j, coord2 in enumerate(layer2_coords):
-                weight = cppn_query.query(*coord1, *coord2)
+                weight = cppn_query.query(*coord1, *coord2, distance(coord1, coord2))
                 weights[i, j] = weight #if abs(weight) > 1e-5 else 0.0  # Apply thresholding
         return torch.nn.Parameter(weights, requires_grad=False)
 class TaskNetwork(torch.nn.Module):
@@ -267,21 +269,25 @@ class TaskNetwork(torch.nn.Module):
         # Get connection matrices with weights potentially being zero
         self.input_hidden_weights = substrate.get_layer_connections(substrate.input_coords, substrate.hidden_coords, cppn_query)
         self.hidden_output_weights = substrate.get_layer_connections(substrate.hidden_coords, substrate.output_coords, cppn_query)
-
+        self.output_hidden_weights = substrate.get_layer_connections(substrate.output_coords, substrate.hidden_coords, cppn_query)
+        self.hidden_bias_weights = substrate.get_layer_connections(substrate.bias_coords, substrate.hidden_coords, cppn_query)
+        self.output_bias_weights = substrate.get_layer_connections(substrate.bias_coords, substrate.output_coords, cppn_query)
+        self.outputs = torch.zeros(1,12)
     def forward(self, inputs):
         # print(inputs)
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
-        hidden_activations = torch.matmul(inputs, self.input_hidden_weights)
+        hidden_activations = torch.matmul(inputs, self.input_hidden_weights) + torch.matmul(self.outputs, self.output_hidden_weights)# + self.hidden_bias_weights
         # print(inputs)
         # print(hidden_activations)
         # print(self.input_hidden_weights)
         hidden_activations = torch.sigmoid(hidden_activations)  # Activation function
 
         # Apply hidden to output connections
-        outputs = torch.matmul(hidden_activations, self.hidden_output_weights)
-        outputs = torch.sigmoid(outputs)
-        return outputs
+        self.outputs = torch.matmul(hidden_activations, self.hidden_output_weights)# + self.output_bias_weights
+        # s = torch.nn.Softmax(dim=0)
+        # self.outputs = s(self.outputs)
+        return self.outputs
 
 
 

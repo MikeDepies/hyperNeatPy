@@ -36,18 +36,18 @@ def simulate_environment(
 ):
     width = 16
     height = 15
-
+    bias_coords = [(0,0,-2)]
     input_coords = [
         (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
-    previous_outputs = [(x, 0, -1) for x in np.linspace(-1, 1, 12)]
+    # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, round(30))
-        for y in np.linspace(-1, 1, round(30))
+        for x in np.linspace(-1, 1, round(5))
+        for y in np.linspace(-1, 1, round(5))
     ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
-    substrate = Substrate(input_coords + previous_outputs, hidden_coords, output_coords)
+    substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
@@ -61,13 +61,13 @@ def simulate_environment(
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
-        action_values = network.forward(torch.cat((torch_input, action_values))).flatten()
+        action_values = network.forward(torch_input).flatten()
         softmax = torch.nn.Softmax(dim=0)
         action_probabilities = softmax(action_values)
         action = torch.argmax(
             action_probabilities
         )
-        # if (action_probabilities[action.item()] < 0.5):
+        # if (action_probabilities[action.item()] < 0.1):
             # if render:
             #     print("action < 0.5")
             # action = torch.tensor(0)
@@ -75,15 +75,16 @@ def simulate_environment(
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        # and y_pos == y_pos_prev
-        if x_pos == x_pos_prev :
+        movement_threshold = 32  # Define a threshold for movement reset
+        if abs(x_pos - x_pos_prev) < movement_threshold:
             no_movement_count += 1
         else:
+            x_pos_prev = x_pos
+            y_pos_prev = y_pos
             no_movement_count = 0
-        if no_movement_count >= 20*20:
+        if no_movement_count >= 20*30:
             break
-        x_pos_prev = x_pos
-        y_pos_prev = y_pos
+       
 
         if done or reward < -10:
             break
@@ -198,7 +199,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(30):
 
             p = Process(target=simulation, args=(queue, i < 1))
             p.start()
