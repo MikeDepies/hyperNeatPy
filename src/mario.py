@@ -75,14 +75,14 @@ def simulate_environment(
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        movement_threshold = 32  # Define a threshold for movement reset
+        movement_threshold = 64  # Define a threshold for movement reset
         if abs(x_pos - x_pos_prev) < movement_threshold:
             no_movement_count += 1
         else:
             x_pos_prev = x_pos
             y_pos_prev = y_pos
             no_movement_count = 0
-        if no_movement_count >= 20*30:
+        if no_movement_count >= 20*20:
             break
        
 

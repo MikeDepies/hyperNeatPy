@@ -16,7 +16,10 @@ class Node:
         self.output_value = 0.0
 
     def activate(self):
-        self.output_value = self.activation_function(self.input_value + self.bias)
+        if self.type == NodeType.INPUT:
+            self.output_value = self.input_value
+        else:
+            self.output_value = self.activation_function(self.input_value + self.bias)
 
 class Connection:
     def __init__(self, input_node_id: int, output_node_id: int, weight: float):
