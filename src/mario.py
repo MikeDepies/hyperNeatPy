@@ -201,9 +201,9 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(10):
+        for i in range(20):
 
-            p = Process(target=simulation, args=(queue, i < 0))
+            p = Process(target=simulation, args=(queue, i < 1))
             p.start()
             processes.append(p)
 
