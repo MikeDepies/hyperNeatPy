@@ -254,6 +254,14 @@ class Substrate:
         self.output_coords = output_coords
         self.bias_coords = bias_coords
 
+    def get_recurrent_layer_connections(self, layer1_coords, layer2_coords, cppn_query):
+        weights = torch.zeros((len(layer1_coords), len(layer2_coords)))
+        for i, coord1 in enumerate(layer1_coords):
+            # for j, coord2 in enumerate(layer2_coords):
+            weight = cppn_query.query(*coord1, *coord1, 0)
+            weights[i, i] = weight #if abs(weight) > 1e-5 else 0.0  # Apply thresholding
+        return torch.nn.Parameter(weights, requires_grad=False)
+
     def get_layer_connections(self, layer1_coords, layer2_coords, cppn_query):
         """
         Generate a matrix of connections (weights) between two layers using 3D coordinates.
@@ -275,22 +283,27 @@ class TaskNetwork(torch.nn.Module):
         self.output_hidden_weights = substrate.get_layer_connections(substrate.output_coords, substrate.hidden_coords, cppn_query)
         self.hidden_bias_weights = substrate.get_layer_connections(substrate.bias_coords, substrate.hidden_coords, cppn_query)
         self.output_bias_weights = substrate.get_layer_connections(substrate.bias_coords, substrate.output_coords, cppn_query)
-        self.outputs = torch.zeros(1,12)
+        self.hidden_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.hidden_coords, substrate.hidden_coords, cppn_query)
+        self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
+        self.outputs = torch.zeros(self.output_bias_weights.shape[0], self.output_bias_weights.shape[1])
+        self.hidden_activations = torch.zeros(self.hidden_bias_weights.shape[0], self.hidden_bias_weights.shape[1])
     def forward(self, inputs):
         # print(inputs)
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
         #+ torch.matmul(self.outputs, self.output_hidden_weights)
-        hidden_activations = torch.matmul(inputs, self.input_hidden_weights) # + self.hidden_bias_weights 
+        hidden_activations = torch.matmul(inputs, self.input_hidden_weights) + torch.matmul(self.hidden_activations, self.hidden_recurrent_weights) # + self.hidden_bias_weights 
         # print(inputs)
         # print(hidden_activations)
         # print(self.input_hidden_weights)
         hidden_activations = torch.sigmoid(hidden_activations)  # Activation function
-
+        self.hidden_activations = hidden_activations
         # Apply hidden to output connections
-        self.outputs = torch.matmul(hidden_activations, self.hidden_output_weights) #+ self.output_bias_weights
-        # s = torch.nn.Softmax(dim=0)
-        # self.outputs = s(self.outputs)
+        # print(torch.matmul(self.outputs, self.output_recurrent_weights))
+        outputs = torch.matmul(hidden_activations, self.hidden_output_weights) + torch.matmul(self.outputs, self.output_recurrent_weights) #+ self.output_bias_weights
+        # print(outputs)
+        s = torch.nn.Softmax(dim=1)
+        self.outputs = s(outputs)
         return self.outputs
 
 

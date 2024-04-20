@@ -62,8 +62,8 @@ def simulate_environment(
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
-        softmax = torch.nn.Softmax(dim=0)
-        action_probabilities = softmax(action_values)
+        # softmax = torch.nn.Softmax(dim=0)
+        action_probabilities = action_values#softmax(action_values)
         action = torch.argmax(
             action_probabilities
         )
@@ -82,7 +82,7 @@ def simulate_environment(
             x_pos_prev = x_pos
             y_pos_prev = y_pos
             no_movement_count = 0
-        if no_movement_count >= 20*60:
+        if no_movement_count >= 20*20:
             break
        
 
