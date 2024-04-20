@@ -139,7 +139,7 @@ def base():
 
 
 def simulation(queue: Queue, render: bool):
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBros-v3")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while not queue.empty():
