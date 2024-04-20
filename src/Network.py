@@ -296,7 +296,7 @@ class TaskNetwork(torch.nn.Module):
         # print(inputs)
         # print(hidden_activations)
         # print(self.input_hidden_weights)
-        hidden_activations = torch.relu(hidden_activations)  # Activation function
+        hidden_activations = torch.tanh(hidden_activations)  # Activation function
         self.hidden_activations = hidden_activations
         # Apply hidden to output connections
         # print(torch.matmul(self.outputs, self.output_recurrent_weights))
