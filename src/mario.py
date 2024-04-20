@@ -54,7 +54,7 @@ def simulate_environment(
     done = False
     x_pos_prev = 0
     y_pos_prev = 0
-    no_movement_count = 0
+    no_movement_count = 20*10
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200 *8):
@@ -75,7 +75,7 @@ def simulate_environment(
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        movement_threshold = 64  # Define a threshold for movement reset
+        movement_threshold = 16  # Define a threshold for movement reset
         if abs(x_pos - x_pos_prev) < movement_threshold:
             no_movement_count += 1
         else:
