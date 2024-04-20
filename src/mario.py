@@ -122,7 +122,7 @@ def fetch_network_genome(api_url, queue: Queue):
 
 
 def base():
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBros-v3")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
     state: np.ndarray = env.reset()
     done = False
