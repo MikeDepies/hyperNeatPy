@@ -36,7 +36,7 @@ def simulate_environment(
 ):
     width = 16
     height = 15
-    bias_coords = [(0,0,-2)]
+    bias_coords = [(0,0,-.5)]
     input_coords = [
         (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
@@ -52,7 +52,7 @@ def simulate_environment(
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
-    x_pos_prev = 0
+    x_pos_prev = 40
     y_pos_prev = 0
     no_movement_count = 20*10
     cum_reward = 0
