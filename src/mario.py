@@ -43,8 +43,8 @@ def simulate_environment(
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, round(5))
-        for y in np.linspace(-1, 1, round(5))
+        for x in np.linspace(-1, 1, round(10))
+        for y in np.linspace(-1, 1, round(10))
     ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
@@ -57,7 +57,7 @@ def simulate_environment(
     no_movement_count = 0
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
-    for step in range(20 * 200):
+    for step in range(20 * 200 *8):
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
@@ -82,7 +82,7 @@ def simulate_environment(
             x_pos_prev = x_pos
             y_pos_prev = y_pos
             no_movement_count = 0
-        if no_movement_count >= 20*20:
+        if no_movement_count >= 20*60:
             break
        
 
