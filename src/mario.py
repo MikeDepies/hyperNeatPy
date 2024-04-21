@@ -49,7 +49,7 @@ def simulate_environment(
     ] for z in np.linspace(-.9, .9, round(30))]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 1.0, 0.2)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork2(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -59,7 +59,7 @@ def simulate_environment(
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200 *8):
-        image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
+        image = (rescale(rgb2gray(state), 1 / 16) / 255)
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
