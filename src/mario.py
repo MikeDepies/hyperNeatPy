@@ -34,7 +34,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 8
+    scale = 16
     width = 256 // scale
     height = 240 // scale
     bias_coords = [(0,0,-.5)]
@@ -45,12 +45,12 @@ def simulate_environment(
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, round(10))
-        for y in np.linspace(-1, 1, round(10))
+        for x in np.linspace(-1, 1, round(2))
+        for y in np.linspace(-1, 1, round(2))
     ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.0)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -61,7 +61,7 @@ def simulate_environment(
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200):
         # rgb2gray(state)
-        image = (rescale(state, 1 / scale, channel_axis=2) / 255)
+        image = (rescale(state, 1 / scale, channel_axis=2) / 127.5) - 1
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
