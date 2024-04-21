@@ -49,7 +49,7 @@ def simulate_environment(
     ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.7)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.0)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False

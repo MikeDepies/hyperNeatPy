@@ -300,7 +300,7 @@ class TaskNetwork(torch.nn.Module):
         self.hidden_activations = hidden_activations
         # Apply hidden to output connections
         # print(torch.matmul(self.outputs, self.output_recurrent_weights))
-        outputs = torch.matmul(hidden_activations, self.hidden_output_weights) + torch.matmul(self.outputs, self.output_recurrent_weights) #+ self.output_bias_weights
+        outputs = torch.matmul(hidden_activations, self.hidden_output_weights)# + torch.matmul(self.outputs, self.output_recurrent_weights) #+ self.output_bias_weights
         # print(outputs)
         s = torch.nn.Softmax(dim=1)
         self.outputs = s(outputs)
