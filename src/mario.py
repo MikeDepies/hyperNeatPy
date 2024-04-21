@@ -34,34 +34,31 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 16
-    width = 256 // scale
-    height = 240 // scale
-    bias_coords = [(0,0,-.5)]
+    width = 16
+    height = 15
+    bias_coords = [(0,0,-2)]
     input_coords = [
-        # (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
-        (x, y, -1 + z) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height) for z in np.linspace(-.1, .1, 3)
+        (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
         (x, y, 0.0)
-        for x in np.linspace(-1, 1, round(2))
-        for y in np.linspace(-1, 1, round(2))
+        for x in np.linspace(-1, 1, round(10))
+        for y in np.linspace(-1, 1, round(10))
     ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
-    x_pos_prev = 40
+    x_pos_prev = 0
     y_pos_prev = 0
-    no_movement_count = 20*10
+    no_movement_count = 20*5
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
-    for step in range(20 * 200):
-        # rgb2gray(state)
-        image = (rescale(state, 1 / scale, channel_axis=2) / 127.5) - 1
+    for step in range(20 * 200 *8):
+        image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
@@ -125,7 +122,7 @@ def fetch_network_genome(api_url, queue: Queue):
 
 
 def base():
-    env = gym_super_mario_bros.make("SuperMarioBros-v3")
+    env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
     state: np.ndarray = env.reset()
     done = False
@@ -142,7 +139,7 @@ def base():
 
 
 def simulation(queue: Queue, render: bool):
-    env = gym_super_mario_bros.make("SuperMarioBros-v3")
+    env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while not queue.empty():
