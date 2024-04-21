@@ -3,6 +3,8 @@ import torch
 from NetworkGenome import ConnectionGenome, NodeGenome, NodeType, ActivationFunction, NetworkGenome
 from typing import Callable, List, Dict
 from math import exp, tanh, sin, cos, sqrt
+
+from SelfAttention import SelfAttention
 ActivationFunctionType = Callable[[float], float]
 
 
@@ -346,7 +348,7 @@ class TaskNetwork2(torch.nn.Module):
     def __init__(self, substrate : Substrate, cppn_query : CPPNConnectionQuery):
         super(TaskNetwork2, self).__init__()
         self.substrate = substrate
-
+        self.self_attention = SelfAttention(weights_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])), weights_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])))
         # Get connection matrices with weights potentially being zero
         self.input_hidden_weights = substrate.get_layer_connections(substrate.input_coords, substrate.hidden_coords[0], cppn_query)
         self.hidden_hidden_weights = [substrate.get_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i+1], cppn_query) for i in range(len(substrate.hidden_coords)-1)]
@@ -363,11 +365,11 @@ class TaskNetwork2(torch.nn.Module):
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
         #+ torch.matmul(self.outputs, self.output_hidden_weights)
-        self.hidden_activations[0] = torch.matmul(inputs, self.input_hidden_weights) #+ torch.matmul(self.hidden_activations, self.hidden_recurrent_weights) # + self.hidden_bias_weights 
+        self.hidden_activations[0] = torch.matmul(inputs, self.input_hidden_weights) + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights) # + self.hidden_bias_weights 
         self.hidden_activations[0] = torch.tanh(self.hidden_activations[0])  # Activation function
         for i in range(len(self.substrate.hidden_coords)-1):
             # print("no loop")
-            self.hidden_activations[i+1] = torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i]) #+ torch.matmul(self.hidden_activations, self.hidden_recurrent_weights[i]) # + self.hidden_bias_weights 
+            self.hidden_activations[i+1] = torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i]) + torch.matmul(self.hidden_activations, self.hidden_recurrent_weights[i]) # + self.hidden_bias_weights 
             self.hidden_activations[i+1] = torch.tanh(self.hidden_activations[i+1])  # Activation function
         # self.hidden_activations = hidden_activations
         # Apply hidden to output connections

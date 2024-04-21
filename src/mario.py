@@ -185,7 +185,7 @@ def rgb2gray(rgb):
 
 if __name__ == "__main__":
     manager = Manager()
-    queue = manager.Queue(30)
+    queue = manager.Queue(10)
     api_url = "http://192.168.0.100:8080/networkGenome"
     queueProcess = Process(
         target=fetch_network_genome,
