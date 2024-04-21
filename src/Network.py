@@ -292,11 +292,11 @@ class TaskNetwork(torch.nn.Module):
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
         #+ torch.matmul(self.outputs, self.output_hidden_weights)
-        hidden_activations = torch.matmul(inputs, self.input_hidden_weights) + torch.matmul(self.hidden_activations, self.hidden_recurrent_weights) # + self.hidden_bias_weights 
+        hidden_activations = torch.matmul(inputs, self.input_hidden_weights) #+ torch.matmul(self.hidden_activations, self.hidden_recurrent_weights) # + self.hidden_bias_weights 
         # print(inputs)
         # print(hidden_activations)
         # print(self.input_hidden_weights)
-        hidden_activations = torch.tanh(hidden_activations)  # Activation function
+        hidden_activations = torch.sigmoid(hidden_activations)  # Activation function
         self.hidden_activations = hidden_activations
         # Apply hidden to output connections
         # print(torch.matmul(self.outputs, self.output_recurrent_weights))
