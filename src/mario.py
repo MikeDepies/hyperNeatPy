@@ -49,7 +49,7 @@ def simulate_environment(
     ] for z in np.linspace(-.9, .9, round(30))]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
+    cppn_query_instance = CPPNConnectionQuery(network_processor, 1.0, 0.2)
     network = TaskNetwork2(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(1):
 
             p = Process(target=simulation, args=(queue, i < 1))
             p.start()
