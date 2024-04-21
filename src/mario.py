@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(1):
+        for i in range(20):
 
             p = Process(target=simulation, args=(queue, i < 1))
             p.start()
