@@ -348,7 +348,7 @@ class TaskNetwork2(torch.nn.Module):
     def __init__(self, substrate : Substrate, cppn_query : CPPNConnectionQuery):
         super(TaskNetwork2, self).__init__()
         self.substrate = substrate
-        self.self_attention = SelfAttention(weights_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])), weights_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])))
+        # self.self_attention = SelfAttention(weights_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])), weights_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])))
         # Get connection matrices with weights potentially being zero
         self.input_hidden_weights = substrate.get_layer_connections(substrate.input_coords, substrate.hidden_coords[0], cppn_query)
         self.hidden_hidden_weights = [substrate.get_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i+1], cppn_query) for i in range(len(substrate.hidden_coords)-1)]
