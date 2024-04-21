@@ -35,8 +35,8 @@ def simulate_environment(
     render: bool,
 ):
     scale = 8
-    width = 256 / scale
-    height = 240 / scale
+    width = 256 // scale
+    height = 240 // scale
     bias_coords = [(0,0,-.5)]
     input_coords = [
         # (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(10):
 
             p = Process(target=simulation, args=(queue, i < 1))
             p.start()
