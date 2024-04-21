@@ -46,7 +46,7 @@ def simulate_environment(
         (x, y, z)
         for x in np.linspace(-1, 1, round(10))
         for y in np.linspace(-1, 1, round(10))
-    ] for z in np.linspace(-.9, .9, round(10))]
+    ] for z in np.linspace(-.9, .9, round(30))]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
