@@ -341,3 +341,43 @@ def parse_node_type(node_type_name: str) -> NodeType:
         "OUTPUT": NodeType.OUTPUT
     }.get(node_type_name, NodeType.INPUT)
 
+
+class TaskNetwork2(torch.nn.Module):
+    def __init__(self, substrate : Substrate, cppn_query : CPPNConnectionQuery):
+        super(TaskNetwork2, self).__init__()
+        self.substrate = substrate
+
+        # Get connection matrices with weights potentially being zero
+        self.input_hidden_weights = substrate.get_layer_connections(substrate.input_coords, substrate.hidden_coords[0], cppn_query)
+        self.hidden_hidden_weights = [substrate.get_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i+1], cppn_query) for i in range(len(substrate.hidden_coords)-1)]
+        self.hidden_output_weights = substrate.get_layer_connections(substrate.hidden_coords[-1], substrate.output_coords, cppn_query)
+        # self.output_hidden_weights = substrate.get_layer_connections(substrate.output_coords, substrate.hidden_coords[0], cppn_query)
+        self.hidden_bias_weights = [substrate.get_layer_connections(substrate.bias_coords, substrate.hidden_coords[i], cppn_query) for i in range(len(substrate.hidden_coords))]
+        self.output_bias_weights = substrate.get_layer_connections(substrate.bias_coords, substrate.output_coords, cppn_query)
+        # self.hidden_recurrent_weights = [substrate.get_recurrent_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query) for i in range(len(substrate.hidden_coords))]
+        # self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
+        self.outputs = torch.zeros(self.output_bias_weights.shape[0], self.output_bias_weights.shape[1])
+        self.hidden_activations = [torch.zeros(self.hidden_bias_weights[i].shape[0], self.hidden_bias_weights[i].shape[1]) for i in range(len(self.hidden_bias_weights))]
+    def forward(self, inputs):
+        # print(inputs)
+        # Inputs should be a tensor of shape [batch_size, num_inputs]
+        # Apply input to hidden connections
+        #+ torch.matmul(self.outputs, self.output_hidden_weights)
+        self.hidden_activations[0] = torch.matmul(inputs, self.input_hidden_weights) #+ torch.matmul(self.hidden_activations, self.hidden_recurrent_weights) # + self.hidden_bias_weights 
+        self.hidden_activations[0] = torch.tanh(self.hidden_activations[0])  # Activation function
+        for i in range(len(self.substrate.hidden_coords)-1):
+            # print("no loop")
+            self.hidden_activations[i+1] = torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i]) #+ torch.matmul(self.hidden_activations, self.hidden_recurrent_weights[i]) # + self.hidden_bias_weights 
+            self.hidden_activations[i+1] = torch.tanh(self.hidden_activations[i+1])  # Activation function
+        # self.hidden_activations = hidden_activations
+        # Apply hidden to output connections
+        # print(torch.matmul(self.outputs, self.output_recurrent_weights))
+        # print(self.input_hidden_weights)
+        # print(self.hidden_activations[-1])
+        # print(self.hidden_activations[0])
+        outputs = torch.matmul(self.hidden_activations[-1], self.hidden_output_weights)# + torch.matmul(self.outputs, self.output_recurrent_weights) #+ self.output_bias_weights
+        # print(outputs)
+        s = torch.nn.Softmax(dim=0)
+        self.outputs = s(outputs)
+        return self.outputs
+

@@ -17,6 +17,7 @@ from Network import (
     NetworkProcessorFactory,
     Substrate,
     TaskNetwork,
+    TaskNetwork2,
     json_to_network_genome,
 )
 
@@ -41,15 +42,15 @@ def simulate_environment(
         (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
-    hidden_coords = [
-        (x, y, 0.0)
+    hidden_coords = [[
+        (x, y, z)
         for x in np.linspace(-1, 1, round(10))
         for y in np.linspace(-1, 1, round(10))
-    ]
+    ] for z in np.linspace(-1, 1, round(10))]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
-    network = TaskNetwork(substrate, cppn_query_instance)
+    network = TaskNetwork2(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
     x_pos_prev = 0
