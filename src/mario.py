@@ -44,8 +44,8 @@ def simulate_environment(
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [[
         (x, y, z)
-        for x in np.linspace(-1, 1, round(4))
-        for y in np.linspace(-1, 1, round(4))
+        for x in np.linspace(-1, 1, round(40))
+        for y in np.linspace(-1, 1, round(40))
     ] for z in np.linspace(-.1, .1, round(1))]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
