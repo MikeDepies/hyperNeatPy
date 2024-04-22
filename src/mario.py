@@ -37,15 +37,15 @@ def simulate_environment(
 ):
     width = 16
     height = 15
-    bias_coords = [(0,0,-.5)]
+    bias_coords = [(0,0,-1.5)]
     input_coords = [
         (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [[
         (x, y, z)
-        for x in np.linspace(-1, 1, round(4))
-        for y in np.linspace(-1, 1, round(4))
+        for x in np.linspace(-1, 1, round(50 - z))
+        for y in np.linspace(-1, 1, round(43 - z))
     ] for z in np.linspace(-.9, .9, round(30))]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
@@ -59,7 +59,7 @@ def simulate_environment(
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200 *8):
-        image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
+        image = (rescale(rgb2gray(state), 1 / 16) / 255)
         # print(image)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
