@@ -60,7 +60,7 @@ def simulate_environment(
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200 *8):
         image = (rescale(state, 1 / 16, channel_axis=2) / 255)
-        print(image.shape)
+        # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
         # softmax = torch.nn.Softmax(dim=0)
