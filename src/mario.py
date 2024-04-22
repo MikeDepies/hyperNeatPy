@@ -46,7 +46,21 @@ def simulate_environment(
         (x, y, z)
         for x in np.linspace(-1, 1, round(12))
         for y in np.linspace(-1, 1, round(12))
-    ] for z in np.linspace(-.9, .9, round(3))]
+    ] for z in np.linspace(-.5, .5, round(3))]
+    # data_dim = 3
+    # top_k = 10
+    # patch_size =7
+    # patch_stride = 4
+    # output_dim =3
+    # query_dim =4
+    # in_dim = data_dim * patch_size ** 2
+    # out_dim = query_dim
+    # [
+    #     (x, y, z)
+    #     for x in np.linspace(-1, 1, round(12))
+    #     for y in np.linspace(-1, 1, round(12))
+    #     for z in np.linspace(-.9, .9, round(2))
+    # ]
     output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
