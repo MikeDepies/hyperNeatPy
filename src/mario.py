@@ -43,10 +43,11 @@ def simulate_environment(
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [[
-        (x, y, z)
+        (x, y, 0)
         for x in np.linspace(-1, 1, round(12))
         for y in np.linspace(-1, 1, round(12))
-    ] for z in np.linspace(-.5, .5, round(3))]
+    ] ]
+    # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
     # top_k = 10
     # patch_size =7
