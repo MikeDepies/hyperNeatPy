@@ -44,8 +44,8 @@ def simulate_environment(
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [[
         (x, y, 0)
-        for x in np.linspace(-1, 1, round(12))
-        for y in np.linspace(-1, 1, round(12))
+        for x in np.linspace(-1, 1, round(width))
+        for y in np.linspace(-1, 1, round(height))
     ] ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
