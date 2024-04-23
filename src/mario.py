@@ -124,8 +124,8 @@ def simulate_environment(
         if y_pos < y_pos_prev:
             fall_count += 1
         # Measure the average speed of Mario
-        
-        speed_sum += abs(x_pos - x_pos_prev_movement)
+        if (tick_count > 0):
+            speed_sum += abs(x_pos - x_pos_prev_movement)
         tick_count += 1
         if tick_count > 0:
             average_speed = speed_sum / tick_count
@@ -192,7 +192,7 @@ def base():
 
 
 def simulation(queue: Queue, render: bool):
-    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
+    env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while not queue.empty():
