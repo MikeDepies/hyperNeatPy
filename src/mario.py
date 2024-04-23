@@ -135,7 +135,7 @@ def simulate_environment(
             average_speed = 0
             average_jump_count = 0
             average_fall_count = 0
-        print("Average speed: ", average_speed)
+        # print("Average speed: ", average_speed)
         # print("Jump count: ", jump_count)
         x_pos_prev_movement = x_pos
         y_pos_prev = y_pos
@@ -255,7 +255,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(1):
+        for i in range(20):
 
             p = Process(target=simulation, args=(queue, i < 1))
             p.start()
