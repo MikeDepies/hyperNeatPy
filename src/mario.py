@@ -120,7 +120,7 @@ def simulate_environment(
         tick_count += 1
         if tick_count > 0:
             average_speed = speed_sum / tick_count
-            average_jump_count = jump_count / tick_count
+            average_jump_count = (jump_count + fall_count) / tick_count
             average_fall_count = fall_count / tick_count
         else:
             average_speed = 0
