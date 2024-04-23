@@ -43,10 +43,20 @@ def simulate_environment(
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [[
-        (x, y, 0)
+        (x, y, -.5)
         for x in np.linspace(-1, 1, round(width))
         for y in np.linspace(-1, 1, round(height))
-    ] ]
+    ],
+     [
+        (x, y, 0)
+        for x in np.linspace(-1, 1, round(width))
+        for y in np.linspace(-.5, .5, round(height))
+    ],
+     [
+        (x, y, .5)
+        for x in np.linspace(-.1, .1, round(width))
+        for y in np.linspace(-.1, .1, round(height))
+    ]  ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
     # top_k = 10
@@ -74,7 +84,7 @@ def simulate_environment(
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
     for step in range(20 * 200 *8):
-        image = (rescale(state, 1 / 16, channel_axis=2) / 255)
+        image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
