@@ -78,7 +78,7 @@ def simulate_environment(
     network = TaskNetwork2(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
-    x_pos_prev = 0
+    x_pos_prev = 40
     y_pos_prev = 0
     no_movement_count = 20*5
     cum_reward = 0
@@ -134,8 +134,8 @@ def simulate_environment(
             average_speed = 0
             average_jump_count = 0
             average_fall_count = 0
-        print("Average speed: ", average_speed)
-        print("Jump count: ", jump_count)
+        # print("Average speed: ", average_speed)
+        # print("Jump count: ", jump_count)
         
         if done or reward < -10:
             break
