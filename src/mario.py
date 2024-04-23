@@ -90,6 +90,7 @@ def simulate_environment(
     average_fall_count = 0
     jump_count = 0
     fall_count = 0
+    x_pos_prev_movement = 40
     for step in range(20 * 200 *8):
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image.shape)
@@ -114,7 +115,7 @@ def simulate_environment(
             no_movement_count += 1
         else:
             x_pos_prev = x_pos
-            y_pos_prev = y_pos
+            
             no_movement_count = 0
         if no_movement_count >= 20*20:
             break
@@ -124,7 +125,7 @@ def simulate_environment(
             fall_count += 1
         # Measure the average speed of Mario
         
-        speed_sum += abs(x_pos - x_pos_prev)
+        speed_sum += abs(x_pos - x_pos_prev_movement)
         tick_count += 1
         if tick_count > 0:
             average_speed = speed_sum / tick_count
@@ -134,9 +135,10 @@ def simulate_environment(
             average_speed = 0
             average_jump_count = 0
             average_fall_count = 0
-        # print("Average speed: ", average_speed)
+        print("Average speed: ", average_speed)
         # print("Jump count: ", jump_count)
-        
+        x_pos_prev_movement = x_pos
+        y_pos_prev = y_pos
         if done or reward < -10:
             break
         # print(render)
@@ -253,7 +255,7 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(1):
 
             p = Process(target=simulation, args=(queue, i < 1))
             p.start()
