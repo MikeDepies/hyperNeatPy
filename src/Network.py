@@ -388,7 +388,7 @@ class TaskNetwork2(torch.nn.Module):
         # print(self.input_hidden_weights)
         # print(self.hidden_activations[-1])
         # print(self.hidden_activations[0])
-        outputs = torch.matmul(self.hidden_activations[-1], self.hidden_output_weights)#+ self.output_bias_weights# + torch.matmul(self.outputs, self.output_recurrent_weights) #+ self.output_bias_weights
+        outputs = torch.matmul(self.hidden_activations[-1], self.hidden_output_weights)+ self.output_bias_weights# + torch.matmul(self.outputs, self.output_recurrent_weights) #+ self.output_bias_weights
         # print(outputs)
         s = torch.nn.Softmax(dim=-1)
         self.outputs = s(outputs)
