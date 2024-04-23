@@ -39,7 +39,7 @@ def simulate_environment(
     height = 15
     bias_coords = [(0,0,-.5)]
     input_coords = [
-        (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height) # for z in np.linspace(-.1, .1, 3)
+        (x, y, -.9 + z) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height) for z in np.linspace(-.1, .1, 3)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
@@ -83,7 +83,7 @@ def simulate_environment(
     fall_count = 0
     x_pos_prev_movement = 40
     for step in range(20 * 200 *8):
-        image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
+        image = (rescale(state, 1 / 16, channel_axis=2) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
