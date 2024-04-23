@@ -49,13 +49,13 @@ def simulate_environment(
     ],
      [
         (x, y, 0)
-        for x in np.linspace(-1, 1, round(width))
-        for y in np.linspace(-.5, .5, round(height))
+        for x in np.linspace(-1, 1, round(width/2))
+        for y in np.linspace(-.5, .5, round(height/2))
     ],
      [
         (x, y, .5)
-        for x in np.linspace(-.1, .1, round(width))
-        for y in np.linspace(-.1, .1, round(height))
+        for x in np.linspace(-1, 1, round(width/4))
+        for y in np.linspace(-.1, .1, round(height/4))
     ]  ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
@@ -83,6 +83,13 @@ def simulate_environment(
     no_movement_count = 20*5
     cum_reward = 0
     action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
+    speed_sum = 0
+    tick_count = 0
+    average_speed = 0
+    average_jump_count = 0
+    average_fall_count = 0
+    jump_count = 0
+    fall_count = 0
     for step in range(20 * 200 *8):
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image.shape)
@@ -97,6 +104,7 @@ def simulate_environment(
             # if render:
             #     print("action < 0.5")
             # action = torch.tensor(0)
+        
         state, reward, done, info = env.step(action.item())
         cum_reward += reward
         x_pos = info["x_pos"]
@@ -110,8 +118,25 @@ def simulate_environment(
             no_movement_count = 0
         if no_movement_count >= 20*20:
             break
-       
-
+        if y_pos > y_pos_prev:
+            jump_count += 1
+        if y_pos < y_pos_prev:
+            fall_count += 1
+        # Measure the average speed of Mario
+        
+        speed_sum += abs(x_pos - x_pos_prev)
+        tick_count += 1
+        if tick_count > 0:
+            average_speed = speed_sum / tick_count
+            average_jump_count = jump_count / tick_count
+            average_fall_count = fall_count / tick_count
+        else:
+            average_speed = 0
+            average_jump_count = 0
+            average_fall_count = 0
+        print("Average speed: ", average_speed)
+        print("Jump count: ", jump_count)
+        
         if done or reward < -10:
             break
         # print(render)
@@ -123,7 +148,7 @@ def simulate_environment(
             print(action_probabilities)
             env.render()
 
-    return info, cum_reward
+    return info, cum_reward, average_speed, average_jump_count
 
 
 def fetch_network_genome(api_url, queue: Queue):
@@ -178,7 +203,7 @@ def simulation(queue: Queue, render: bool):
         )
         network_processor = network_processor_factory.createProcessor(network_genome)
         # print("starting simulation " + str(data[0]))
-        info, cum_reward = simulate_environment(network_processor, env, render)
+        info, cum_reward, average_speed, average_jump_count, average_fall_count = simulate_environment(network_processor, env, render)
         # print(info)
         
         requests.post(
@@ -196,6 +221,9 @@ def simulation(queue: Queue, render: bool):
                 "life": int(info["life"]),
                 "flagGet": bool(info["flag_get"]),
                 "status": str(info["status"]),
+                "averageSpeed": float(average_speed),
+                "averageJumpCount": float(average_jump_count),
+                "averageFallCount": float(average_fall_count)
             },
         )
         env.reset()
