@@ -148,7 +148,7 @@ def simulate_environment(
             print(action_probabilities)
             env.render()
 
-    return info, cum_reward, average_speed, average_jump_count
+    return info, cum_reward, average_speed, average_jump_count, average_fall_count
 
 
 def fetch_network_genome(api_url, queue: Queue):
