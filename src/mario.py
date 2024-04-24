@@ -104,7 +104,7 @@ def simulate_environment(
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        movement_threshold = 64  # Define a threshold for movement reset
+        movement_threshold = 16  # Define a threshold for movement reset
         if abs(x_pos - x_pos_prev) < movement_threshold:
             no_movement_count += 1
         else:
@@ -169,7 +169,7 @@ def fetch_network_genome(api_url, queue: Queue):
 
 
 def simulation(queue: Queue, render: bool):
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while not queue.empty():
