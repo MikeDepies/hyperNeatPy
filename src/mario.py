@@ -37,17 +37,20 @@ def simulate_environment(
 ):
     width = 16
     height = 15
-    bias_coords = [(0,0,-.5)]
+    bias_coords = [(0, 0, -0.5)]
     input_coords = [
-        (x, y, -1) for x in np.linspace(-1, 1, width) for y in np.linspace(-1, 1, height) # for z in np.linspace(-.1, .1, 3)
+        (x, y, -1)
+        for x in np.linspace(-1, 1, width)
+        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
-     [
-        (x, y, z)
-        for x in np.linspace(-1, 1, round(width/2))
-        for y in np.linspace(-1, 1, round(height/2))
-    ] for z in np.linspace(-.5, .5, round(3))
+        [
+            (x, y, z)
+            for x in np.linspace(-1, 1, round(width / 2))
+            for y in np.linspace(-1, 1, round(height / 2))
+        ]
+        for z in np.linspace(-0.5, 0.5, round(3))
     ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
@@ -64,7 +67,7 @@ def simulate_environment(
     #     for y in np.linspace(-1, 1, round(12))
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
-    output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12) ]
+    output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12)]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork2(substrate, cppn_query_instance)
@@ -72,9 +75,9 @@ def simulate_environment(
     done = False
     x_pos_prev = 40
     y_pos_prev = 0
-    no_movement_count = 20*5
+    no_movement_count = 20 * 5
     cum_reward = 0
-    action_values = torch.tensor([0,0,0,0,0,0,0,0,0, 0, 0, 0])
+    action_values = torch.tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     speed_sum = 0
     tick_count = 0
     average_speed = 0
@@ -83,21 +86,19 @@ def simulate_environment(
     jump_count = 0
     fall_count = 0
     x_pos_prev_movement = 40
-    for step in range(20 * 200 *8):
+    for step in range(20 * 200 * 8):
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values = network.forward(torch_input).flatten()
         # softmax = torch.nn.Softmax(dim=0)
-        action_probabilities = action_values#softmax(action_values)
-        action = torch.argmax(
-            action_probabilities
-        )
+        action_probabilities = action_values  # softmax(action_values)
+        action = torch.argmax(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
-            # if render:
-            #     print("action < 0.5")
-            # action = torch.tensor(0)
-        
+        # if render:
+        #     print("action < 0.5")
+        # action = torch.tensor(0)
+
         state, reward, done, info = env.step(action.item())
         cum_reward += reward
         x_pos = info["x_pos"]
@@ -107,16 +108,16 @@ def simulate_environment(
             no_movement_count += 1
         else:
             x_pos_prev = x_pos
-            
+
             no_movement_count = 0
-        if no_movement_count >= 20*20:
+        if no_movement_count >= 20 * 20:
             break
         if y_pos > y_pos_prev:
             jump_count += 1
         if y_pos < y_pos_prev:
             fall_count += 1
         # Measure the average speed of Mario
-        if (tick_count > 0):
+        if tick_count > 0:
             speed_sum += abs(x_pos - x_pos_prev_movement)
         tick_count += 1
         if tick_count > 0:
@@ -166,7 +167,6 @@ def fetch_network_genome(api_url, queue: Queue):
             time.sleep(1)
 
 
-
 def simulation(queue: Queue, render: bool):
     env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
@@ -181,9 +181,11 @@ def simulation(queue: Queue, render: bool):
         )
         network_processor = network_processor_factory.createProcessor(network_genome)
         # print("starting simulation " + str(data[0]))
-        info, cum_reward, average_speed, average_jump_count, average_fall_count = simulate_environment(network_processor, env, render)
+        info, cum_reward, average_speed, average_jump_count, average_fall_count = (
+            simulate_environment(network_processor, env, render)
+        )
         # print(info)
-        
+
         requests.post(
             "http://192.168.0.100:8080/score",
             json={
@@ -201,7 +203,7 @@ def simulation(queue: Queue, render: bool):
                 "status": str(info["status"]),
                 "averageSpeed": float(average_speed),
                 "averageJumpCount": float(average_jump_count),
-                "averageFallCount": float(average_fall_count)
+                "averageFallCount": float(average_fall_count),
             },
         )
         env.reset()
