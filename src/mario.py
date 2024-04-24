@@ -44,10 +44,11 @@ def simulate_environment(
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
      [
-        (x, y, 0)
+        (x, y, z)
         for x in np.linspace(-1, 1, round(width/2))
-        for y in np.linspace(-.5, .5, round(height/2))
-    ]  ]
+        for y in np.linspace(-1, 1, round(height/2))
+    ] for z in np.linspace(-.5, .5, round(3))
+    ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
     # top_k = 10
@@ -230,9 +231,9 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(3):
 
-            p = Process(target=simulation, args=(queue, i < 1))
+            p = Process(target=simulation, args=(queue, True))
             p.start()
             processes.append(p)
 
