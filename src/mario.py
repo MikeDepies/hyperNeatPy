@@ -47,8 +47,8 @@ def simulate_environment(
     hidden_coords = [
         [
             (x, y, z)
-            for x in np.linspace(-1, 1, round(width / 2))
-            for y in np.linspace(-1, 1, round(height / 2))
+            for x in np.linspace(-1, 1, round(width ))
+            for y in np.linspace(-1, 1, round(height))
         ]
         for z in np.linspace(-0.5, 0.5, round(3))
     ]
@@ -143,7 +143,7 @@ def simulate_environment(
             # print(network.hidden_output_weights)
             # print(action)
             # print(action_probabilities[action.item()])
-            print(action_probabilities)
+            # print(action_probabilities)
             env.render()
 
     return info, cum_reward, average_speed, average_jump_count, average_fall_count
