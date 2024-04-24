@@ -67,7 +67,9 @@ def simulate_environment(
     #     for y in np.linspace(-1, 1, round(12))
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
-    output_coords = [(x, y, 1) for x in np.linspace(-1, 1, 12) for y in np.linspace(-1, 1, 12)]
+    output_width = 12
+    output_height = 24
+    output_coords = [(x, y, 1) for x in np.linspace(-1, 1, output_width) for y in np.linspace(-1, 1, output_height)]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork2(substrate, cppn_query_instance)
@@ -90,9 +92,9 @@ def simulate_environment(
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
-        action_values : np.ndarray = network.forward(torch_input).reshape(12, 12)
+        action_values : np.ndarray = network.forward(torch_input).reshape(output_width, output_height)
         softmax = torch.nn.Softmax(dim=-1)
-        action_probabilities = action_values.sum(axis=0).softmax(dim=-1)  # softmax(action_values)
+        action_probabilities = action_values.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
@@ -141,7 +143,7 @@ def simulate_environment(
             # print(network.hidden_output_weights)
             # print(action)
             # print(action_probabilities[action.item()])
-            # print(action_probabilities)
+            print(action_probabilities)
             env.render()
 
     return info, cum_reward, average_speed, average_jump_count, average_fall_count
@@ -218,6 +220,18 @@ def rgb2gray(rgb):
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--num_instances', type=int, default=8,
+                        help='number of instances to run')
+    parser.add_argument('--render', type=bool, default=False,
+                        help='render the environment')
+
+    args = parser.parse_args()
+
+    num_instances = args.num_instances
+    render = args.render
     manager = Manager()
     queue = manager.Queue(10)
     api_url = "http://192.168.0.100:8080/networkGenome"
@@ -234,9 +248,9 @@ if __name__ == "__main__":
 
         processes = []
 
-        for i in range(20):
+        for i in range(num_instances):
 
-            p = Process(target=simulation, args=(queue, False))
+            p = Process(target=simulation, args=(queue, render))
             p.start()
             processes.append(p)
 
