@@ -37,7 +37,7 @@ def simulate_environment(
 ):
     width = 16
     height = 15
-    bias_coords = [(0, 0, -0.5)]
+    bias_coords = [(0, 0, -1.5)]
     input_coords = [
         (x, y, -1)
         for x in np.linspace(-1, 1, width)
@@ -67,7 +67,7 @@ def simulate_environment(
     #     for y in np.linspace(-1, 1, round(12))
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
-    output_coords = [(x, 0, 1) for x in np.linspace(-1, 1, 12)]
+    output_coords = [(x, y, 1) for x in np.linspace(-1, 1, 12) for y in np.linspace(-1, 1, 12)]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork2(substrate, cppn_query_instance)
@@ -90,10 +90,11 @@ def simulate_environment(
         image = (rescale(rgb2gray(state), 1 / 16) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
-        action_values = network.forward(torch_input).flatten()
-        # softmax = torch.nn.Softmax(dim=0)
-        action_probabilities = action_values  # softmax(action_values)
+        action_values : np.ndarray = network.forward(torch_input).reshape(12, 12)
+        softmax = torch.nn.Softmax(dim=-1)
+        action_probabilities = action_values.sum(axis=0).softmax(dim=-1)  # softmax(action_values)
         action = torch.argmax(action_probabilities)
+        # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
         # if render:
         #     print("action < 0.5")
@@ -138,9 +139,9 @@ def simulate_environment(
         if render:
             # print(network.input_hidden_weights)
             # print(network.hidden_output_weights)
-            print(action)
-            print(action_probabilities[action.item()])
-            print(action_probabilities)
+            # print(action)
+            # print(action_probabilities[action.item()])
+            # print(action_probabilities)
             env.render()
 
     return info, cum_reward, average_speed, average_jump_count, average_fall_count
@@ -235,7 +236,7 @@ if __name__ == "__main__":
 
         for i in range(20):
 
-            p = Process(target=simulation, args=(queue, i < 1))
+            p = Process(target=simulation, args=(queue, False))
             p.start()
             processes.append(p)
 
