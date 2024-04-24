@@ -225,13 +225,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--num_instances', type=int, default=8,
                         help='number of instances to run')
-    parser.add_argument('--render', type=bool, default=False,
+    parser.add_argument('--should_render', type=bool, default=False,
                         help='render the environment')
 
     args = parser.parse_args()
 
     num_instances = args.num_instances
-    render = args.render
+    should_render = args.should_render
+    print(should_render)
+    print(num_instances)
     manager = Manager()
     queue = manager.Queue(10)
     api_url = "http://192.168.0.100:8080/networkGenome"
@@ -250,7 +252,7 @@ if __name__ == "__main__":
 
         for i in range(num_instances):
 
-            p = Process(target=simulation, args=(queue, render))
+            p = Process(target=simulation, args=(queue, should_render))
             p.start()
             processes.append(p)
 
