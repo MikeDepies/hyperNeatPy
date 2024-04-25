@@ -51,7 +51,7 @@ def simulate_environment(
             for x in np.linspace(-1, 1, round(width / 2))
             for y in np.linspace(-1, 1, round(height / 2))
         ]
-        for z in np.linspace(-0.5, 0.5, round(10))
+        for z in np.linspace(-0.5, 0.5, round(5))
     ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
@@ -69,7 +69,7 @@ def simulate_environment(
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
     output_width = 12
-    output_height = 24
+    output_height = 48
     output_coords = [(x, y, 1) for x in np.linspace(-1, 1, output_width) for y in np.linspace(-1, 1, output_height)]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
@@ -78,7 +78,7 @@ def simulate_environment(
     done = False
     x_pos_prev = 40
     y_pos_prev = 0
-    no_movement_count = 20 * 5
+    no_movement_count = 20 * 190
     cum_reward = 0
     action_values = torch.tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     speed_sum = 0
@@ -114,7 +114,7 @@ def simulate_environment(
             x_pos_prev = x_pos
 
             no_movement_count = 0
-        if no_movement_count >= 20 * 20:
+        if no_movement_count >= 20 * 200:
             break
         if y_pos > y_pos_prev:
             jump_count += 1
