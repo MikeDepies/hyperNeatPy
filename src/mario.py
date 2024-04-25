@@ -146,7 +146,7 @@ def simulate_environment(
             # print(action_probabilities[action.item()])
             # print(action_probabilities)
             env.render()
-    if done:
+    if info["flag_get"]:
         info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
     return info, cum_reward, average_speed, average_jump_count, average_fall_count
 
