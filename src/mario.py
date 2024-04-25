@@ -20,6 +20,7 @@ from Network import (
     TaskNetwork2,
     json_to_network_genome,
 )
+from stageLengthMap import stageLengthMap
 
 # from Network import CPPNConnectionQuery, NetworkProcessor, Substrate, TaskNetwork
 
@@ -145,7 +146,8 @@ def simulate_environment(
             # print(action_probabilities[action.item()])
             # print(action_probabilities)
             env.render()
-
+    if done:
+        info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
     return info, cum_reward, average_speed, average_jump_count, average_fall_count
 
 
