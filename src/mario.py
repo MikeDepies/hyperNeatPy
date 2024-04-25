@@ -51,7 +51,7 @@ def simulate_environment(
             for x in np.linspace(-1, 1, round(width / 2))
             for y in np.linspace(-1, 1, round(height / 2))
         ]
-        for z in np.linspace(-0.5, 0.5, round(5))
+        for z in np.linspace(-0.5, 0.5, round(10))
     ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
