@@ -94,8 +94,11 @@ def simulate_environment(
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values : np.ndarray = network.forward(torch_input).reshape(output_width, output_height)
-        softmax = torch.nn.Softmax(dim=-1)
-        action_probabilities = action_values.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
+        K = 3
+        top_values, top_indices = torch.topk(action_values, K, dim=1)
+        result = torch.zeros_like(action_values)
+        result.scatter_(1, top_indices, top_values)
+        action_probabilities = result.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
