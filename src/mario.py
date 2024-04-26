@@ -78,7 +78,7 @@ def simulate_environment(
     done = False
     x_pos_prev = 40
     y_pos_prev = 0
-    no_movement_count = 20 * 190
+    no_movement_count = 0
     cum_reward = 0
     action_values = torch.tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     speed_sum = 0
