@@ -69,6 +69,7 @@ def simulate_environment(
     #     for y in np.linspace(-1, 1, round(12))
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
+    status :str = "small"	#Mario's status, i.e., {'small', 'tall', 'fireball'}
     output_width = 12
     output_height = 12
     output_coords = [(x, y, 1) for x in np.linspace(-1, 1, output_width) for y in np.linspace(-1, 1, output_height)]
@@ -87,19 +88,27 @@ def simulate_environment(
     average_speed = 0
     average_jump_count = 0
     average_fall_count = 0
+    average_small_status_count = 0
+    average_tall_status_count = 0
+    average_fireball_status_count = 0
     jump_count = 0
     fall_count = 0
+    small_status_count = 0
+    tall_status_count = 0
+    fireball_status_count = 0
     x_pos_prev_movement = 40
     for step in range(20 * 200 * 8):
         image = (rescale(rgb2gray(state), scale) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values : np.ndarray = network.forward(torch_input).reshape(output_width, output_height)
-        K = 3
-        top_values, top_indices = torch.topk(action_values, K, dim=1)
-        result = torch.zeros_like(action_values)
-        result.scatter_(1, top_indices, top_values)
-        action_probabilities = result.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
+        
+        # K = 3
+        # top_values, top_indices = torch.topk(action_values, K, dim=1)
+        # result = torch.zeros_like(action_values)
+        # result.scatter_(1, top_indices, top_values)
+        # action_probabilities = result.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
+        action_probabilities = (action_values.softmax(dim=1) * action_values.softmax(dim=0)).sum(dim=1)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
@@ -125,6 +134,12 @@ def simulate_environment(
         if y_pos < y_pos_prev:
             fall_count += 1
         # Measure the average speed of Mario
+        if info["status"] == "small":
+            small_status_count += 1
+        if info["status"] == "tall":
+            tall_status_count += 1
+        if info["status"] == "fireball":
+            fireball_status_count += 1
         if tick_count > 0:
             speed_sum += abs(x_pos - x_pos_prev_movement)
         tick_count += 1
@@ -132,6 +147,9 @@ def simulate_environment(
             average_speed = speed_sum / tick_count
             average_jump_count = (jump_count + fall_count) / tick_count
             average_fall_count = fall_count / tick_count
+            average_small_status_count = small_status_count / tick_count
+            average_tall_status_count = tall_status_count / tick_count
+            average_fireball_status_count = fireball_status_count / tick_count
         else:
             average_speed = 0
             average_jump_count = 0
@@ -152,7 +170,7 @@ def simulate_environment(
             env.render()
     if info["flag_get"]:
         info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
-    return info, cum_reward, average_speed, average_jump_count, average_fall_count
+    return info, cum_reward, average_speed, average_jump_count, average_fall_count, average_small_status_count, average_tall_status_count, average_fireball_status_count
 
 
 def fetch_network_genome(api_url, queue: Queue):
@@ -190,7 +208,7 @@ def simulation(queue: Queue, render: bool):
         )
         network_processor = network_processor_factory.createProcessor(network_genome)
         # print("starting simulation " + str(data[0]))
-        info, cum_reward, average_speed, average_jump_count, average_fall_count = (
+        info, cum_reward, average_speed, average_jump_count, average_fall_count, average_small_status_count, average_tall_status_count, average_fireball_status_count = (
             simulate_environment(network_processor, env, render)
         )
         # print(info)
@@ -213,6 +231,9 @@ def simulation(queue: Queue, render: bool):
                 "averageSpeed": float(average_speed),
                 "averageJumpCount": float(average_jump_count),
                 "averageFallCount": float(average_fall_count),
+                "averageSmallStatusCount": float(average_small_status_count),
+                "averageTallStatusCount": float(average_tall_status_count),
+                "averageFireballStatusCount": float(average_fireball_status_count),
             },
         )
         env.reset()
