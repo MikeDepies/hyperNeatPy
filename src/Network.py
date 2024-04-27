@@ -380,7 +380,7 @@ class TaskNetwork2(torch.nn.Module):
         self.hidden_activations[0] = torch.sigmoid(self.hidden_activations[0])  # Activation function
         for i in range(len(self.substrate.hidden_coords)-1):
             # print("no loop")  + torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1]) 
-            self.hidden_activations[i+1] = torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i])+ self.hidden_bias_weights[i+1]  + torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1]) 
+            self.hidden_activations[i+1] = torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i])+ self.hidden_bias_weights[i+1]  #+ torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1]) 
             self.hidden_activations[i+1] = torch.sigmoid(self.hidden_activations[i+1])  # Activation function
         # self.hidden_activations = hidden_activations
         # Apply hidden to output connections
