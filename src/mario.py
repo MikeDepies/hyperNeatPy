@@ -108,7 +108,7 @@ def simulate_environment(
         # result = torch.zeros_like(action_values)
         # result.scatter_(1, top_indices, top_values)
         # action_probabilities = result.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
-        action_probabilities = (action_values.softmax(dim=1) * action_values.softmax(dim=0)).sum(dim=1)
+        action_probabilities = (action_values.softmax(dim=1) * action_values.softmax(dim=0)).sum(dim=1) #.softmax(dim=-1)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
