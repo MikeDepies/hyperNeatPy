@@ -37,8 +37,8 @@ def simulate_environment(
     render: bool,
 ):
     scale = 1/8
-    width = 256 * scale
-    height = 240 * scale
+    width = round(256 * scale)
+    height = round(240 * scale)
     bias_coords = [(0, 0, -1.5)]
     input_coords = [
         (x, y, -1)
