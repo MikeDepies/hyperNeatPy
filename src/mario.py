@@ -91,7 +91,7 @@ def simulate_environment(
     fall_count = 0
     x_pos_prev_movement = 40
     for step in range(20 * 200 * 8):
-        image = (rescale(rgb2gray(state), 1 / scale) / 127.5) - 1
+        image = (rescale(rgb2gray(state), scale) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values : np.ndarray = network.forward(torch_input).reshape(output_width, output_height)
