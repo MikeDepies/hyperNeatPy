@@ -32,3 +32,19 @@ class SelfAttention(nn.Module):
         dot = torch.bmm(queries, keys.transpose(1, 2))  # (b, t, t)
         scaled_dot = torch.div(dot, math.sqrt(k))
         return scaled_dot
+
+
+def calculate_patches(image_height, image_width, patch_height, patch_width, stride_height, stride_width):
+    # Calculate number of patches along height
+    n_height = (image_height - patch_height) // stride_height + 1
+    
+    # Calculate number of patches along width
+    n_width = (image_width - patch_width) // stride_width + 1
+    
+    # Handle cases where there is no room for even one patch
+    if n_height < 0 or n_width < 0:
+        return 0
+
+    # Calculate total number of patches
+    total_patches = n_height * n_width
+    return total_patches

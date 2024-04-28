@@ -20,6 +20,7 @@ from Network import (
     TaskNetwork2,
     json_to_network_genome,
 )
+from SelfAttention import SelfAttention, calculate_patches
 from stageLengthMap import stageLengthMap
 
 # from Network import CPPNConnectionQuery, NetworkProcessor, Substrate, TaskNetwork
@@ -47,10 +48,10 @@ def simulate_environment(
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
-        (x, y, -.5) 
+        (x, y, -0.5)
         for y in np.linspace(-1, 1, height)
-        for x in np.linspace(-1, 1, width) 
-        ]
+        for x in np.linspace(-1, 1, width)
+    ]
     hidden_coords = [
         [
             (x, y, 0)
@@ -59,6 +60,9 @@ def simulate_environment(
         ]
         # for z in np.linspace(-0.9, 0.9, round(1))
     ]
+    num_patches = calculate_patches(height, width, 7, 7, 4, 4)
+    query_dim = 12
+
     # patch_size = 7
     # patch_stride = 4
     # n = int((image_size - patch_size) / patch_stride + 1)
@@ -97,6 +101,11 @@ def simulate_environment(
     ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
+    weights_q = torch.randn(num_patches, query_dim)
+    weights_k = torch.randn(num_patches, query_dim)
+    bias_q = torch.randn(num_patches)
+    bias_k = torch.randn(num_patches)
+    self_attention = SelfAttention(weights_q, weights_k, bias_q, bias_k)
     network = TaskNetwork2(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -136,7 +145,9 @@ def simulate_environment(
         # print(action_values)
         # print(action_values.softmax(dim=1))
 
-        action_probabilities = (action_values.softmax(dim=0) * action_values.softmax(dim=1)).sum(
+        action_probabilities = (
+            action_values.softmax(dim=0) * action_values.softmax(dim=1)
+        ).sum(
             dim=1
         )  # .softmax(dim=-1)
         action = torch.argmax(action_probabilities)
