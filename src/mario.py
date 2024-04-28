@@ -36,7 +36,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 1/16
+    scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -1.5)]
@@ -69,10 +69,14 @@ def simulate_environment(
     #     for y in np.linspace(-1, 1, round(12))
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
-    status :str = "small"	#Mario's status, i.e., {'small', 'tall', 'fireball'}
+    status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
     output_width = 12
     output_height = 36
-    output_coords = [(x, y, 1) for x in np.linspace(-1, 1, output_width) for y in np.linspace(-1, 1, output_height)]
+    output_coords = [
+        (x, y, 1)
+        for y in np.linspace(-1, 1, output_height)
+        for x in np.linspace(-1, 1, output_width)
+    ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
     network = TaskNetwork2(substrate, cppn_query_instance)
@@ -101,8 +105,10 @@ def simulate_environment(
         image = (rescale(rgb2gray(state), scale) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
-        action_values : np.ndarray = network.forward(torch_input).reshape(output_width, output_height)
-        
+        action_values: np.ndarray = network.forward(torch_input).reshape(
+            output_width, output_height
+        )
+
         # K = 3
         # top_values, top_indices = torch.topk(action_values, K, dim=1)
         # result = torch.zeros_like(action_values)
@@ -112,7 +118,9 @@ def simulate_environment(
         # print(action_values)
         # print(action_values.softmax(dim=1))
 
-        action_probabilities = (action_values.softmax(dim=0)).sum(dim=1) #.softmax(dim=-1)
+        action_probabilities = (action_values.softmax(dim=0)).sum(
+            dim=1
+        )  # .softmax(dim=-1)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
@@ -174,7 +182,16 @@ def simulate_environment(
             env.render()
     if info["flag_get"]:
         info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
-    return info, cum_reward, average_speed, average_jump_count, average_fall_count, average_small_status_count, average_tall_status_count, average_fireball_status_count
+    return (
+        info,
+        cum_reward,
+        average_speed,
+        average_jump_count,
+        average_fall_count,
+        average_small_status_count,
+        average_tall_status_count,
+        average_fireball_status_count,
+    )
 
 
 def fetch_network_genome(api_url, queue: Queue):
@@ -212,9 +229,16 @@ def simulation(queue: Queue, render: bool):
         )
         network_processor = network_processor_factory.createProcessor(network_genome)
         # print("starting simulation " + str(data[0]))
-        info, cum_reward, average_speed, average_jump_count, average_fall_count, average_small_status_count, average_tall_status_count, average_fireball_status_count = (
-            simulate_environment(network_processor, env, render)
-        )
+        (
+            info,
+            cum_reward,
+            average_speed,
+            average_jump_count,
+            average_fall_count,
+            average_small_status_count,
+            average_tall_status_count,
+            average_fireball_status_count,
+        ) = simulate_environment(network_processor, env, render)
         # print(info)
 
         requests.post(
@@ -253,11 +277,13 @@ def rgb2gray(rgb):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--num_instances', type=int, default=8,
-                        help='number of instances to run')
-    parser.add_argument('--should_render', type=bool, default=False,
-                        help='render the environment')
+    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser.add_argument(
+        "--num_instances", type=int, default=8, help="number of instances to run"
+    )
+    parser.add_argument(
+        "--should_render", type=bool, default=False, help="render the environment"
+    )
 
     args = parser.parse_args()
 
