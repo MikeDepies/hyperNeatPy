@@ -52,7 +52,7 @@ def simulate_environment(
             for y in np.linspace(-1, 1, round(height / 2))
             for x in np.linspace(-1, 1, round(width / 2))
         ]
-        for z in np.linspace(-0.9, 0.9, round(30))
+        for z in np.linspace(-0.9, 0.9, round(10))
     ]
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
@@ -118,7 +118,7 @@ def simulate_environment(
         # print(action_values)
         # print(action_values.softmax(dim=1))
 
-        action_probabilities = (action_values.softmax(dim=0)).sum(
+        action_probabilities = (action_values.softmax(dim=0) * action_values.softmax(dim=1)).sum(
             dim=1
         )  # .softmax(dim=-1)
         action = torch.argmax(action_probabilities)
