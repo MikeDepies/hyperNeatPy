@@ -7,7 +7,7 @@ width = 4
 height = 8
 bias_coords = [(0,0,-2)]
 input_coords = [
-    (x,y) for x in np.linspace(1, width, width) for y in np.linspace(1, height, height)
+    (x,y) for x in np.linspace(1, width, width) for y in np.linspace(-1, 1, 1)
 ]
 
 m = torch.tensor([
