@@ -11,11 +11,11 @@ class SelfAttention(nn.Module):
         self.dim_q = weights_q.size()[1]
 
         # Initialize weights and biases for queries and keys
-        self.weights_q = nn.Parameter(weights_q)
-        self.bias_q = nn.Parameter(bias_q)
+        self.weights_q = weights_q
+        self.bias_q = bias_q
 
-        self.weights_k = nn.Parameter(weights_k)
-        self.bias_k = nn.Parameter(bias_k)
+        self.weights_k = weights_k
+        self.bias_k = bias_k
 
     def forward(self, input_data):
         # Expect input_data to be of shape (b, t, k).

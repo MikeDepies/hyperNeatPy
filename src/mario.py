@@ -46,6 +46,11 @@ def simulate_environment(
         for x in np.linspace(-1, 1, width)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
+    attention_coords = [
+        (x, y, -.5) 
+        for y in np.linspace(-1, 1, height)
+        for x in np.linspace(-1, 1, width) 
+        ]
     hidden_coords = [
         [
             (x, y, 0)
@@ -54,6 +59,19 @@ def simulate_environment(
         ]
         # for z in np.linspace(-0.9, 0.9, round(1))
     ]
+    # patch_size = 7
+    # patch_stride = 4
+    # n = int((image_size - patch_size) / patch_stride + 1)
+    # offset = self._patch_size // 2
+    # patch_centers = []
+    # for i in range(n):
+    #     patch_center_row = offset + i * patch_stride
+    #     for j in range(n):
+    #         patch_center_col = offset + j * patch_stride
+    #         patch_centers.append([patch_center_row, patch_center_col])
+    # self._patch_centers = torch.tensor(patch_centers).float()
+
+    # num_patches = n ** 2
     # for z in np.linspace(-.5, .5, round(3))
     # data_dim = 3
     # top_k = 10
