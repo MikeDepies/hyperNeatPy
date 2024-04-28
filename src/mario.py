@@ -42,15 +42,15 @@ def simulate_environment(
     bias_coords = [(0, 0, -1.5)]
     input_coords = [
         (x, y, -1)
-        for x in np.linspace(-1, 1, width)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
+        for x in np.linspace(-1, 1, width)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     hidden_coords = [
         [
             (x, y, z)
-            for x in np.linspace(-1, 1, round(width / 2))
             for y in np.linspace(-1, 1, round(height / 2))
+            for x in np.linspace(-1, 1, round(width / 2))
         ]
         for z in np.linspace(-0.9, 0.9, round(30))
     ]
