@@ -71,7 +71,7 @@ def simulate_environment(
     # ]
     status :str = "small"	#Mario's status, i.e., {'small', 'tall', 'fireball'}
     output_width = 12
-    output_height = 12
+    output_height = 36
     output_coords = [(x, y, 1) for x in np.linspace(-1, 1, output_width) for y in np.linspace(-1, 1, output_height)]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
@@ -108,7 +108,11 @@ def simulate_environment(
         # result = torch.zeros_like(action_values)
         # result.scatter_(1, top_indices, top_values)
         # action_probabilities = result.sum(axis=1).softmax(dim=-1)  # softmax(action_values)
-        action_probabilities = (action_values.softmax(dim=1) * action_values.softmax(dim=0)).sum(dim=1) #.softmax(dim=-1)
+        # * action_values.softmax(dim=0)
+        # print(action_values)
+        # print(action_values.softmax(dim=1))
+
+        action_probabilities = (action_values.softmax(dim=0)).sum(dim=1) #.softmax(dim=-1)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
