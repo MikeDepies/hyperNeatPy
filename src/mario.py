@@ -37,7 +37,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 1 / 8
+    scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -1.5)]
@@ -245,7 +245,7 @@ def fetch_network_genome(api_url, queue: Queue):
 
 
 def simulation(queue: Queue, render: bool):
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while not queue.empty():
