@@ -55,10 +55,10 @@ def simulate_environment(
     hidden_coords = [
         [
             (x, y, z)
-            for y in np.linspace(-1, 1, round(5))
-            for x in np.linspace(-1, 1, round(5))
+            for y in np.linspace(-1, 1, round(8))
+            for x in np.linspace(-1, 1, round(8))
         ]
-        for z in np.linspace(-0.9, 0.9, round(100))
+        for z in np.linspace(-0.9, 0.9, round(10))
     ]
     num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     query_dim = 12
