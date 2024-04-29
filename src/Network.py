@@ -22,6 +22,7 @@ class Node:
             self.output_value = self.input_value
         else:
             self.output_value = self.activation_function(self.input_value + self.bias)
+        self.input_value = 0.0
 
 class Connection:
     def __init__(self, input_node_id: int, output_node_id: int, weight: float):
@@ -74,8 +75,8 @@ class NetworkProcessorSimple(NetworkProcessor):
         self.node_map = {node.id: node for node in network.nodes}
 
     def feedforward(self, input_values: List[float]) -> List[float]:
-        for node in self.network.nodes:
-            node.input_value = 0.0
+        # for node in self.network.nodes:
+        #     node.input_value = 0.0
 
         for index, node in enumerate(self.input_nodes):
             node.input_value = input_values[index]
