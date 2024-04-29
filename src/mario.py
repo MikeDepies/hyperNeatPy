@@ -37,7 +37,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 1 / 8
+    scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -1.5)]
@@ -54,11 +54,11 @@ def simulate_environment(
     ]
     hidden_coords = [
         [
-            (x, y, 0)
-            for y in np.linspace(-1, 1, round(12))
-            for x in np.linspace(-1, 1, round(12))
+            (x, y, z)
+            for y in np.linspace(-1, 1, round(5))
+            for x in np.linspace(-1, 1, round(5))
         ]
-        # for z in np.linspace(-0.9, 0.9, round(1))
+        for z in np.linspace(-0.9, 0.9, round(100))
     ]
     num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     query_dim = 12
@@ -93,7 +93,7 @@ def simulate_environment(
     # ]
     status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
     output_width = 12
-    output_height = 36
+    output_height = 12
     output_coords = [
         (x, y, 1)
         for y in np.linspace(-1, 1, output_height)
