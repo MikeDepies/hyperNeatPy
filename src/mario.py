@@ -37,7 +37,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 1 / 4
+    scale = 1 / 8
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -1.5)]
@@ -55,8 +55,8 @@ def simulate_environment(
     hidden_coords = [
         [
             (x, y, 0)
-            for y in np.linspace(-1, 1, round(2))
-            for x in np.linspace(-1, 1, round(2))
+            for y in np.linspace(-1, 1, round(12))
+            for x in np.linspace(-1, 1, round(12))
         ]
         # for z in np.linspace(-0.9, 0.9, round(1))
     ]
