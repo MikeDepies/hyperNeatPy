@@ -227,7 +227,7 @@ def simulation(queue: Queue, render: bool, scale: float, output_width: int, outp
     env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
-    while not queue.empty():
+    while True:
         data = queue.get()
         network : TaskNetwork2 = data[1]
         
@@ -328,7 +328,7 @@ if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(num_instances)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    for i in range(round(num_instances/2)):
+    for i in range(round(num_instances/4)):
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
