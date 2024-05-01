@@ -60,8 +60,8 @@ def simulate_environment(
         ]
         for z in np.linspace(-0.9, 0.9, round(20))
     ]
-    num_patches = calculate_patches(height, width, 7, 7, 4, 4)
-    query_dim = 12
+    # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
+    # query_dim = 12
 
     # patch_size = 7
     # patch_stride = 4
@@ -101,11 +101,11 @@ def simulate_environment(
     ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
-    weights_q = torch.randn(num_patches, query_dim)
-    weights_k = torch.randn(num_patches, query_dim)
-    bias_q = torch.randn(num_patches)
-    bias_k = torch.randn(num_patches)
-    self_attention = SelfAttention(weights_q, weights_k, bias_q, bias_k)
+    # weights_q = torch.randn(num_patches, query_dim)
+    # weights_k = torch.randn(num_patches, query_dim)
+    # bias_q = torch.randn(num_patches)
+    # bias_k = torch.randn(num_patches)
+    # self_attention = SelfAttention(weights_q, weights_k, bias_q, bias_k)
     network = TaskNetwork2(substrate, cppn_query_instance)
     state: np.ndarray = env.reset()
     done = False
@@ -211,6 +211,8 @@ def simulate_environment(
             env.render()
     # if info["flag_get"]:
     #     info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
+    if info["stage"] == 4 and info["x_pos"] < reward:
+        reward = info["x_pos"] - (400 - info["time"])
     return (
         info,
         cum_reward,
