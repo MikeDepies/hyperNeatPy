@@ -38,15 +38,15 @@ class Network:
 class DefaultActivationFunctionMapper:
     def map(self, activationFunction: ActivationFunction) -> ActivationFunctionType:
         return {
-            ActivationFunction.IDENTITY: lambda x: max(-1.0, min(1.0, x)),
-            ActivationFunction.SIGMOID: lambda x: max(-1.0, min(1.0, 1 / (1 + exp(-x)))),
-            ActivationFunction.TANH: lambda x: max(-1.0, min(1.0, tanh(x))),
-            ActivationFunction.RELU: lambda x: max(-1.0, min(1.0, max(0.0, x))),
-            ActivationFunction.GAUSSIAN: lambda x: max(-1.0, min(1.0, exp(-x ** 2.0))),
-            ActivationFunction.SINE: lambda x: max(-1.0, min(1.0, sin(x))),
-            ActivationFunction.COS: lambda x: max(-1.0, min(1.0, cos(x))),
-            ActivationFunction.ABS: lambda x: max(-1.0, min(1.0, abs(x))),
-            ActivationFunction.STEP: lambda x: max(-1.0, min(1.0, 0.0 if x < 0 else 1.0))
+            ActivationFunction.IDENTITY: lambda x: x,
+            ActivationFunction.SIGMOID: lambda x: 1 / (1 + exp(-x)),
+            ActivationFunction.TANH: lambda x: tanh(x),
+            ActivationFunction.RELU: lambda x: max(0.0, x),
+            ActivationFunction.GAUSSIAN: lambda x: exp(-x ** 2.0),
+            ActivationFunction.SINE: lambda x: sin(x),
+            ActivationFunction.COS: lambda x: cos(x),
+            ActivationFunction.ABS: lambda x: abs(x),
+            ActivationFunction.STEP: lambda x: 0.0 if x < 0 else 1.0
         }[activationFunction]
 
 class NetworkBuilder:
