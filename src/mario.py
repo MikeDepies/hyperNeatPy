@@ -40,7 +40,7 @@ def simulate_environment(
     output_width: int,
     output_height: int,
 ):
-    
+
     # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     # query_dim = 12
 
@@ -73,7 +73,7 @@ def simulate_environment(
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
     status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
-    
+
     state: np.ndarray = env.reset()
     done = False
     x_pos_prev = 40
@@ -193,12 +193,11 @@ def simulate_environment(
 
 
 def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
-    
-    
+
     while True:
         # print("fetching")
         response = requests.get(api_url)
-        
+
         if response.status_code == 200:
             data = json.loads(response.text)
             # print(data)
@@ -208,7 +207,9 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                 network_processor_factory = NetworkProcessorFactory(
                     network_builder, False, 1, 0.01
                 )
-                network_processor = network_processor_factory.createProcessor(network_genome)
+                network_processor = network_processor_factory.createProcessor(
+                    network_genome
+                )
                 cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
                 network = TaskNetwork2(substrate, cppn_query_instance)
                 # print("Network genome found " + str(data["id"]))
@@ -223,14 +224,16 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             time.sleep(1)
 
 
-def simulation(queue: Queue, render: bool, scale: float, output_width: int, output_height: int):
+def simulation(
+    queue: Queue, render: bool, scale: float, output_width: int, output_height: int
+):
     env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
         data = queue.get()
-        network : TaskNetwork2 = data[1]
-        
+        network: TaskNetwork2 = data[1]
+
         # print("starting simulation " + str(data[0]))
         (
             info,
@@ -241,7 +244,9 @@ def simulation(queue: Queue, render: bool, scale: float, output_width: int, outp
             average_small_status_count,
             average_tall_status_count,
             average_fireball_status_count,
-        ) = simulate_environment(network, env, render, scale, output_width, output_height)
+        ) = simulate_environment(
+            network, env, render, scale, output_width, output_height
+        )
         # print(info)
 
         requests.post(
@@ -328,7 +333,7 @@ if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(num_instances)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    for i in range(round(num_instances/2)):
+    for i in range(round(num_instances / 2)):
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
@@ -336,20 +341,25 @@ if __name__ == "__main__":
                 queue,
                 substrate,
             ),
+            daemon=True,
         )
         queueProcess.start()
-        
-        
-    
+
     while True:
 
         processes = []
 
         for i in range(num_instances):
 
-            p = Process(target=simulation, args=(queue, should_render, scale, output_width, output_height))
+            p = Process(
+                target=simulation,
+                args=(queue, should_render, scale, output_width, output_height),
+                daemon=True,
+            )
             p.start()
+
             processes.append(p)
 
         for p in processes:
             p.join()
+            p.close()
