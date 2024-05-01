@@ -328,7 +328,7 @@ if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(num_instances)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    for i in range(1):
+    for i in range(num_instances/2):
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
