@@ -33,33 +33,14 @@ from stageLengthMap import stageLengthMap
 #     else:
 #         raise Exception(f"Failed to fetch network genome from {api_url}. Status code: {response.status_code}")
 def simulate_environment(
-    network_processor: NetworkProcessor,
+    network: TaskNetwork2,
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
+    scale: float,
+    output_width: int,
+    output_height: int,
 ):
-    scale = 1 / 8
-    width = round(256 * scale)
-    height = round(240 * scale)
-    bias_coords = [(0, 0, 0)]
-    input_coords = [
-        (x, y, -1)
-        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
-        for x in np.linspace(-1, 1, width)
-    ]
-    # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
-    attention_coords = [
-        (x, y, -0.5)
-        for y in np.linspace(-1, 1, height)
-        for x in np.linspace(-1, 1, width)
-    ]
-    hidden_coords = [
-        [
-            (x, y, z)
-            for y in np.linspace(-1, 1, round(8))
-            for x in np.linspace(-1, 1, round(8))
-        ]
-        for z in np.linspace(-0.9, -0.1, round(30))
-    ]
+    
     # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     # query_dim = 12
 
@@ -92,21 +73,7 @@ def simulate_environment(
     #     for z in np.linspace(-.9, .9, round(2))
     # ]
     status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
-    output_width = 12
-    output_height = 12
-    output_coords = [
-        (x, y, 1)
-        for y in np.linspace(-1, 1, output_height)
-        for x in np.linspace(-1, 1, output_width)
-    ]
-    substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
-    cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
-    # weights_q = torch.randn(num_patches, query_dim)
-    # weights_k = torch.randn(num_patches, query_dim)
-    # bias_q = torch.randn(num_patches)
-    # bias_k = torch.randn(num_patches)
-    # self_attention = SelfAttention(weights_q, weights_k, bias_q, bias_k)
-    network = TaskNetwork2(substrate, cppn_query_instance)
+    
     state: np.ndarray = env.reset()
     done = False
     x_pos_prev = 40
@@ -225,17 +192,27 @@ def simulate_environment(
     )
 
 
-def fetch_network_genome(api_url, queue: Queue):
+def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
+    
+    
     while True:
         # print("fetching")
         response = requests.get(api_url)
+        
         if response.status_code == 200:
             data = json.loads(response.text)
             # print(data)
             if data["exists"]:
                 network_genome = json_to_network_genome(data)
+                network_builder = NetworkBuilder(DefaultActivationFunctionMapper())
+                network_processor_factory = NetworkProcessorFactory(
+                    network_builder, False, 1, 0.01
+                )
+                network_processor = network_processor_factory.createProcessor(network_genome)
+                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
+                network = TaskNetwork2(substrate, cppn_query_instance)
                 # print("Network genome found " + str(data["id"]))
-                queue.put([data["id"], network_genome])
+                queue.put([data["id"], network])
             else:
                 print("No network genome found - sleeping for 1 second")
                 time.sleep(1)
@@ -246,19 +223,14 @@ def fetch_network_genome(api_url, queue: Queue):
             time.sleep(1)
 
 
-def simulation(queue: Queue, render: bool):
+def simulation(queue: Queue, render: bool, scale: float, output_width: int, output_height: int):
     env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while not queue.empty():
         data = queue.get()
-        network_genome = data[1]
-        # print("Building network " + str(data[0]))
-        network_builder = NetworkBuilder(DefaultActivationFunctionMapper())
-        network_processor_factory = NetworkProcessorFactory(
-            network_builder, False, 1, 0.01
-        )
-        network_processor = network_processor_factory.createProcessor(network_genome)
+        network : TaskNetwork2 = data[1]
+        
         # print("starting simulation " + str(data[0]))
         (
             info,
@@ -269,7 +241,7 @@ def simulation(queue: Queue, render: bool):
             average_small_status_count,
             average_tall_status_count,
             average_fireball_status_count,
-        ) = simulate_environment(network_processor, env, render)
+        ) = simulate_environment(network, env, render, scale, output_width, output_height)
         # print(info)
 
         requests.post(
@@ -318,6 +290,37 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    scale = 1 / 8
+    width = round(256 * scale)
+    height = round(240 * scale)
+    bias_coords = [(0, 0, 0)]
+    input_coords = [
+        (x, y, -1)
+        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
+        for x in np.linspace(-1, 1, width)
+    ]
+    # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
+    attention_coords = [
+        (x, y, -0.5)
+        for y in np.linspace(-1, 1, height)
+        for x in np.linspace(-1, 1, width)
+    ]
+    hidden_coords = [
+        [
+            (x, y, z)
+            for y in np.linspace(-1, 1, round(8))
+            for x in np.linspace(-1, 1, round(8))
+        ]
+        for z in np.linspace(-0.9, -0.1, round(30))
+    ]
+    output_width = 12
+    output_height = 12
+    output_coords = [
+        (x, y, 1)
+        for y in np.linspace(-1, 1, output_height)
+        for x in np.linspace(-1, 1, output_width)
+    ]
+    substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     num_instances = args.num_instances
     should_render = args.should_render
     print(should_render)
@@ -325,22 +328,26 @@ if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(10)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    queueProcess = Process(
-        target=fetch_network_genome,
-        args=(
-            api_url,
-            queue,
-        ),
-    )
-    queueProcess.start()
-
+    for i in range(num_instances):
+        queueProcess = Process(
+            target=fetch_network_genome,
+            args=(
+                api_url,
+                queue,
+                substrate,
+            ),
+        )
+        queueProcess.start()
+        
+        
+    
     while True:
 
         processes = []
 
         for i in range(num_instances):
 
-            p = Process(target=simulation, args=(queue, should_render))
+            p = Process(target=simulation, args=(queue, should_render, scale, output_width, output_height))
             p.start()
             processes.append(p)
 
