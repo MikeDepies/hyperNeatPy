@@ -55,10 +55,10 @@ def simulate_environment(
     hidden_coords = [
         [
             (x, y, z)
-            for y in np.linspace(-1, 1, round(8))
-            for x in np.linspace(-1, 1, round(8))
+            for y in np.linspace(-1, 1, round(16))
+            for x in np.linspace(-1, 1, round(16))
         ]
-        for z in np.linspace(-0.9, 0.9, round(20))
+        for z in np.linspace(-0.9, 0.9, round(1))
     ]
     # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     # query_dim = 12
@@ -212,7 +212,7 @@ def simulate_environment(
     # if info["flag_get"]:
     #     info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
     if info["stage"] == 4 and info["x_pos"] < reward:
-        reward = info["x_pos"] - (400 - info["time"])
+        cum_reward = info["x_pos"] - (400 - info["time"])
     return (
         info,
         cum_reward,
