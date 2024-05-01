@@ -37,7 +37,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 1 / 4
+    scale = 1 / 8
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, 0)]
@@ -58,7 +58,7 @@ def simulate_environment(
             for y in np.linspace(-1, 1, round(8))
             for x in np.linspace(-1, 1, round(8))
         ]
-        for z in np.linspace(-0.9, -0.1, round(10))
+        for z in np.linspace(-0.9, -0.1, round(30))
     ]
     # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     # query_dim = 12
