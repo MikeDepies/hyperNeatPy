@@ -40,7 +40,7 @@ def simulate_environment(
     scale = 1 / 4
     width = round(256 * scale)
     height = round(240 * scale)
-    bias_coords = [(0, 0, -1.5)]
+    bias_coords = [(0, 0, 0)]
     input_coords = [
         (x, y, -1)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
@@ -55,10 +55,10 @@ def simulate_environment(
     hidden_coords = [
         [
             (x, y, z)
-            for y in np.linspace(-1, 1, round(16))
-            for x in np.linspace(-1, 1, round(16))
+            for y in np.linspace(-1, 1, round(8))
+            for x in np.linspace(-1, 1, round(8))
         ]
-        for z in np.linspace(-0.9, 0.9, round(1))
+        for z in np.linspace(-0.9, -0.1, round(10))
     ]
     # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
     # query_dim = 12
