@@ -37,7 +37,7 @@ def simulate_environment(
     env: gym_super_mario_bros.SuperMarioBrosEnv,
     render: bool,
 ):
-    scale = 1 / 16
+    scale = 1 / 4
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -1.5)]
@@ -209,8 +209,8 @@ def simulate_environment(
             # print(action_probabilities[action.item()])
             # print(action_probabilities)
             env.render()
-    if info["flag_get"]:
-        info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
+    # if info["flag_get"]:
+    #     info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
     return (
         info,
         cum_reward,
