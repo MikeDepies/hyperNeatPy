@@ -96,7 +96,7 @@ def simulate_environment(
     fireball_status_count = 0
     x_pos_prev_movement = 40
     for step in range(20 * 200 * 8):
-        image = (rescale(state, scale) / 127.5) - 1
+        image = (rescale(state, scale, channel_axis=2) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values: np.ndarray = network.forward(torch_input).reshape(
@@ -227,7 +227,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
 def simulation(
     queue: Queue, render: bool, scale: float, output_width: int, output_height: int
 ):
-    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
+    env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
