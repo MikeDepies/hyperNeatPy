@@ -96,7 +96,7 @@ def simulate_environment(
     fireball_status_count = 0
     x_pos_prev_movement = 40
     for step in range(20 * 200 * 8):
-        image = (rescale(state, scale, channel_axis=2) / 127.5) - 1
+        image = (rescale(rgb2gray(state), scale) / 255)
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values: np.ndarray = network.forward(torch_input).reshape(
@@ -300,10 +300,10 @@ if __name__ == "__main__":
     height = round(240 * scale)
     bias_coords = [(0, 0, 0)]
     input_coords = [
-        (x, y, z)
+        (x, y, -1)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
         for x in np.linspace(-1, 1, width)
-        for z in np.linspace(-1,-.8, 3)
+        
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
@@ -314,10 +314,10 @@ if __name__ == "__main__":
     hidden_coords = [
         [
             (x, y, z)
-            for y in np.linspace(-1, 1, round(8))
-            for x in np.linspace(-1, 1, round(8))
+            for y in np.linspace(-1, 1, min(round(30 -z * 4), 4))
+            for x in np.linspace(-1, 1, min(round(30 -z * 4), 4))
         ]
-        for z in np.linspace(-0.6, -0.1, round(30))
+        for z in np.linspace(-0.9, -0.1, round(10))
     ]
     output_width = 12
     output_height = 12
