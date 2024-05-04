@@ -50,7 +50,7 @@ class Connection:
 
 
 class Network:
-    def __init__(self, nodes: list[Node], connections: list[Connection], compute_layers: list[set[int]]):
+    def __init__(self, nodes: 'list[Node]', connections: 'list[Connection]', compute_layers: 'list[set[int]]'):
         self.nodes = nodes
         self.connections = connections
         self.compute_layers = compute_layers
