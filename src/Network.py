@@ -1,3 +1,4 @@
+from ast import Set
 import json
 import torch
 from NetworkGenome import (
@@ -38,7 +39,7 @@ class Node:
                 self.output_value = self.activation_function(self.input_value + self.bias)
             except Exception as e:
                 print(f"Error activating node {self.id} - {self.input_value} - {self.bias}: {e}")
-        self.input_value = 0.0
+        # self.input_value = 0.0
 
 
 class Connection:
@@ -49,9 +50,10 @@ class Connection:
 
 
 class Network:
-    def __init__(self, nodes: List[Node], connections: List[Connection]):
+    def __init__(self, nodes: list[Node], connections: list[Connection], compute_layers: list[set[int]]):
         self.nodes = nodes
         self.connections = connections
+        self.compute_layers = compute_layers
 
 
 class DefaultActivationFunctionMapper:
@@ -93,14 +95,74 @@ class NetworkBuilder:
             for connection_gene in genome.connection_genes
             if connection_gene.enabled
         ]
-
-        return Network(nodes, connections)
+        inputNodes = [node.id for node in nodes if node.type == NodeType.INPUT]
+        outputNodes = [node.id for node in nodes if node.type == NodeType.OUTPUT]
+        compute_layers = feed_forward_layers(inputNodes, outputNodes, connections)
+        # print(compute_layers)
+        return Network(nodes, connections, compute_layers)
 
 
 class NetworkProcessor:
     def feedforward(self, input_values: List[float]) -> List[float]:
         raise NotImplementedError
 
+
+def required_for_output(inputs : list[int], outputs : list[int], connections : list[Connection]):
+    required = set(outputs)
+    s = set(outputs)
+    while 1:
+        # Find nodes not in s whose output is consumed by a node in s.
+        t = set(connection.input_node_id for connection in connections if connection.output_node_id in s and connection.input_node_id not in s)
+
+        if not t:
+            break
+
+        layer_nodes = set(x for x in t if x not in inputs)
+        if not layer_nodes:
+            break
+
+        required = required.union(layer_nodes)
+        s = s.union(t)
+
+    return required
+
+
+def feed_forward_layers(inputs : list[int], outputs : list[int], connections : list[Connection]):
+    """
+    Collect the layers whose members can be evaluated in parallel in a feed-forward network.
+    :param inputs: list of the network input nodes
+    :param outputs: list of the output node identifiers
+    :param connections: list of (input, output) connections in the network.
+
+    Returns a list of layers, with each layer consisting of a set of node identifiers.
+    Note that the returned layers do not contain nodes whose output is ultimately
+    never used to compute the final network output.
+    """
+
+    required = required_for_output(inputs, outputs, connections)
+    # print(required)
+    layers = []
+    s = set(inputs)
+    while 1:
+        # Find candidate nodes c for the next layer.  These nodes should connect
+        # a node in s to a node not in s.
+        c = set(connection.output_node_id for connection in connections if connection.input_node_id in s and connection.output_node_id not in s)
+        
+        # Keep only the used nodes whose entire input set is contained in s.
+        t = set()
+        for n in c:
+            
+            if n in required and all(connection.input_node_id in s for connection in connections if connection.output_node_id == n):
+                # print("added", n)
+                t.add(n)
+
+        if not t:
+            break
+        # print("append", t)
+        layers.append(t)
+        s = s.union(t)
+
+    return layers
 
 class NetworkProcessorSimple(NetworkProcessor):
     def __init__(self, network: Network):
@@ -120,20 +182,30 @@ class NetworkProcessorSimple(NetworkProcessor):
         }
         self.node_map = {node.id: node for node in network.nodes}
 
-    def feedforward(self, input_values: List[float]) -> List[float]:
-        # for node in self.network.nodes:
-        #     node.input_value = 0.0
+    def feedforward(self, input_values: list[float]) -> list[float]:
+        for node in self.network.nodes:
+            node.input_value = 0.0
 
         for index, node in enumerate(self.input_nodes):
             node.input_value = input_values[index]
 
-        for node in self.sorted_nodes:
-            for connection in self.input_connections_by_output_node_id.get(node.id, []):
-                input_node = self.node_map.get(connection.input_node_id)
-                if input_node:
-                    node.input_value += input_node.output_value * connection.weight
-            node.activate()
+        for layer in self.network.compute_layers:
+            for node_id in layer:
+                node = self.node_map.get(node_id)
+                for connection in self.input_connections_by_output_node_id.get(node.id, []):
+                    input_node = self.node_map.get(connection.input_node_id)
+                    if input_node:
+                        node.input_value += input_node.output_value * connection.weight
+                node.activate()
 
+        # for node in self.sorted_nodes:
+        #     for connection in self.input_connections_by_output_node_id.get(node.id, []):
+        #         input_node = self.node_map.get(connection.input_node_id)
+        #         if input_node:
+        #             node.input_value += input_node.output_value * connection.weight
+        #     node.activate()
+        # for index, node in enumerate(self.output_nodes):
+        #     print(node.output_value)
         return [node.output_value for node in self.output_nodes]
 
 
