@@ -12,6 +12,7 @@ from typing import Callable, List, Dict
 from math import exp, tanh, sin, cos, sqrt
 
 from SelfAttention import SelfAttention
+from activations import cos_activation, gauss_activation, relu_activation, sigmoid_activation, sin_activation, tanh_activation
 
 ActivationFunctionType = Callable[[float], float]
 
@@ -60,12 +61,12 @@ class DefaultActivationFunctionMapper:
     def map(self, activationFunction: ActivationFunction) -> ActivationFunctionType:
         return {
             ActivationFunction.IDENTITY: lambda x: x,
-            ActivationFunction.SIGMOID: lambda x: 1 / (1 + exp(-x)),
-            ActivationFunction.TANH: lambda x: tanh(x),
-            ActivationFunction.RELU: lambda x: max(0.0, x),
-            ActivationFunction.GAUSSIAN: lambda x: exp(-(x**2.0)),
-            ActivationFunction.SINE: lambda x: sin(x),
-            ActivationFunction.COS: lambda x: cos(x),
+            ActivationFunction.SIGMOID: sigmoid_activation,
+            ActivationFunction.TANH: tanh_activation,
+            ActivationFunction.RELU: relu_activation,
+            ActivationFunction.GAUSSIAN: gauss_activation,
+            ActivationFunction.SINE: sin_activation,
+            ActivationFunction.COS: cos_activation,
             ActivationFunction.ABS: lambda x: abs(x),
             ActivationFunction.STEP: lambda x: 0.0 if x < 0 else 1.0,
         }[activationFunction]
