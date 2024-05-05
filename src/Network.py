@@ -188,6 +188,7 @@ class NetworkProcessorSimple(NetworkProcessor):
 
         for index, node in enumerate(self.input_nodes):
             node.input_value = input_values[index]
+            node.output_value = input_values[index]
 
         for layer in self.network.compute_layers:
             for node_id in layer:
