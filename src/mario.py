@@ -227,7 +227,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
 def simulation(
     queue: Queue, render: bool, scale: float, output_width: int, output_height: int
 ):
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
@@ -298,7 +298,7 @@ if __name__ == "__main__":
     scale = 1 / 8
     width = round(256 * scale)
     height = round(240 * scale)
-    bias_coords = [(0, 0, 0)]
+    bias_coords = [(0, 0, -2)]
     input_coords = [
         (x, y, -1)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
@@ -317,7 +317,7 @@ if __name__ == "__main__":
             for y in np.linspace(-1, 1, 8)
             for x in np.linspace(-1, 1, 8)
         ]
-        for z in np.linspace(-0.9, -0.1, round(30))
+        for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 12
     output_height = 12
