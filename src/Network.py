@@ -107,7 +107,7 @@ class NetworkProcessor:
         raise NotImplementedError
 
 
-def required_for_output(inputs : list[int], outputs : list[int], connections : list[Connection]):
+def required_for_output(inputs : 'list[int]', outputs : 'list[int]', connections : 'list[Connection]') -> 'set[int]':
     required = set(outputs)
     s = set(outputs)
     while 1:
@@ -127,7 +127,7 @@ def required_for_output(inputs : list[int], outputs : list[int], connections : l
     return required
 
 
-def feed_forward_layers(inputs : list[int], outputs : list[int], connections : list[Connection]):
+def feed_forward_layers(inputs : 'list[int]', outputs : 'list[int]', connections : 'list[Connection]') -> 'list[set[int]]':
     """
     Collect the layers whose members can be evaluated in parallel in a feed-forward network.
     :param inputs: list of the network input nodes
