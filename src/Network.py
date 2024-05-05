@@ -182,7 +182,7 @@ class NetworkProcessorSimple(NetworkProcessor):
         }
         self.node_map = {node.id: node for node in network.nodes}
 
-    def feedforward(self, input_values: list[float]) -> list[float]:
+    def feedforward(self, input_values: 'list[float]') -> 'list[float]':
         for node in self.network.nodes:
             node.input_value = 0.0
 
