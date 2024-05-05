@@ -626,7 +626,7 @@ class TaskNetwork2(torch.nn.Module):
             substrate.bias_coords, substrate.output_coords, cppn_query
         )
         self.hidden_recurrent_weights = [substrate.get_recurrent_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query) for i in range(len(substrate.hidden_coords))]
-        self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
+        # self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
         self.outputs = torch.zeros(
             self.output_bias_weights.shape[0], self.output_bias_weights.shape[1]
         )
@@ -656,7 +656,7 @@ class TaskNetwork2(torch.nn.Module):
         # + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
         self.hidden_activations[0] = (
             torch.matmul(inputs, self.input_hidden_weights)
-            + self.hidden_bias_weights[0] + self.hidden_recurrent_weights[0]
+            + self.hidden_bias_weights[0]
         )  # + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
         self.hidden_activations[0] = torch.sigmoid(
             self.hidden_activations[0]
@@ -665,7 +665,7 @@ class TaskNetwork2(torch.nn.Module):
             # print("no loop")  + torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1])
             self.hidden_activations[i + 1] = (
                 torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i])
-                + self.hidden_bias_weights[i + 1] + self.hidden_recurrent_weights[i + 1]
+                + self.hidden_bias_weights[i + 1]
             )  # + torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1])
             self.hidden_activations[i + 1] = torch.sigmoid(
                 self.hidden_activations[i + 1]
