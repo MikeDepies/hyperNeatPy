@@ -625,7 +625,7 @@ class TaskNetwork2(torch.nn.Module):
         self.output_bias_weights = substrate.get_layer_connections(
             substrate.bias_coords, substrate.output_coords, cppn_query
         )
-        self.hidden_recurrent_weights = [substrate.get_recurrent_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query) for i in range(len(substrate.hidden_coords))]
+        # self.hidden_recurrent_weights = [substrate.get_recurrent_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query) for i in range(len(substrate.hidden_coords))]
         # self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
         self.outputs = torch.zeros(
             self.output_bias_weights.shape[0], self.output_bias_weights.shape[1]

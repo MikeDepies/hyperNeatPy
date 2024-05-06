@@ -301,21 +301,21 @@ if __name__ == "__main__":
     bias_coords = [(0, 0, -2)]
     input_coords = [
         (x, y, -1)
-        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
         for x in np.linspace(-1, 1, width)
+        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
         
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
         (x, y, -0.5)
-        for y in np.linspace(-1, 1, height)
         for x in np.linspace(-1, 1, width)
+        for y in np.linspace(-1, 1, height)
     ]
     hidden_coords = [
         [
             (x, y, z)
-            for y in np.linspace(-1, 1, 10)
             for x in np.linspace(-1, 1, 10)
+            for y in np.linspace(-1, 1, 10)
         ]
         for z in np.linspace(-0.9, 0.9, round(3))
     ]
@@ -323,8 +323,8 @@ if __name__ == "__main__":
     output_height = 12
     output_coords = [
         (x, y, 1)
-        for y in np.linspace(-1, 1, output_height)
         for x in np.linspace(-1, 1, output_width)
+        for y in np.linspace(-1, 1, output_height)
     ]
     substrate = Substrate(input_coords, hidden_coords, output_coords, bias_coords)
     num_instances = args.num_instances
