@@ -96,7 +96,7 @@ def simulate_environment(
     fireball_status_count = 0
     x_pos_prev_movement = 40
     for step in range(20 * 200 * 8):
-        image = (rescale(rgb2gray(state), scale) / 255)
+        image = (rescale(rgb2gray(state), scale) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values: np.ndarray = network.forward(torch_input).reshape(
@@ -113,7 +113,7 @@ def simulate_environment(
         # print(action_values.softmax(dim=1))
 
         action_probabilities = (
-            action_values.softmax(dim=0) * action_values.softmax(dim=1)
+            action_values.softmax(dim=0) #* action_values.softmax(dim=1)
         ).sum(
             dim=1
         )  # .softmax(dim=-1)
@@ -210,7 +210,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                 network_processor = network_processor_factory.createProcessor(
                     network_genome
                 )
-                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.2)
+                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.7)
                 network = TaskNetwork2(substrate, cppn_query_instance)
                 # print("Network genome found " + str(data["id"]))
                 queue.put([data["id"], network])
