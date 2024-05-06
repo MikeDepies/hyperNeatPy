@@ -332,7 +332,7 @@ if __name__ == "__main__":
     print(should_render)
     print(num_instances)
     manager = Manager()
-    queue = manager.Queue(num_instances)
+    queue = manager.Queue(3)
     api_url = "http://192.168.0.100:8080/networkGenome"
     for i in range(round(num_instances )):
         queueProcess = Process(
