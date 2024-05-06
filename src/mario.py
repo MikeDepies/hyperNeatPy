@@ -295,7 +295,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    scale = 1 / 4
+    scale = 1 / 8
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -2)]
@@ -313,11 +313,11 @@ if __name__ == "__main__":
     ]
     hidden_coords = [
         [
-            (x, y, 0)
+            (x, y, z)
             for y in np.linspace(-1, 1, 10)
             for x in np.linspace(-1, 1, 10)
         ]
-        # for z in np.linspace(-0.9, 0.9, round(30))
+        for z in np.linspace(-0.9, 0.9, round(3))
     ]
     output_width = 12
     output_height = 12
