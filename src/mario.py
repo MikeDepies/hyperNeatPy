@@ -295,7 +295,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    scale = 1 / 8
+    scale = 1 / 4
     width = round(256 * scale)
     height = round(240 * scale)
     bias_coords = [(0, 0, -2)]
