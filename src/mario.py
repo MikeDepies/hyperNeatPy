@@ -317,7 +317,7 @@ if __name__ == "__main__":
             for x in np.linspace(-1, 1, 10)
             for y in np.linspace(-1, 1, 10)
         ]
-        for z in np.linspace(-0.9, 0.9, round(3))
+        for z in np.linspace(-0.9, 0.9, round(20))
     ]
     output_width = 12
     output_height = 12
