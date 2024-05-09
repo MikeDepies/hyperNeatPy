@@ -113,9 +113,9 @@ def simulate_environment(
         # print(action_values.softmax(dim=1))
 
         action_probabilities = (
-            action_values.softmax(dim=0) #* action_values.softmax(dim=1)
+            action_values.softmax(dim=0) * action_values.softmax(dim=1)
         ).sum(
-            dim=1
+            dim=0
         )  # .softmax(dim=-1)
         action = torch.argmax(action_probabilities)
         # print(action_probabilities)
@@ -314,10 +314,10 @@ if __name__ == "__main__":
     hidden_coords = [
         [
             (x, y, z)
-            for x in np.linspace(-1, 1, 8)
-            for y in np.linspace(-1, 1, 8)
+            for x in np.linspace(-1, 1, 12)
+            for y in np.linspace(-1, 1, 12)
         ]
-        for z in np.linspace(-0.9, 0.9, round(60))
+        for z in np.linspace(-0.9, 0.9, round(10))
     ]
     output_width = 12
     output_height = 12
