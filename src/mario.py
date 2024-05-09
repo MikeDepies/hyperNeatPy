@@ -314,10 +314,10 @@ if __name__ == "__main__":
     hidden_coords = [
         [
             (x, y, z)
-            for x in np.linspace(-1, 1, 16)
-            for y in np.linspace(-1, 1, 16)
+            for x in np.linspace(-1, 1, 8)
+            for y in np.linspace(-1, 1, 8)
         ]
-        for z in np.linspace(-0.9, 0.9, round(1))
+        for z in np.linspace(-0.9, 0.9, round(60))
     ]
     output_width = 12
     output_height = 12
