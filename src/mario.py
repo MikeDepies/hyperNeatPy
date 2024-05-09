@@ -178,8 +178,8 @@ def simulate_environment(
             env.render()
     # if info["flag_get"]:
     #     info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
-    # if info["stage"] == 4 and info["x_pos"] < cum_reward:
-    #     cum_reward = info["x_pos"] - (400 - info["time"])
+    if info["stage"] == 4 and info["x_pos"] < cum_reward:
+        cum_reward = info["x_pos"] - (400 - info["time"])
     return (
         info,
         cum_reward,
@@ -227,7 +227,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
 def simulation(
     queue: Queue, render: bool, scale: float, output_width: int, output_height: int
 ):
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
