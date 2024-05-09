@@ -178,8 +178,8 @@ def simulate_environment(
             env.render()
     # if info["flag_get"]:
     #     info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
-    if info["stage"] == 4 and info["x_pos"] < cum_reward:
-        cum_reward = info["x_pos"] - (400 - info["time"])
+    # if info["stage"] == 4 and info["x_pos"] < cum_reward:
+    #     cum_reward = info["x_pos"] - (400 - info["time"])
     return (
         info,
         cum_reward,
