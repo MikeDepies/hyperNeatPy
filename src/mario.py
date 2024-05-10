@@ -210,7 +210,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                 network_processor = network_processor_factory.createProcessor(
                     network_genome
                 )
-                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.7)
+                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
                 network = TaskNetwork2(substrate, cppn_query_instance)
                 # print("Network genome found " + str(data["id"]))
                 queue.put([data["id"], network])
@@ -314,10 +314,10 @@ if __name__ == "__main__":
     hidden_coords = [
         [
             (x, y, z)
-            for x in np.linspace(-1, 1, 12)
-            for y in np.linspace(-1, 1, 12)
+            for x in np.linspace(-1, 1, 8)
+            for y in np.linspace(-1, 1, 8)
         ]
-        for z in np.linspace(-0.9, 0.9, round(10))
+        for z in np.linspace(-0.9, 0.9, round(40))
     ]
     output_width = 12
     output_height = 12
