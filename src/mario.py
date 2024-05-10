@@ -210,7 +210,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                 network_processor = network_processor_factory.createProcessor(
                     network_genome
                 )
-                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
+                cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.9)
                 network = TaskNetwork2(substrate, cppn_query_instance)
                 # print("Network genome found " + str(data["id"]))
                 queue.put([data["id"], network])
