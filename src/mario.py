@@ -135,7 +135,7 @@ def simulate_environment(
             x_pos_prev = x_pos
 
             no_movement_count = 0
-        if no_movement_count >= 20 * 40:
+        if no_movement_count >= 20 * 20:
             break
         if y_pos > y_pos_prev:
             jump_count += 1
@@ -149,7 +149,7 @@ def simulate_environment(
         if info["status"] == "fireball":
             fireball_status_count += 1
         if tick_count > 0:
-            speed_sum += abs(x_pos - x_pos_prev_movement)
+            speed_sum += min(4, abs(x_pos - x_pos_prev_movement))
         tick_count += 1
         if tick_count > 0:
             average_speed = speed_sum / tick_count
@@ -304,7 +304,6 @@ if __name__ == "__main__":
         (x, y, -1)
         for x in np.linspace(-1, 1, width)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
-        
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
@@ -313,11 +312,7 @@ if __name__ == "__main__":
         for y in np.linspace(-1, 1, height)
     ]
     hidden_coords = [
-        [
-            (x, y, z)
-            for x in np.linspace(-1, 1, 8)
-            for y in np.linspace(-1, 1, 8)
-        ]
+        [(x, y, z) for x in np.linspace(-1, 1, 8) for y in np.linspace(-1, 1, 8)]
         for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 12
@@ -335,7 +330,7 @@ if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(3)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    for i in range(round(num_instances )):
+    for i in range(round(num_instances)):
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
