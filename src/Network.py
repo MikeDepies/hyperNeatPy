@@ -200,14 +200,98 @@ class NetworkProcessorSimple(NetworkProcessor):
                         node.input_value += input_node.output_value * connection.weight
                 node.activate()
 
-        # for node in self.sorted_nodes:
-        #     for connection in self.input_connections_by_output_node_id.get(node.id, []):
-        #         input_node = self.node_map.get(connection.input_node_id)
-        #         if input_node:
-        #             node.input_value += input_node.output_value * connection.weight
-        #     node.activate()
-        # for index, node in enumerate(self.output_nodes):
-        #     print(node.output_value)
+        return [node.output_value for node in self.output_nodes]
+
+class PyTorchNetwork(nn.Module):
+    def __init__(self, network):
+        super(PyTorchNetwork, self).__init__()
+        self.layers = []
+        self.activations = []
+        self.build_layers(network)
+
+    def build_layers(self, network : Network):
+        # Iterate over compute layers to build weight matrices
+        for i in range(len(network.compute_layers) - 1):
+            current_layer = list(network.compute_layers[i])
+            next_layer = list(network.compute_layers[i + 1])
+            # Initialize weight matrix with zeros
+            weight_matrix = torch.zeros((len(next_layer), len(current_layer)), dtype=torch.float32)
+            
+            # Map node IDs to indices for matrix placement
+            current_layer_index = {node_id: idx for idx, node_id in enumerate(current_layer)}
+            next_layer_index = {node_id: idx for idx, node_id in enumerate(next_layer)}
+
+            # Populate the weight matrix
+            for conn in network.connections:
+                if conn.input_node_id in current_layer_index and conn.output_node_id in next_layer_index:
+                    input_idx = current_layer_index[conn.input_node_id]
+                    output_idx = next_layer_index[conn.output_node_id]
+                    weight_matrix[output_idx, input_idx] = conn.weight
+
+            # Convert to nn.Parameter to allow gradient updates
+            # weight_matrix = nn.Parameter(weight_matrix)
+            self.layers.append(weight_matrix)
+            # Assuming uniform activation function for simplicity
+            self.activations.append(network.node_map[next_layer[0]].activation_function)
+
+    def forward(self, x):
+        for weights, activation in zip(self.layers, self.activations):
+            x = torch.matmul(x, weights.t())  # Apply weights
+            x = activation(x)  # Apply activation function
+        return x
+    
+class NetworkProcessorTensor(NetworkProcessor):
+    def __init__(self, network: Network):
+        self.network = network
+        self.output_nodes = [
+            node for node in network.nodes if node.type == NodeType.OUTPUT
+        ]
+        self.input_nodes = [
+            node for node in network.nodes if node.type == NodeType.INPUT
+        ]
+        self.sorted_nodes = sorted(network.nodes, key=lambda node: node.type.value)
+        self.input_connections_by_output_node_id = {
+            node.id: [
+                conn for conn in network.connections if conn.output_node_id == node.id
+            ]
+            for node in network.nodes
+        }
+        self.node_map = {node.id: node for node in network.nodes}
+        input_values = torch.zeros(len(self.input_nodes))
+        output_values = torch.zeros(len(self.output_nodes))
+        previous_layer = input_values
+        for layer in network.compute_layers:
+            hidden_values = torch.zeros(len(layer))
+            hidden_weights = torch.zeros(len(layer), len(previous_layer) if previous_layer else len(layer))
+            previous_layer = layer
+            for node_index, node in enumerate(layer):
+                node = self.node_map.get(node)
+                connections = self.input_connections_by_output_node_id.get(node.id, [])
+                for connection_index, connection in enumerate(connections):
+                    input_node = self.node_map.get(connection.input_node_id)
+                    if input_node:
+                        hidden_weights[connection_index, node_index] = connection.weight
+                        # hidden_values[node_index] += input_node.output_value * connection.weight
+                
+            
+
+    def feedforward(self, input_values: 'list[float]') -> 'list[float]':
+        for node in self.network.nodes:
+            node.input_value = 0.0
+
+        for index, node in enumerate(self.input_nodes):
+            node.input_value = input_values[index]
+            node.output_value = input_values[index]
+
+        for layer in self.network.compute_layers:
+            for node_id in layer:
+                node = self.node_map.get(node_id)
+                for connection in self.input_connections_by_output_node_id.get(node.id, []):
+                    input_node = self.node_map.get(connection.input_node_id)
+                    if input_node:
+                        node.input_value += input_node.output_value * connection.weight
+                node.activate()
+
         return [node.output_value for node in self.output_nodes]
 
 

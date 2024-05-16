@@ -95,7 +95,7 @@ def simulate_environment(
     tall_status_count = 0
     fireball_status_count = 0
     x_pos_prev_movement = 40
-    for step in range(20 * 200 * 8):
+    while True:
         image = (rescale(rgb2gray(state), scale) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
@@ -128,7 +128,7 @@ def simulate_environment(
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        movement_threshold = 16  # Define a threshold for movement reset
+        movement_threshold = 64  # Define a threshold for movement reset
         if abs(x_pos - x_pos_prev) < movement_threshold:
             no_movement_count += 1
         else:
