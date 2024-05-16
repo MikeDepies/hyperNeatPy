@@ -202,43 +202,43 @@ class NetworkProcessorSimple(NetworkProcessor):
 
         return [node.output_value for node in self.output_nodes]
 
-class PyTorchNetwork(nn.Module):
-    def __init__(self, network):
-        super(PyTorchNetwork, self).__init__()
-        self.layers = []
-        self.activations = []
-        self.build_layers(network)
+# class PyTorchNetwork(nn.Module):
+#     def __init__(self, network):
+#         super(PyTorchNetwork, self).__init__()
+#         self.layers = []
+#         self.activations = []
+#         self.build_layers(network)
 
-    def build_layers(self, network : Network):
-        # Iterate over compute layers to build weight matrices
-        for i in range(len(network.compute_layers) - 1):
-            current_layer = list(network.compute_layers[i])
-            next_layer = list(network.compute_layers[i + 1])
-            # Initialize weight matrix with zeros
-            weight_matrix = torch.zeros((len(next_layer), len(current_layer)), dtype=torch.float32)
+#     def build_layers(self, network : Network):
+#         # Iterate over compute layers to build weight matrices
+#         for i in range(len(network.compute_layers) - 1):
+#             current_layer = list(network.compute_layers[i])
+#             next_layer = list(network.compute_layers[i + 1])
+#             # Initialize weight matrix with zeros
+#             weight_matrix = torch.zeros((len(next_layer), len(current_layer)), dtype=torch.float32)
             
-            # Map node IDs to indices for matrix placement
-            current_layer_index = {node_id: idx for idx, node_id in enumerate(current_layer)}
-            next_layer_index = {node_id: idx for idx, node_id in enumerate(next_layer)}
+#             # Map node IDs to indices for matrix placement
+#             current_layer_index = {node_id: idx for idx, node_id in enumerate(current_layer)}
+#             next_layer_index = {node_id: idx for idx, node_id in enumerate(next_layer)}
 
-            # Populate the weight matrix
-            for conn in network.connections:
-                if conn.input_node_id in current_layer_index and conn.output_node_id in next_layer_index:
-                    input_idx = current_layer_index[conn.input_node_id]
-                    output_idx = next_layer_index[conn.output_node_id]
-                    weight_matrix[output_idx, input_idx] = conn.weight
+#             # Populate the weight matrix
+#             for conn in network.connections:
+#                 if conn.input_node_id in current_layer_index and conn.output_node_id in next_layer_index:
+#                     input_idx = current_layer_index[conn.input_node_id]
+#                     output_idx = next_layer_index[conn.output_node_id]
+#                     weight_matrix[output_idx, input_idx] = conn.weight
 
-            # Convert to nn.Parameter to allow gradient updates
-            # weight_matrix = nn.Parameter(weight_matrix)
-            self.layers.append(weight_matrix)
-            # Assuming uniform activation function for simplicity
-            self.activations.append(network.node_map[next_layer[0]].activation_function)
+#             # Convert to nn.Parameter to allow gradient updates
+#             # weight_matrix = nn.Parameter(weight_matrix)
+#             self.layers.append(weight_matrix)
+#             # Assuming uniform activation function for simplicity
+#             self.activations.append(network.node_map[next_layer[0]].activation_function)
 
-    def forward(self, x):
-        for weights, activation in zip(self.layers, self.activations):
-            x = torch.matmul(x, weights.t())  # Apply weights
-            x = activation(x)  # Apply activation function
-        return x
+#     def forward(self, x):
+#         for weights, activation in zip(self.layers, self.activations):
+#             x = torch.matmul(x, weights.t())  # Apply weights
+#             x = activation(x)  # Apply activation function
+#         return x
     
 class NetworkProcessorTensor(NetworkProcessor):
     def __init__(self, network: Network):
