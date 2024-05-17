@@ -100,7 +100,7 @@ def simulate_environment(
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values: np.ndarray = network.forward(torch_input).reshape(
-            output_width, output_height
+            output_height, output_width
         )
 
         # K = 3
