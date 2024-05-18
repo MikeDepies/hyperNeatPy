@@ -111,9 +111,9 @@ def simulate_environment(
         # * action_values.softmax(dim=0)
         # print(action_values)
         # print(action_values.softmax(dim=1))
-
+# action_values.softmax(dim=0) * 
         action_probabilities = (
-            action_values.softmax(dim=0) * action_values.softmax(dim=1)
+            action_values.softmax(dim=1)
         ).sum(
             dim=0
         )  # .softmax(dim=-1)
@@ -312,11 +312,11 @@ if __name__ == "__main__":
         for x in np.linspace(-1, 1, width)
     ]
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.9, 0.9, round(30))
+        [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
+        for z in np.linspace(-0.9, 0.9, round(5))
     ]
     output_width = 12
-    output_height = 24
+    output_height = 1
     output_coords = [
         (y, x, 1)
         for y in np.linspace(-1, 1, output_height)
