@@ -135,7 +135,7 @@ def simulate_environment(
             x_pos_prev = x_pos
 
             no_movement_count = 0
-        if no_movement_count >= 20 * 20:
+        if no_movement_count >= 20 * 60:
             break
         if y_pos > y_pos_prev:
             jump_count += 1
@@ -317,7 +317,7 @@ if __name__ == "__main__":
         for z in np.linspace(-0.9, 0.9, round(50))
     ]
     output_width = 12
-    output_height = 24
+    output_height = 48
     output_coords = [
         (y, x, 1)
         for y in np.linspace(-1, 1, output_height)
