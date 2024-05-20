@@ -74,7 +74,7 @@ def simulate_environment(
     # ]
     status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
 
-    state: np.ndarray = env.reset()
+    active_state: np.ndarray = env.reset()
     done = False
     x_pos_prev = 40
     y_pos_prev = 0
@@ -96,7 +96,7 @@ def simulate_environment(
     fireball_status_count = 0
     x_pos_prev_movement = 40
     while True:
-        image = (rescale(rgb2gray(state), scale) / 127.5) - 1
+        image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
         # print(image.shape)
         torch_input = torch.from_numpy(image.flatten()).float()
         action_values: np.ndarray = network.forward(torch_input).reshape(
@@ -125,17 +125,19 @@ def simulate_environment(
         # action = torch.tensor(0)
 
         state, reward, done, info = env.step(action.item())
+        if tick_count % 5 == 0:
+            active_state = state
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
-        movement_threshold = 64  # Define a threshold for movement reset
+        movement_threshold = 32  # Define a threshold for movement reset
         if abs(x_pos - x_pos_prev) < movement_threshold:
             no_movement_count += 1
         else:
             x_pos_prev = x_pos
 
             no_movement_count = 0
-        if no_movement_count >= 20 * 60:
+        if no_movement_count >= 20 * 20:
             break
         if y_pos > y_pos_prev:
             jump_count += 1
