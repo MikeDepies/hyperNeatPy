@@ -125,7 +125,7 @@ def simulate_environment(
         # action = torch.tensor(0)
 
         state, reward, done, info = env.step(action.item())
-        if tick_count % 5 == 0:
+        if tick_count % 20 == 0:
             active_state = state
         cum_reward += reward
         x_pos = info["x_pos"]
