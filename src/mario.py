@@ -352,7 +352,7 @@ if __name__ == "__main__":
     scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 3
+    input_depth = 10
     bias_coords = [(0, 0, -2)]
     input_coords = [
         (y, x, z)
