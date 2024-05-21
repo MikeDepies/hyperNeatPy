@@ -41,7 +41,7 @@ def simulate_environment(
     output_height: int,
     input_width: int,
     input_height: int,
-    input_depth: int
+    input_depth: int,
 ):
 
     # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
@@ -98,7 +98,10 @@ def simulate_environment(
     tall_status_count = 0
     fireball_status_count = 0
     x_pos_prev_movement = 40
-    image_input_history = [torch.zeros((input_height, input_width)).flatten() for _ in range(input_depth)]
+    image_input_history = [
+        torch.zeros((input_height, input_width)).flatten() for _ in range(input_depth)
+    ]
+
     def update_image_input_history(new_image, history, max_size):
         """
         Adds a new image to the history and removes the oldest image to maintain the max size.
@@ -112,17 +115,21 @@ def simulate_environment(
             history.pop(0)  # Remove the oldest element
         history.append(new_image)  # Add the new element
         return history
+
     image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-        # print(image.shape)
+    # print(image.shape)
     torch_input = torch.from_numpy(image.flatten()).float()
-    image_input_history = update_image_input_history(torch_input, image_input_history, input_depth)
+    image_input_history = update_image_input_history(
+        torch_input, image_input_history, input_depth
+    )
+    large_flatten_tensor = torch.cat([tensor for tensor in image_input_history])
     # Example usage:
     # new_image = torch.zeros((height, width)).flatten()  # Replace with actual new image tensor
     # image_input_history = update_image_input_history(new_image, image_input_history, input_depth)
     while True:
-        
+
         # Join each tensor in image_input_history into one large flatten tensor
-        large_flatten_tensor = torch.cat([tensor for tensor in image_input_history])
+
         action_values: np.ndarray = network.forward(large_flatten_tensor).reshape(
             output_height, output_width
         )
@@ -135,10 +142,8 @@ def simulate_environment(
         # * action_values.softmax(dim=0)
         # print(action_values)
         # print(action_values.softmax(dim=1))
-# action_values.softmax(dim=0) * 
-        action_probabilities = (
-            action_values.softmax(dim=1)
-        ).sum(
+        # action_values.softmax(dim=0) *
+        action_probabilities = (action_values.softmax(dim=1)).sum(
             dim=0
         )  # .softmax(dim=-1)
         action = torch.argmax(action_probabilities)
@@ -152,9 +157,12 @@ def simulate_environment(
         if tick_count % 40 == 0:
             image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
             # print(image.shape)
-            torch_input = torch.from_numpy(image.flatten()).float()   
+            torch_input = torch.from_numpy(image.flatten()).float()
             active_state = state
-            image_input_history = update_image_input_history(torch_input, image_input_history, input_depth)
+            image_input_history = update_image_input_history(
+                torch_input, image_input_history, input_depth
+            )
+            large_flatten_tensor = torch.cat([tensor for tensor in image_input_history])
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
@@ -255,7 +263,14 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
 
 
 def simulation(
-    queue: Queue, render: bool, scale: float, output_width: int, output_height: int, input_width: int, input_height: int, input_depth: int
+    queue: Queue,
+    render: bool,
+    scale: float,
+    output_width: int,
+    output_height: int,
+    input_width: int,
+    input_height: int,
+    input_depth: int,
 ):
     # env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     env = gym_super_mario_bros.make("SuperMarioBros-v0")
@@ -276,7 +291,15 @@ def simulation(
             average_tall_status_count,
             average_fireball_status_count,
         ) = simulate_environment(
-            network, env, render, scale, output_width, output_height, input_width, input_height, input_depth
+            network,
+            env,
+            render,
+            scale,
+            output_width,
+            output_height,
+            input_width,
+            input_height,
+            input_depth,
         )
         # print(info)
 
@@ -333,9 +356,9 @@ if __name__ == "__main__":
     bias_coords = [(0, 0, -2)]
     input_coords = [
         (y, x, z)
-        for y in np.linspace(-1, 1, height)  
+        for y in np.linspace(-1, 1, height)
         for x in np.linspace(-1, 1, width)
-        for z in np.linspace(-1, -.9, input_depth)
+        for z in np.linspace(-1, -0.9, input_depth)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
@@ -383,7 +406,16 @@ if __name__ == "__main__":
 
             p = Process(
                 target=simulation,
-                args=(queue, should_render, scale, output_width, output_height, width, height, input_depth),
+                args=(
+                    queue,
+                    should_render,
+                    scale,
+                    output_width,
+                    output_height,
+                    width,
+                    height,
+                    input_depth,
+                ),
                 daemon=True,
             )
             p.start()
