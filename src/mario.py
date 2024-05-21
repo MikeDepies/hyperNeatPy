@@ -112,15 +112,15 @@ def simulate_environment(
             history.pop(0)  # Remove the oldest element
         history.append(new_image)  # Add the new element
         return history
-
+    image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+        # print(image.shape)
+    torch_input = torch.from_numpy(image.flatten()).float()
+    image_input_history = update_image_input_history(torch_input, image_input_history, input_depth)
     # Example usage:
     # new_image = torch.zeros((height, width)).flatten()  # Replace with actual new image tensor
     # image_input_history = update_image_input_history(new_image, image_input_history, input_depth)
     while True:
-        image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-        # print(image.shape)
-        torch_input = torch.from_numpy(image.flatten()).float()
-        image_input_history = update_image_input_history(torch_input, image_input_history, input_depth)
+        
         # Join each tensor in image_input_history into one large flatten tensor
         large_flatten_tensor = torch.cat([tensor for tensor in image_input_history])
         action_values: np.ndarray = network.forward(large_flatten_tensor).reshape(
@@ -150,7 +150,11 @@ def simulate_environment(
 
         state, reward, done, info = env.step(action.item())
         if tick_count % 40 == 0:
+            image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+            # print(image.shape)
+            torch_input = torch.from_numpy(image.flatten()).float()   
             active_state = state
+            image_input_history = update_image_input_history(torch_input, image_input_history, input_depth)
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
