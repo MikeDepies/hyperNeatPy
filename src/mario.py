@@ -368,8 +368,8 @@ if __name__ == "__main__":
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 3) for x in np.linspace(-1, 1, 4)]
-        for z in np.linspace(-0.9, 0.9, round(50))
+        [(y, x, z) for y in np.linspace(-1, 1, 6) for x in np.linspace(-1, 1, 8)]
+        for z in np.linspace(-0.9, 0.9, round(10))
     ]
     output_width = 12
     output_height = 48
@@ -421,6 +421,8 @@ if __name__ == "__main__":
             p.start()
 
             processes.append(p)
+            if should_render:
+                time.sleep(0.5)
 
         for p in processes:
             p.join()
