@@ -250,11 +250,11 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                 )
                 cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
                 network = TaskNetwork2(substrate, cppn_query_instance)
-                # print("Network genome found " + str(data["id"]))
+                print("Network genome found " + str(data["id"]))
                 queue.put([data["id"], network])
             else:
                 print("No network genome found - sleeping for 1 second")
-                time.sleep(1)
+                time.sleep(.1)
         else:
             print(
                 f"Failed to fetch network genome from {api_url}. Status code: {response.status_code}"
@@ -384,9 +384,9 @@ if __name__ == "__main__":
     print(should_render)
     print(num_instances)
     manager = Manager()
-    queue = manager.Queue(3)
+    queue = manager.Queue(num_instances * 4)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    for i in range(round(num_instances)):
+    for i in range(round(num_instances *2)):
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
