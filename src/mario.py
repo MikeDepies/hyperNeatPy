@@ -117,7 +117,7 @@ def simulate_environment(
 
         state, reward, done, info = env.step(action.item())
         
-        if tick_count % 20 * 1 == 0:
+        if tick_count % 20 * 5 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
             image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
             # print(image.shape)
