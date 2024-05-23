@@ -82,7 +82,7 @@ def simulate_environment(
     if color_channels == 1:
         image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
         torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
-    elif color_channels == 2:
+    elif color_channels == 3:
         image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
         torch_input = torch.from_numpy(image).flatten().float()
     # print(image.shape)
@@ -131,7 +131,7 @@ def simulate_environment(
             if color_channels == 1:
                 image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
                 torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
-            elif color_channels == 2:
+            elif color_channels == 3:
                 image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
                 torch_input = torch.from_numpy(image).flatten().float()
             # print(image.shape)
