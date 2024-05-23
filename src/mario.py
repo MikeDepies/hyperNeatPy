@@ -353,13 +353,13 @@ if __name__ == "__main__":
     scale = 1 / 4
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 3
+    input_depth = 1
     bias_coords = [(0, 0, -2)]
     input_coords = [
         (y, x, z)
         for y in np.linspace(-1, 1, height)
         for x in np.linspace(-1, 1, width)
-        for z in np.linspace(-1, -0.9, input_depth)
+        for z in np.linspace(-1, -0.9, input_depth * 3)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
