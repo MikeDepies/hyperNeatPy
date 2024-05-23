@@ -34,6 +34,7 @@ def simulate_environment(
     input_width: int,
     input_height: int,
     input_depth: int,
+    color_channels: int,
 ):
 
     status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
@@ -59,8 +60,10 @@ def simulate_environment(
     tall_status_count = 0
     fireball_status_count = 0
     x_pos_prev_movement = 40
+    action_change_count = 0
+    prev_action = 0
     image_input_history = [
-        torch.zeros((input_height, input_width, 3)).flatten() for _ in range(input_depth)
+        torch.zeros((input_height, input_width, color_channels)).flatten() for _ in range(input_depth)
     ]
 
     def update_image_input_history(new_image, history, max_size):
@@ -76,11 +79,14 @@ def simulate_environment(
             history.pop(0)  # Remove the oldest element
         history.append(new_image)  # Add the new element
         return history
-
-    # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-    image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
+    if color_channels == 1:
+        image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+        torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+    elif color_channels == 2:
+        image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
+        torch_input = torch.from_numpy(image).flatten().float()
     # print(image.shape)
-    torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+    # torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
     image_input_history = update_image_input_history(
         torch_input, image_input_history, input_depth
     )
@@ -109,6 +115,9 @@ def simulate_environment(
             dim=0
         )  # .softmax(dim=-1)
         action = torch.argmax(action_probabilities)
+        if action != prev_action:
+            action_change_count += 1
+        prev_action = action
         # print(action_probabilities)
         # if (action_probabilities[action.item()] < 0.1):
         # if render:
@@ -117,11 +126,16 @@ def simulate_environment(
 
         state, reward, done, info = env.step(action.item())
         
-        if tick_count % 20 * 5 == 0:
+        if tick_count % 20 * 2 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-            image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
+            if color_channels == 1:
+                image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+                torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+            elif color_channels == 2:
+                image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
+                torch_input = torch.from_numpy(image).flatten().float()
             # print(image.shape)
-            torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+            
             active_state = state
             image_input_history = update_image_input_history(
                 torch_input, image_input_history, input_depth
@@ -191,6 +205,7 @@ def simulate_environment(
         average_small_status_count,
         average_tall_status_count,
         average_fireball_status_count,
+        action_change_count,
     )
 
 
@@ -235,6 +250,7 @@ def simulation(
     input_width: int,
     input_height: int,
     input_depth: int,
+    color_channels: int,
 ):
     env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
     # env = gym_super_mario_bros.make("SuperMarioBros-v0")
@@ -254,6 +270,7 @@ def simulation(
             average_small_status_count,
             average_tall_status_count,
             average_fireball_status_count,
+            action_change_count,
         ) = simulate_environment(
             network,
             env,
@@ -264,6 +281,7 @@ def simulation(
             input_width,
             input_height,
             input_depth,
+            color_channels,
         )
         # print(info)
 
@@ -288,6 +306,7 @@ def simulation(
                 "averageSmallStatusCount": float(average_small_status_count),
                 "averageTallStatusCount": float(average_tall_status_count),
                 "averageFireballStatusCount": float(average_fireball_status_count),
+                "actionChangeCount": float(action_change_count),
             },
         )
         env.reset()
@@ -312,17 +331,18 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
+    color_channels = 1
     scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 5
+    input_depth = 10
     bias_coords = [(0, 0, -2)]
+    
     input_coords = [
         (y, x, z)
         for y in np.linspace(-1, 1, height)
         for x in np.linspace(-1, 1, width)
-        for z in np.linspace(-1, -0.9, input_depth * 3)
+        for z in np.linspace(-1, -0.9, input_depth * color_channels)
     ]
     # previous_outputs = [(x, 0, -.5) for x in np.linspace(-1, 1, 12)]
     attention_coords = [
@@ -333,7 +353,7 @@ if __name__ == "__main__":
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 6) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.9, 0.9, round(10))
+        for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 12
     output_height = 48
@@ -379,6 +399,7 @@ if __name__ == "__main__":
                     width,
                     height,
                     input_depth,
+                    color_channels,
                 ),
                 daemon=True,
             )
