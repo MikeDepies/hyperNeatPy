@@ -60,7 +60,7 @@ def simulate_environment(
     fireball_status_count = 0
     x_pos_prev_movement = 40
     image_input_history = [
-        torch.zeros((input_height, input_width)).flatten() for _ in range(input_depth)
+        torch.zeros((input_height, input_width, 3)).flatten() for _ in range(input_depth)
     ]
 
     def update_image_input_history(new_image, history, max_size):
