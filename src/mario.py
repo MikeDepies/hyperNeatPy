@@ -154,8 +154,9 @@ def simulate_environment(
         # action = torch.tensor(0)
 
         state, reward, done, info = env.step(action.item())
-        if tick_count % 40 == 0:
-            image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+        if tick_count % 20 * 5 == 0:
+            # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+            image = (rescale(active_state, scale, channel_axis=2) / 127.5) -1
             # print(image.shape)
             torch_input = torch.from_numpy(image.flatten()).float()
             active_state = state
@@ -349,10 +350,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    scale = 1 / 16
+    scale = 1 / 4
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 10
+    input_depth = 3
     bias_coords = [(0, 0, -2)]
     input_coords = [
         (y, x, z)
