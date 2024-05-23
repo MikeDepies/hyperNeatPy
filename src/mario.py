@@ -23,15 +23,7 @@ from Network import (
 from SelfAttention import SelfAttention, calculate_patches
 from stageLengthMap import stageLengthMap
 
-# from Network import CPPNConnectionQuery, NetworkProcessor, Substrate, TaskNetwork
 
-
-# def fetch_network_genome(api_url):
-#     response = requests.get(api_url)
-#     if response.status_code == 200:
-#         return json_to_network_genome(response.text)
-#     else:
-#         raise Exception(f"Failed to fetch network genome from {api_url}. Status code: {response.status_code}")
 def simulate_environment(
     network: TaskNetwork2,
     env: gym_super_mario_bros.SuperMarioBrosEnv,
@@ -44,37 +36,6 @@ def simulate_environment(
     input_depth: int,
 ):
 
-    # num_patches = calculate_patches(height, width, 7, 7, 4, 4)
-    # query_dim = 12
-
-    # patch_size = 7
-    # patch_stride = 4
-    # n = int((image_size - patch_size) / patch_stride + 1)
-    # offset = self._patch_size // 2
-    # patch_centers = []
-    # for i in range(n):
-    #     patch_center_row = offset + i * patch_stride
-    #     for j in range(n):
-    #         patch_center_col = offset + j * patch_stride
-    #         patch_centers.append([patch_center_row, patch_center_col])
-    # self._patch_centers = torch.tensor(patch_centers).float()
-
-    # num_patches = n ** 2
-    # for z in np.linspace(-.5, .5, round(3))
-    # data_dim = 3
-    # top_k = 10
-    # patch_size =7
-    # patch_stride = 4
-    # output_dim =3
-    # query_dim =4
-    # in_dim = data_dim * patch_size ** 2
-    # out_dim = query_dim
-    # [
-    #     (x, y, z)
-    #     for x in np.linspace(-1, 1, round(12))
-    #     for y in np.linspace(-1, 1, round(12))
-    #     for z in np.linspace(-.9, .9, round(2))
-    # ]
     status: str = "small"  # Mario's status, i.e., {'small', 'tall', 'fireball'}
 
     active_state: np.ndarray = env.reset()
@@ -117,7 +78,7 @@ def simulate_environment(
         return history
 
     # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-    image = (rescale(active_state, scale, channel_axis=2) / 127.5) -1
+    image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
     # print(image.shape)
     torch_input = torch.from_numpy(image.flatten()).float()
     image_input_history = update_image_input_history(
@@ -157,7 +118,7 @@ def simulate_environment(
         state, reward, done, info = env.step(action.item())
         if tick_count % 20 * 5 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-            image = (rescale(active_state, scale, channel_axis=2) / 127.5) -1
+            image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
             # print(image.shape)
             torch_input = torch.from_numpy(image.flatten()).float()
             active_state = state
@@ -256,7 +217,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                 queue.put([data["id"], network])
             else:
                 print("No network genome found - sleeping for 1 second")
-                time.sleep(.1)
+                time.sleep(0.1)
         else:
             print(
                 f"Failed to fetch network genome from {api_url}. Status code: {response.status_code}"
@@ -274,8 +235,8 @@ def simulation(
     input_height: int,
     input_depth: int,
 ):
-    # env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
+    # env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
@@ -351,10 +312,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    scale = 1 / 8
+    scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 1
+    input_depth = 5
     bias_coords = [(0, 0, -2)]
     input_coords = [
         (y, x, z)
@@ -388,7 +349,7 @@ if __name__ == "__main__":
     manager = Manager()
     queue = manager.Queue(num_instances * 4)
     api_url = "http://192.168.0.100:8080/networkGenome"
-    for i in range(round(num_instances *2)):
+    for i in range(round(num_instances * 2)):
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
