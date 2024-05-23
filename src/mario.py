@@ -117,7 +117,7 @@ def simulate_environment(
 
         state, reward, done, info = env.step(action.item())
         
-        if tick_count % 20 * 5 == 0:
+        if tick_count % 20 * 1 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
             image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
             # print(image.shape)
@@ -137,7 +137,7 @@ def simulate_environment(
             x_pos_prev = x_pos
 
             no_movement_count = 0
-        if no_movement_count >= 20 * 20:
+        if no_movement_count >= 20 * 40:
             break
         if y_pos > y_pos_prev:
             jump_count += 1
@@ -180,8 +180,8 @@ def simulate_environment(
             env.render()
     # if info["flag_get"]:
     #     info["x_pos"] = stageLengthMap[(int(info["world"]), int(info["stage"]))]
-    # if info["stage"] == 4 and info["x_pos"] < cum_reward:
-    #     cum_reward = info["x_pos"] - (400 - info["time"])
+    if info["stage"] == 4 and info["x_pos"] < cum_reward:
+        cum_reward = info["x_pos"] - (400 - info["time"])
     return (
         info,
         cum_reward,
