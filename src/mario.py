@@ -80,7 +80,7 @@ def simulate_environment(
     # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
     image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
     # print(image.shape)
-    torch_input = torch.from_numpy(image.flatten()).float()
+    torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
     image_input_history = update_image_input_history(
         torch_input, image_input_history, input_depth
     )
@@ -116,11 +116,12 @@ def simulate_environment(
         # action = torch.tensor(0)
 
         state, reward, done, info = env.step(action.item())
+        
         if tick_count % 20 * 5 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
             image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
             # print(image.shape)
-            torch_input = torch.from_numpy(image.flatten()).float()
+            torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
             active_state = state
             image_input_history = update_image_input_history(
                 torch_input, image_input_history, input_depth
