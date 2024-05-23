@@ -81,10 +81,10 @@ def simulate_environment(
         return history
     if color_channels == 1:
         image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-        torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+        torch_input = torch.from_numpy(image).flatten().float()
     elif color_channels == 3:
         image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
-        torch_input = torch.from_numpy(image).flatten().float()
+        torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
     # print(image.shape)
     # torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
     image_input_history = update_image_input_history(
@@ -130,10 +130,10 @@ def simulate_environment(
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
             if color_channels == 1:
                 image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-                torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+                torch_input = torch.from_numpy(image).flatten().float()
             elif color_channels == 3:
                 image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
-                torch_input = torch.from_numpy(image).flatten().float()
+                torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
             # print(image.shape)
             
             active_state = state
