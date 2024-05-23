@@ -116,7 +116,8 @@ def simulate_environment(
         history.append(new_image)  # Add the new element
         return history
 
-    image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+    # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+    image = (rescale(active_state, scale, channel_axis=2) / 127.5) -1
     # print(image.shape)
     torch_input = torch.from_numpy(image.flatten()).float()
     image_input_history = update_image_input_history(
