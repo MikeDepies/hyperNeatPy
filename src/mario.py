@@ -335,7 +335,7 @@ if __name__ == "__main__":
     scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 1
+    input_depth = 5
     bias_coords = [(0, 0, -2)]
     
     input_coords = [
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 3) for x in np.linspace(-1, 1, 4)]
+        [(y, x, z) for y in np.linspace(-1, 1, 5) for x in np.linspace(-1, 1, 8)]
         for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 12
