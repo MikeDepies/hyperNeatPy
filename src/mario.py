@@ -126,7 +126,7 @@ def simulate_environment(
 
         state, reward, done, info = env.step(action.item())
         
-        if tick_count % 20 * 2 == 0:
+        if tick_count % 20 * 1 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
             if color_channels == 1:
                 image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
@@ -335,7 +335,7 @@ if __name__ == "__main__":
     scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
-    input_depth = 10
+    input_depth = 1
     bias_coords = [(0, 0, -2)]
     
     input_coords = [
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 6) for x in np.linspace(-1, 1, 8)]
+        [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
         for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 12
