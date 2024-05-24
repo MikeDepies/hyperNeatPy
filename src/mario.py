@@ -331,7 +331,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    color_channels = 1
+    color_channels = 3
     scale = 1 / 16
     width = round(256 * scale)
     height = round(240 * scale)
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
+        [(y, x, z) for y in np.linspace(-1, 1, 3) for x in np.linspace(-1, 1, 4)]
         for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 12
