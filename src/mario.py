@@ -126,21 +126,21 @@ def simulate_environment(
 
         state, reward, done, info = env.step(action.item())
         
-        if tick_count % 20 * 1 == 0:
+        # if tick_count % 20 * 1 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-            if color_channels == 1:
-                image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
-                torch_input = torch.from_numpy(image).flatten().float()
-            elif color_channels == 3:
-                image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
-                torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
-            # print(image.shape)
-            
-            active_state = state
-            image_input_history = update_image_input_history(
-                torch_input, image_input_history, input_depth
-            )
-            large_flatten_tensor = torch.cat([tensor for tensor in image_input_history])
+        if color_channels == 1:
+            image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+            torch_input = torch.from_numpy(image).flatten().float()
+        elif color_channels == 3:
+            image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
+            torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
+        # print(image.shape)
+        
+        active_state = state
+        image_input_history = update_image_input_history(
+            torch_input, image_input_history, input_depth
+        )
+        large_flatten_tensor = torch.cat([tensor for tensor in image_input_history])
         cum_reward += reward
         x_pos = info["x_pos"]
         y_pos = info["y_pos"]
