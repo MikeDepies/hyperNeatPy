@@ -253,7 +253,7 @@ def simulation(
     color_channels: int,
 ):
     # env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
-    env = gym_super_mario_bros.make("SuperMarioBros-v0")
+    env = gym_super_mario_bros.make("SuperMarioBros-v3")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
@@ -332,7 +332,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     color_channels = 3
-    scale = 1 / 16
+    scale = 1 / 8
     width = round(256 * scale)
     height = round(240 * scale)
     input_depth = 5
