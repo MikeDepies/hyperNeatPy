@@ -832,8 +832,8 @@ def main():
     ]
     output_width = 5
     output_height = 1
-    analog_width = 5
-    analog_height = 5
+    analog_width = 10
+    analog_height = 10
     analog_coords = [
         (y, x, 0.9)
         for y in np.linspace(-1, 1, analog_height)
