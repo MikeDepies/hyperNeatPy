@@ -321,10 +321,11 @@ class GameStateDeltaProcessor:
             player2 = agent2.player(self.game_state)
             prev_player2 = agent2.player(self.prev_game_state)
             player1_percent_change = player1.percent - prev_player1.percent
-            player1_stock_change = player1.stock - prev_player1.stock
+            player1_stock_change = int(player1.stock) - int(prev_player1.stock)
             player2_percent_change = player2.percent - prev_player2.percent
-            player2_stock_change = player2.stock - prev_player2.stock
-
+            player2_stock_change = int(player2.stock) - int(prev_player2.stock)
+            print(f"player1_stock_change: {player1_stock_change}")
+            # print(f"player2_stock_change: {player2_stock_change}")
             if player1_stock_change < 0:
                 # lose stocks
                 agent1_score_delta.death_count_delta = 1
