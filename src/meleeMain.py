@@ -55,7 +55,6 @@ class MeleeArgs:
         dolphin_executable_path,
         connect_code,
         iso,
-        console_port,
     ):
         self.mode = mode
         self.num_instances = num_instances
@@ -67,18 +66,11 @@ class MeleeArgs:
         self.dolphin_executable_path = dolphin_executable_path
         self.connect_code = connect_code
         self.iso = iso
-        self.console_port = console_port
 
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Melee")
-    parser.add_argument(
-        "--console_port",
-        "-c",
-        type=int,
-        help="The port the console will run on",
-        default=4444,
-    )
+
     parser.add_argument(
         "--mode",
         "-m",
@@ -144,7 +136,7 @@ def parseArgs():
         dolphin_executable_path=args.dolphin_executable_path,
         connect_code=args.connect_code,
         iso=args.iso,
-        console_port=args.console_port,
+        
     )
 
 
@@ -152,14 +144,14 @@ def createMelee(args: MeleeArgs, instance_num: int):
     if args.mode == "stream":
         console = Console(
             path=args.dolphin_executable_path,
-            slippi_port=args.console_port + instance_num,
+            slippi_port=args.dolphin_port + instance_num,
             blocking_input=False,
             polling_mode=False,
         )
     else:
         console = Console(
             path=args.dolphin_executable_path,
-            slippi_port=args.console_port,
+            slippi_port=args.dolphin_port + i,
             blocking_input=True,
             polling_mode=False,
             setup_gecko_codes=True,
@@ -811,6 +803,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 
 def main():
     args = parseArgs()
+    print(args.console_port)
     use_action_coords = False
     width = 8
     height = 2
