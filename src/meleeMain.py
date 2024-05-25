@@ -610,6 +610,7 @@ def simulation(
             "death_count": agent_score.death_count,
             "damage_dealt": agent_score.damage_dealt,
             "damage_received": agent_score.damage_received,
+            "cpu_level": cpu_config.cpu_level,
         }
         # score_queue.put(score_dict)
         if args.mode == "train":
@@ -757,6 +758,7 @@ def score_queue_process(score_queue: Queue):
                 "stocksLost": score["death_count"],
                 "damageDone": score["damage_dealt"],
                 "damageTaken": score["damage_received"],
+                "cpuLevel": score["cpu_level"],
             },
         )
         print("send request!")
