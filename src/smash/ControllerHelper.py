@@ -49,7 +49,9 @@ class ControllerHelper:
     def processAnalog(self, analogOutput : Tensor):
         flat_index = torch.argmax(analogOutput)
         max_index = torch.unravel_index(flat_index, analogOutput.shape)
-        max_analog_y = max_index[0]
-        max_analog_x = max_index[1]
+        max_analog_y = max_index[0].item()
+        max_analog_x = max_index[1].item()
         shape = analogOutput.shape
-        return (max_analog_x / (shape[0] - 1), max_analog_y / (shape [1] - 1))
+        analog = (max_analog_x / (shape[0] - 1), max_analog_y / (shape [1] - 1))
+        return analog
+
