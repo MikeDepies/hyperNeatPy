@@ -151,7 +151,7 @@ def createMelee(args: MeleeArgs, instance_num: int):
     else:
         console = Console(
             path=args.dolphin_executable_path,
-            slippi_port=args.dolphin_port + i,
+            slippi_port=args.dolphin_port + instance_num,
             blocking_input=True,
             polling_mode=False,
             setup_gecko_codes=True,
@@ -803,7 +803,6 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 
 def main():
     args = parseArgs()
-    print(args.console_port)
     use_action_coords = False
     width = 8
     height = 2
