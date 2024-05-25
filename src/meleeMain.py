@@ -866,11 +866,12 @@ def main():
     manager = Manager()
     queue = manager.Queue(num_instances)
     score_queue = manager.Queue(num_instances)
-    api_url = "http://192.168.0.100:8080/networkGenome"  # if mode == "train" else "http://192.168.0.100:8080/sampleBestGenome"
+    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestNetworkGenome"
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
     for i in range(round(num_instances)):
+        
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
@@ -881,6 +882,7 @@ def main():
             daemon=True,
         )
         queueProcess.start()
+        time.sleep(3)
 
     # while True:
 
