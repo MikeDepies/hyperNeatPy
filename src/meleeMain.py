@@ -533,10 +533,10 @@ class MeleeSimulation:
             )
             main_stick_x, main_stick_y = self.controller_helper.processAnalog(analog)
             c_analog_x, c_analog_y = self.controller_helper.processAnalog(c_analog)
-            print(f"main stick x: {main_stick_x}")
-            print(f"main stick y: {main_stick_y}")
-            print(f"c stick x: {c_analog_x}")
-            print(f"c stick y: {c_analog_y}")
+            # print(f"main stick x: {main_stick_x}")
+            # print(f"main stick y: {main_stick_y}")
+            # print(f"c stick x: {c_analog_x}")
+            # print(f"c stick y: {c_analog_y}")
             self.controller_helper.processMessage(
                 {
                     "a": press_a,
