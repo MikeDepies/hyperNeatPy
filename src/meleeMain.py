@@ -324,7 +324,7 @@ class GameStateDeltaProcessor:
             player1_stock_change = int(player1.stock) - int(prev_player1.stock)
             player2_percent_change = player2.percent - prev_player2.percent
             player2_stock_change = int(player2.stock) - int(prev_player2.stock)
-            print(f"player1_stock_change: {player1_stock_change}")
+            # print(f"player1_stock_change: {player1_stock_change}")
             # print(f"player2_stock_change: {player2_stock_change}")
             if player1_stock_change < 0:
                 # lose stocks
