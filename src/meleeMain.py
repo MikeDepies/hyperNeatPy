@@ -148,11 +148,11 @@ def parseArgs():
     )
 
 
-def createMelee(args: MeleeArgs):
+def createMelee(args: MeleeArgs, instance_num: int):
     if args.mode == "stream":
         console = Console(
             path=args.dolphin_executable_path,
-            slippi_port=args.console_port,
+            slippi_port=args.console_port + instance_num,
             blocking_input=False,
             polling_mode=False,
         )
@@ -557,9 +557,9 @@ class MeleeSimulation:
 
 
 def simulation(
-    queue: Queue, score_queue: Queue, args: MeleeArgs, use_action_coords: bool
+    queue: Queue, score_queue: Queue, args: MeleeArgs, use_action_coords: bool, instance_num: int
 ):
-    meleeCore = createMelee(args)
+    meleeCore = createMelee(args, instance_num)
     meleeCore.run()
     signal_handler = MeleeSignalHandler(meleeCore)
     signal.signal(signal.SIGINT, signal_handler.signal_handler)
@@ -877,7 +877,7 @@ def main():
 
         p = Process(
             target=simulation,
-            args=(queue, score_queue, args, use_action_coords),
+            args=(queue, score_queue, args, use_action_coords, i),
             daemon=True,
         )
         p.start()
