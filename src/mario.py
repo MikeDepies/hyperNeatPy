@@ -219,7 +219,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             data = json.loads(response.text)
             # print(data)
             if data["exists"]:
-                network_genome = json_to_network_genome(data)
+                network_genome = json_to_network_genome(data["networkGenome"])
                 network_builder = NetworkBuilder(DefaultActivationFunctionMapper())
                 network_processor_factory = NetworkProcessorFactory(
                     network_builder, False, 1, 0.01

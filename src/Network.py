@@ -625,8 +625,8 @@ class TaskNetwork(torch.nn.Module):
         return self.outputs
 
 
-def json_to_network_genome(data) -> NetworkGenome:
-    network_genome = data["networkGenome"]
+def json_to_network_genome(network_genome) -> NetworkGenome:
+    # network_genome = data["networkGenome"]
     node_genomes = list(
         map(
             lambda d: NodeGenome(
@@ -646,9 +646,9 @@ def json_to_network_genome(data) -> NetworkGenome:
             network_genome["connectionGenes"],
         )
     )
-    fitness = data.get("fitness")
-    shared_fitness = data.get("sharedFitness")
-    species_id = data.get("speciesId")
+    fitness = network_genome.get("fitness")
+    shared_fitness = network_genome.get("sharedFitness")
+    species_id = network_genome.get("speciesId")
     return NetworkGenome(
         node_genomes, connection_genes, fitness, shared_fitness, species_id
     )
@@ -687,6 +687,7 @@ class TaskNetwork2(torch.nn.Module):
         self.substrate = substrate
         # self.self_attention = SelfAttention(weights_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])), weights_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])))
         # Get connection matrices with weights potentially being zero
+        
         self.input_hidden_weights = substrate.get_layer_connections(
             substrate.input_coords, substrate.hidden_coords[0], cppn_query
         )
@@ -722,7 +723,7 @@ class TaskNetwork2(torch.nn.Module):
             for i in range(len(self.hidden_bias_weights))
         ]
 
-    def forward(self, inputs):
+    def forward(self, inputs : torch.Tensor):
         # print(inputs)
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
