@@ -606,8 +606,17 @@ def simulation(
             if state == SimulationState.GAME_OVER:
                 print("Game Over")
                 break
-        if args.mode == "train":
-            score_queue.put((id, agent_score))
+        print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
+        score_dict = {
+            "id": id,
+            "kill_count": agent_score.kill_count,
+            "death_count": agent_score.death_count,
+            "damage_dealt": agent_score.damage_dealt,
+            "damage_received": agent_score.damage_received,
+        }
+        # score_queue.put(score_dict)
+        # if args.mode == "train":
+        score_queue.put(score_dict)
         # else:
         #     score_queue.put((id, agent_score))
     # simulation.simulation_step(game_state, game_state_evaluator, menu_helper)
@@ -740,17 +749,20 @@ def score_queue_process(score_queue: Queue):
     id: str
     score: AgentScore
     while True:
-        (id, score) = score_queue.get()
+        score = score_queue.get()
+        id = score["id"]
+        # print(f"process: {id} {score}")
         requests.post(
             "http://192.168.0.100:8080/score",
             json={
                 "id": id,
-                "stocksTaken": score.kill_count,
-                "stocksLost": score.death_count,
-                "damageDone": score.damage_dealt,
-                "damageTaken": score.damage_received,
+                "stocksTaken": score["kill_count"],
+                "stocksLost": score["death_count"],
+                "damageDone": score["damage_dealt"],
+                "damageTaken": score["damage_received"],
             },
         )
+        print("send request!")
 
 
 def game_state_to_tensor(
