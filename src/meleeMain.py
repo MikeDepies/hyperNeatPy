@@ -802,8 +802,8 @@ def game_state_to_tensor_action_normalized(
 
 def output_tensor_to_controller_tensors(output_tensor: Tensor):
     buttons = output_tensor[:, :5].reshape(1, 5)
-    analog = output_tensor[:, 5:30].reshape(10, 10)
-    c_analog = output_tensor[:, 30:65].reshape(10, 10)
+    analog = output_tensor[:, 5:105].reshape(10, 10)
+    c_analog = output_tensor[:, 105:205].reshape(10, 10)
     return buttons, analog, c_analog
 
 
