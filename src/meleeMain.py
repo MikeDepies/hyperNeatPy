@@ -613,12 +613,13 @@ def simulation(
             agent_configuration_list, stage
         )
         meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
-        game_state_evaluator = GameStateEvaluator(
-            meleeCore,
-            [
+        agents = [
                 Agent(meleeCore, agent_config, meleeCore.controller, network),
                 Agent(meleeCore, cpu_config, meleeCore.controller_opponent, None),
-            ],
+            ]
+        game_state_evaluator = GameStateEvaluator(
+            meleeCore,
+            agents,
             GameStateDeltaProcessor(),
         )
         agent_score: AgentScore
@@ -630,7 +631,8 @@ def simulation(
                 print(f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}")
                 first_step = False
             if agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
-                print(f"({instance_num}) game state: {game_state.menu_state} frame: {game_state.frame}")
+                if game_state.frame % (60 * 5) == 0 and game_state.menu_state == melee.Menu.IN_GAME:
+                    print(f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}")
             # print(game_state)
             # print(agent_config.character)
             # print(cpu_config.character)
