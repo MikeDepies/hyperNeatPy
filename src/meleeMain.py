@@ -622,9 +622,13 @@ def simulation(
             GameStateDeltaProcessor(),
         )
         agent_score: AgentScore
+        first_step = True
         print(f"start loop {instance_num}")
         while True:
             game_state = meleeCore.next_step()
+            if first_step:
+                print(f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}")
+                first_step = False
             # print(game_state)
             # print(agent_config.character)
             # print(cpu_config.character)
