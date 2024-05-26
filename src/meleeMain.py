@@ -598,15 +598,16 @@ def simulation(
     network: TaskNetwork2
     agent_config: AgentConfiguration
     cpu_config: AgentConfiguration
+    stage : melee.Stage
     # fetch from queue
     while True:
-        (id, network, agent_config, cpu_config) = queue.get()
+        (id, network, agent_config, cpu_config, stage) = queue.get()
         agent_configuration_list = [
             agent_config,
             cpu_config,
         ]
         melee_config = MeleeConfiguration(
-            agent_configuration_list, melee.Stage.FINAL_DESTINATION
+            agent_configuration_list, stage
         )
         simulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
         game_state_evaluator = GameStateEvaluator(
@@ -765,6 +766,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                     network,
                     task.agent_task.agent_config,
                     task.cpu_task.agent_config,
+                    task.stage
                 ]
             )
 
@@ -798,11 +800,80 @@ def score_queue_process(score_queue: Queue):
         )
         print("send request!")
 
+def stageToInt(stage: melee.Stage):
+    if stage == melee.Stage.FINAL_DESTINATION:
+        return 0
+    elif stage == melee.Stage.BATTLEFIELD:
+        return 1
+    elif stage == melee.Stage.DREAMLAND:
+        return 2
+    elif stage == melee.Stage.POKEMON_STADIUM:
+        return 3
+    elif stage == melee.Stage.FOUNTAIN_OF_DREAMS:
+        return 4
+    elif stage == melee.Stage.YOSHIS_STORY:
+        return 5
+
+def characterToInt(character: melee.Character):
+    if character == melee.Character.MARIO:
+        return 0
+    elif character == melee.Character.FOX:
+        return 1
+    elif character == melee.Character.CPTFALCON:
+        return 2
+    elif character == melee.Character.DK:
+        return 3
+    elif character == melee.Character.KIRBY:
+        return 4
+    elif character == melee.Character.BOWSER:
+        return 5
+    elif character == melee.Character.LINK:
+        return 6
+    elif character == melee.Character.SHEIK:
+        return 7
+    elif character == melee.Character.NESS:
+        return 8
+    elif character == melee.Character.PEACH:
+        return 9
+    elif character == melee.Character.POPO:
+        return 10
+    elif character == melee.Character.NANA:
+        return 11
+    elif character == melee.Character.PIKACHU:
+        return 12
+    elif character == melee.Character.SAMUS:
+        return 13
+    elif character == melee.Character.YOSHI:
+        return 14
+    elif character == melee.Character.JIGGLYPUFF:
+        return 15
+    elif character == melee.Character.MEWTWO:
+        return 16
+    elif character == melee.Character.LUIGI:
+        return 17
+    elif character == melee.Character.MARTH:
+        return 18
+    elif character == melee.Character.ZELDA:
+        return 19
+    elif character == melee.Character.YLINK:
+        return 20
+    elif character == melee.Character.DOC:
+        return 21
+    elif character == melee.Character.FALCO:
+        return 22
+    elif character == melee.Character.PICHU:
+        return 23
+    elif character == melee.Character.GAMEANDWATCH:
+        return 24
+    elif character == melee.Character.GANONDORF:
+        return 25
+    elif character == melee.Character.ROY:
+        return 26
 
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 7))
+    input_tensor = torch.zeros((2, 9))
     input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -812,6 +883,8 @@ def game_state_to_tensor(
         input_tensor[i, 4] = 1 if player.facing == True else -1
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
+        input_tensor[i, 7] = stageToInt(game_state.stage) / 6
+        input_tensor[i, 8] = characterToInt(player.character) / 26
         input_action_tensor[i, min(385, player.action.value)] = 1
 
     return input_tensor, input_action_tensor
@@ -820,7 +893,7 @@ def game_state_to_tensor(
 def game_state_to_tensor_action_normalized(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 8))
+    input_tensor = torch.zeros((2, 10))
     # input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -831,6 +904,8 @@ def game_state_to_tensor_action_normalized(
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
         input_tensor[i, 7] = min(385, player.action.value) / 385
+        input_tensor[i, 8] = stageToInt(game_state.stage) / 6
+        input_tensor[i, 9] = characterToInt(player.character) / 26
 
     return input_tensor
 
@@ -845,7 +920,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 def main():
     args = parseArgs()
     use_action_coords = False
-    width = 8
+    width = 10
     height = 2
     action_width = 386
     action_height = 2
