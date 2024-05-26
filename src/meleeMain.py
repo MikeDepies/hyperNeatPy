@@ -601,6 +601,7 @@ def simulation(
     stage : melee.Stage
     # fetch from queue
     while True:
+        print("get next network")
         (id, network, agent_config, cpu_config, stage) = queue.get()
         agent_configuration_list = [
             agent_config,
@@ -619,6 +620,7 @@ def simulation(
             GameStateDeltaProcessor(),
         )
         agent_score: AgentScore
+        print("start loop")
         while True:
             game_state = meleeCore.next_step()
             print(game_state)
@@ -651,7 +653,7 @@ def simulation(
         if args.mode == "train":
             score_queue.put(score_dict)
         print("last after send")
-    print("done?")
+    
         # else:
         #     score_queue.put((id, agent_score))
     # simulation.simulation_step(game_state, game_state_evaluator, menu_helper)
