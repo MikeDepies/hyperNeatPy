@@ -602,6 +602,7 @@ def simulation(
             agent_score = score[1]
             if state == SimulationState.GAME_OVER:
                 print("Game Over")
+                meleeCore.controller.release_all()
                 break
         print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
         score_dict = {
