@@ -612,9 +612,9 @@ def simulation(
             "damage_dealt": agent_score.damage_dealt,
             "damage_received": agent_score.damage_received,
             "cpu_level": cpu_config.cpu_level,
-            "stage": melee_config.stage,
-            "character" : agent_config.character,
-            "opponent_character" : cpu_config.character,
+            "stage": melee_config.stage.name,
+            "character" : agent_config.character.name,
+            "opponent_character" : cpu_config.character.name,
 
         }
         # score_queue.put(score_dict)
