@@ -313,7 +313,7 @@ class GameStateDeltaProcessor:
             return
         delta_scores: List[AgentScoreDelta] = []
         for [agent1, agent2] in agents:
-            agent1_score_delta = AgentScoreDelta(agent1, 0, 0, 0.0, 0.0)
+            agent1_score_delta = AgentScoreDelta(agent1, 0, 0, 0.0, 0.0, 0.0)
             player1 = agent1.player(self.game_state)
             prev_player1 = agent1.player(self.prev_game_state)
             player2 = agent2.player(self.game_state)
