@@ -624,6 +624,8 @@ def simulation(
         while True:
             game_state = meleeCore.next_step()
             print(game_state)
+            print(agent_config.character)
+            print(cpu_config.character)
             if game_state is None:
                 print("Game state is None")
                 continue
