@@ -203,6 +203,8 @@ class MeleeCore:
 
     def stop(self):
         self.console.stop()
+        print("=>>>>>>>>>>>>>>>>SHUTTING DOWN<<<<<<<<<<<<<<<<<=")
+        
 
     def next_step(self):
         return self.console.step()
@@ -630,8 +632,9 @@ def simulation(
             if game_state is None:
                 print("Game state is None")
                 meleeCore.stop()
-                simulation(queue, score_queue, args, use_action_coords, instance_num)
-                return
+                # simulation(queue, score_queue, args, use_action_coords, instance_num)
+                
+                break
             (score, state) = meleeSimulation.simulation_step(
                 game_state, game_state_evaluator, menu_helper
             )
