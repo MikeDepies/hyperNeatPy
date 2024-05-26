@@ -419,6 +419,12 @@ def characterToString(character : melee.Character):
         return "FOX"
     elif character == melee.Character.FALCO:
         return "FALCO"
+    elif character == melee.Character.LINK:
+        return "LINK"
+    elif character == melee.Character.MARIO:
+        return "MARIO"
+    elif character == melee.Character.YOSHI:
+        return "YOSHI"
 
 class SimulationState(Enum):
     RUNNING = 0
