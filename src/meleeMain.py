@@ -647,8 +647,11 @@ def simulation(
 
         }
         # score_queue.put(score_dict)
+        print("last before send")
         if args.mode == "train":
             score_queue.put(score_dict)
+        print("last after send")
+    print("done?")
         # else:
         #     score_queue.put((id, agent_score))
     # simulation.simulation_step(game_state, game_state_evaluator, menu_helper)
