@@ -630,8 +630,8 @@ def simulation(
             if first_step:
                 print(f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}")
                 first_step = False
-            if agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
-                if game_state.frame % (60 * 5) == 0 and game_state.menu_state == melee.Menu.IN_GAME:
+            if game_state.frame > 60*60*4: #agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
+                if game_state.frame % (60 * 10) == 0 and game_state.menu_state == melee.Menu.IN_GAME:
                     print(f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}")
             # print(game_state)
             # print(agent_config.character)
