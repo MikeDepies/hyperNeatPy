@@ -821,28 +821,28 @@ def main():
         for x in np.linspace(-1, 1, width)
     ]
     action_coords = [
-        (y, x, -9)
+        (y, x, -0.9)
         for y in np.linspace(-1, 1, action_height)
         for x in np.linspace(-1, 1, action_width)
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 16)]
-        for z in np.linspace(-0.9, 0.9, round(10))
+        for z in np.linspace(-0.9, 0.0, round(10))
     ]
     output_width = 5
     output_height = 1
     analog_width = 10
     analog_height = 10
     analog_coords = [
-        (y, x, 0.9)
-        for y in np.linspace(-1, 1, analog_height)
-        for x in np.linspace(-1, 1, analog_width)
+        (y, x, 0.6)
+        for y in np.linspace(-1, 0, analog_height)
+        for x in np.linspace(-1, 0, analog_width)
     ]
     c_analog_coords = [
-        (y, x, 0.95)
-        for y in np.linspace(-1, 1, analog_height)
-        for x in np.linspace(-1, 1, analog_width)
+        (y, x, 0.6)
+        for y in np.linspace(0, 1, analog_height)
+        for x in np.linspace(0, 1, analog_width)
     ]
     output_coords = [
         (y, x, 1)
