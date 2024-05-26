@@ -272,12 +272,14 @@ class AgentScore:
         death_count: int,
         damage_dealt: float,
         damage_received: float,
+        center_advantage: float
     ):
         self.agent = agent
         self.kill_count = kill_count
         self.death_count = death_count
         self.damage_dealt = damage_dealt
         self.damage_received = damage_received
+        self.center_advantage = center_advantage
 
 
 class AgentScoreDelta:
@@ -288,12 +290,14 @@ class AgentScoreDelta:
         death_count_delta: int,
         damage_dealt_delta: float,
         damage_received_delta: float,
+        center_advantage_delta: float
     ):
         self.agent = agent
         self.kill_count_delta = kill_count_delta
         self.death_count_delta = death_count_delta
         self.damage_dealt_delta = damage_dealt_delta
         self.damage_received_delta = damage_received_delta
+        self.center_advantage_delta = center_advantage_delta
 
 
 class GameStateDeltaProcessor:
@@ -320,6 +324,8 @@ class GameStateDeltaProcessor:
             player2_stock_change = int(player2.stock) - int(prev_player2.stock)
             # print(f"player1_stock_change: {player1_stock_change}")
             # print(f"player2_stock_change: {player2_stock_change}")
+            if abs(player1.x) < 25:
+                agent1_score_delta.center_advantage_delta = 1
             if player1_stock_change < 0:
                 # lose stocks
                 agent1_score_delta.death_count_delta = 1
@@ -372,6 +378,9 @@ class GameStateEvaluator:
             self.agent_scores[
                 delta_score.agent.agent_configuration.port
             ].damage_received += delta_score.damage_received_delta
+            self.agent_scores[
+                delta_score.agent.agent_configuration.port
+            ].center_advantage += delta_score.center_advantage_delta
         return self.agent_scores
 
 
@@ -660,6 +669,7 @@ def simulation(
             "death_count": agent_score.death_count,
             "damage_dealt": agent_score.damage_dealt,
             "damage_received": agent_score.damage_received,
+            "center_advantage": agent_score.center_advantage,
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
             "character" : characterToString(agent_config.character),
@@ -816,6 +826,7 @@ def score_queue_process(score_queue: Queue):
                 "stocksLost": score["death_count"],
                 "damageDone": score["damage_dealt"],
                 "damageTaken": score["damage_received"],
+                "centerAdvantage": score["center_advantage"],
                 "cpuLevel": score["cpu_level"],
                 "stage": score["stage"],
                 "character": score["character"],
