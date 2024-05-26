@@ -625,6 +625,8 @@ def simulation(
         agent_score: AgentScore
         first_step = True
         print(f"start loop {instance_num}")
+        if agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
+            continue
         while True:
             game_state = meleeCore.next_step()
             if first_step:
