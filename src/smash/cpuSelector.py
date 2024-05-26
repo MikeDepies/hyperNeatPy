@@ -123,7 +123,7 @@ def choose_character(character : melee.Character, gamestate : melee.GameState, c
                     controller.tilt_analog(melee.Button.BUTTON_MAIN, .65, .5)
                     return
                 if ai_state.cpu_level == cpu_level:
-                    print("level: " + str(cpu_level) + " cursor: " + str(cursor_x))
+                    # print("level: " + str(cpu_level) + " cursor: " + str(cursor_x))
                     if gamestate.frame % 2 == 0:
                         controller.press_button(melee.Button.BUTTON_A)
                     else:

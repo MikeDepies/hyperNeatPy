@@ -640,10 +640,10 @@ def simulation(
             )
             agent_score = score[1]
             if state == SimulationState.GAME_OVER:
-                print("Game Over")
+                # print("Game Over")
                 meleeCore.controller.release_all()
                 break
-        print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
+        # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
         score_dict = {
             "id": id,
             "kill_count": agent_score.kill_count,
@@ -812,7 +812,7 @@ def score_queue_process(score_queue: Queue):
                 "opponentCharacter": score["opponent_character"],
             },
         )
-        print("send request!")
+        # print("send request!")
 
 def stageToInt(stage: melee.Stage):
     if stage == melee.Stage.FINAL_DESTINATION:
@@ -988,8 +988,8 @@ def main():
     print(mode)
     print(num_instances)
     manager = Manager()
-    queue = manager.Queue(num_instances)
-    score_queue = manager.Queue(num_instances)
+    queue = manager.Queue(num_instances * 2)
+    score_queue = manager.Queue(num_instances * 5)
     api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestNetworkGenome"
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
