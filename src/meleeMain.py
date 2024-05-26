@@ -354,7 +354,7 @@ class GameStateEvaluator:
         self.agents = agents
         self.game_state_processor = game_state_processor
         self.agent_scores = {
-            agent.agent_configuration.port: AgentScore(agent, 0, 0, 0.0, 0.0)
+            agent.agent_configuration.port: AgentScore(agent, 0, 0, 0.0, 0.0, 0.0)
             for agent in agents
         }
 
