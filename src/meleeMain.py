@@ -612,6 +612,10 @@ def simulation(
             "damage_dealt": agent_score.damage_dealt,
             "damage_received": agent_score.damage_received,
             "cpu_level": cpu_config.cpu_level,
+            "stage": melee_config.stage,
+            "character" : agent_config.character,
+            "opponent_character" : cpu_config.character,
+
         }
         # score_queue.put(score_dict)
         if args.mode == "train":
@@ -760,6 +764,9 @@ def score_queue_process(score_queue: Queue):
                 "damageDone": score["damage_dealt"],
                 "damageTaken": score["damage_received"],
                 "cpuLevel": score["cpu_level"],
+                "stage": score["stage"],
+                "character": score["character"],
+                "opponentCharacter": score["opponent_character"],
             },
         )
         print("send request!")
