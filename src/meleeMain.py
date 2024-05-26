@@ -601,7 +601,7 @@ def simulation(
     stage : melee.Stage
     # fetch from queue
     while True:
-        print("get next network")
+        # print("get next network")
         (id, network, agent_config, cpu_config, stage) = queue.get()
         agent_configuration_list = [
             agent_config,
@@ -610,7 +610,7 @@ def simulation(
         melee_config = MeleeConfiguration(
             agent_configuration_list, stage
         )
-        simulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
+        meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
         game_state_evaluator = GameStateEvaluator(
             meleeCore,
             [
@@ -623,14 +623,16 @@ def simulation(
         print("start loop")
         while True:
             game_state = meleeCore.next_step()
-            print(game_state)
-            print(agent_config.character)
-            print(cpu_config.character)
-            print(stage)
+            # print(game_state)
+            # print(agent_config.character)
+            # print(cpu_config.character)
+            # print(stage)
             if game_state is None:
                 print("Game state is None")
-                continue
-            (score, state) = simulation.simulation_step(
+                meleeCore.stop()
+                simulation(queue, score_queue, args, use_action_coords, instance_num)
+                return
+            (score, state) = meleeSimulation.simulation_step(
                 game_state, game_state_evaluator, menu_helper
             )
             agent_score = score[1]
@@ -652,10 +654,10 @@ def simulation(
 
         }
         # score_queue.put(score_dict)
-        print("last before send")
+        # print("last before send")
         if args.mode == "train":
             score_queue.put(score_dict)
-        print("last after send")
+        # print("last after send")
     
         # else:
         #     score_queue.put((id, agent_score))
