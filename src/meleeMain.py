@@ -374,13 +374,40 @@ class GameStateEvaluator:
 
 
 class MeleeConfiguration:
-    def __init__(self, agents: List[AgentConfiguration], stage: melee.enums.Stage):
+    def __init__(self, agents: List[AgentConfiguration], stage: melee.Stage):
         self.agents = agents
         self.stage = stage
 
 
 from enum import Enum
 
+def stageToString(stage : melee.Stage):
+    if stage == melee.Stage.FINAL_DESTINATION:
+        return "FINALDESTINATION"
+    elif stage == melee.Stage.BATTLEFIELD:
+        return "BATTLEFIELD"
+    elif stage == melee.Stage.POKEMON_STADIUM:
+        return "POKEMONSTADIUM"
+    elif stage == melee.Stage.DREAMLAND:
+        return "DREAMLAND"
+    elif stage == melee.Stage.FOUNTAIN_OF_DREAMS:
+        return "FOUNTAINOFDREAMS"
+    elif stage == melee.Stage.YOSHIS_STORY:
+        return "YOSHISSTORY"
+
+def characterToString(character : melee.Character):
+    if character == melee.Character.DOC:
+        return "DOC"
+    elif character == melee.Character.DK:
+        return "DK"
+    elif character == melee.Character.CPTFALCON:
+        return "CPTFALCON"
+    elif character == melee.Character.GANONDORF:
+        return "GANONDORF"
+    elif character == melee.Character.FOX:
+        return "FOX"
+    elif character == melee.Character.FALCO:
+        return "FALCO"
 
 class SimulationState(Enum):
     RUNNING = 0
@@ -612,9 +639,9 @@ def simulation(
             "damage_dealt": agent_score.damage_dealt,
             "damage_received": agent_score.damage_received,
             "cpu_level": cpu_config.cpu_level,
-            "stage": melee_config.stage.name,
-            "character" : agent_config.character.name,
-            "opponent_character" : cpu_config.character.name,
+            "stage": stageToString(melee_config.stage),
+            "character" : characterToString(agent_config.character),
+            "opponent_character" : characterToString(cpu_config.character),
 
         }
         # score_queue.put(score_dict)
