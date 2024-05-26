@@ -630,7 +630,7 @@ def simulation(
                 print(f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}")
                 first_step = False
             if agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
-                print(game_state.menu_state)
+                print(f"({instance_num}) game state: {game_state.menu_state} frame: {game_state.frame}")
             # print(game_state)
             # print(agent_config.character)
             # print(cpu_config.character)
