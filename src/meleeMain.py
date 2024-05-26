@@ -884,7 +884,7 @@ def characterToInt(character: melee.Character):
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 9))
+    input_tensor = torch.zeros((2, 10))
     input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -905,7 +905,7 @@ def game_state_to_tensor(
 def game_state_to_tensor_action_normalized(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 10))
+    input_tensor = torch.zeros((2, 11))
     # input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
