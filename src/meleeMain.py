@@ -622,7 +622,7 @@ def simulation(
             GameStateDeltaProcessor(),
         )
         agent_score: AgentScore
-        print("start loop")
+        print(f"start loop {instance_num}")
         while True:
             game_state = meleeCore.next_step()
             # print(game_state)
