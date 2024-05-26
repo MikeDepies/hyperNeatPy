@@ -626,6 +626,7 @@ def simulation(
             print(game_state)
             print(agent_config.character)
             print(cpu_config.character)
+            print(stage)
             if game_state is None:
                 print("Game state is None")
                 continue
