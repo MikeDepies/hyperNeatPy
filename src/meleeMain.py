@@ -280,6 +280,7 @@ class AgentScore:
         self.damage_dealt = damage_dealt
         self.damage_received = damage_received
         self.center_advantage = center_advantage
+        self.unique_actions = set()
 
 
 class AgentScoreDelta:
@@ -298,6 +299,7 @@ class AgentScoreDelta:
         self.damage_dealt_delta = damage_dealt_delta
         self.damage_received_delta = damage_received_delta
         self.center_advantage_delta = center_advantage_delta
+        self.action = 0
 
 
 class GameStateDeltaProcessor:
@@ -338,6 +340,8 @@ class GameStateDeltaProcessor:
             if player2_percent_change > 0:
                 # implement tests to see if player1 is actually damaging player2
                 agent1_score_delta.damage_dealt_delta = player2_percent_change
+            agent1_score_delta.action = player1.action
+            
             delta_scores.append(agent1_score_delta)
         return delta_scores
 
@@ -381,6 +385,9 @@ class GameStateEvaluator:
             self.agent_scores[
                 delta_score.agent.agent_configuration.port
             ].center_advantage += delta_score.center_advantage_delta
+            self.agent_scores[
+                delta_score.agent.agent_configuration.port
+            ].unique_actions.add(delta_score.action)
         return self.agent_scores
 
 
@@ -676,6 +683,7 @@ def simulation(
             "damage_dealt": agent_score.damage_dealt,
             "damage_received": agent_score.damage_received,
             "center_advantage": agent_score.center_advantage,
+            "unique_action_count": len(agent_score.unique_actions),
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
             "character" : characterToString(agent_config.character),
@@ -833,6 +841,7 @@ def score_queue_process(score_queue: Queue):
                 "damageDone": score["damage_dealt"],
                 "damageTaken": score["damage_received"],
                 "centerAdvantage": score["center_advantage"],
+                "uniqueActionCount": score["unique_action_count"],
                 "cpuLevel": score["cpu_level"],
                 "stage": score["stage"],
                 "character": score["character"],
