@@ -560,7 +560,7 @@ class MeleeSimulation:
                 game_state, agents[0].player(game_state), agents[1].player(game_state)
             )
             task_input = torch.cat(
-                input_tensor.flatten(), input_action_tensor.flatten()
+                (input_tensor.flatten(), input_action_tensor.flatten())
             )
         else:
             input_tensor = game_state_to_tensor_action_normalized(
@@ -971,8 +971,8 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 
 def main():
     args = parseArgs()
-    use_action_coords = False
-    width = 11
+    use_action_coords = True
+    width = 10 if use_action_coords else 11
     height = 2
     action_width = 386
     action_height = 2
