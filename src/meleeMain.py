@@ -967,7 +967,7 @@ def main():
     height = 2
     action_width = 386
     action_height = 2
-    bias_coords = [(0, 0, -2)]
+    bias_coords = [(0, 0, .3)]
     input_coords = [
         (y, x, -1)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
