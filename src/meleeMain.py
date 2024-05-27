@@ -691,7 +691,7 @@ def simulation(
             "opponent_character" : characterToString(cpu_config.character),
 
         }
-        print(f"{score_dict}")
+        # print(f"{score_dict}")
         # score_queue.put(score_dict)
         # print("last before send")
         if args.mode == "train":
