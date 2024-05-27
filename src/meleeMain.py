@@ -684,6 +684,7 @@ def simulation(
             "damage_received": agent_score.damage_received,
             "center_advantage": agent_score.center_advantage,
             "unique_action_count": len(agent_score.unique_actions),
+            "total_frames" : game_state.frame,
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
             "character" : characterToString(agent_config.character),
@@ -843,6 +844,7 @@ def score_queue_process(score_queue: Queue):
                 "damageTaken": score["damage_received"],
                 "centerAdvantage": score["center_advantage"],
                 "uniqueActionCount": score["unique_action_count"],
+                "totalFrames": score["total_frames"],
                 "cpuLevel": score["cpu_level"],
                 "stage": score["stage"],
                 "character": score["character"],
@@ -991,7 +993,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 16)]
-        for z in np.linspace(-0.9, 0.0, round(3))
+        for z in np.linspace(-0.9, 0.0, round(8))
     ]
     output_width = 5
     output_height = 1
