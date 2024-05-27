@@ -684,7 +684,7 @@ def simulation(
             "damage_received": agent_score.damage_received,
             "center_advantage": agent_score.center_advantage,
             "unique_action_count": len(agent_score.unique_actions),
-            "total_frames" : game_state.frame,
+            "total_frames" : int(game_state.frame),
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
             "character" : characterToString(agent_config.character),
