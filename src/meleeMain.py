@@ -798,7 +798,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.0)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.6)
             network = TaskNetwork2(substrate, cppn_query_instance)
             queue.put(
                 [
@@ -1017,7 +1017,7 @@ def main():
     manager = Manager()
     queue = manager.Queue(num_instances * 2)
     score_queue = manager.Queue(num_instances * 5)
-    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestNetworkGenome"
+    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestFromMap/20"
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
