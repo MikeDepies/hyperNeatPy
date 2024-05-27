@@ -690,6 +690,7 @@ def simulation(
             "opponent_character" : characterToString(cpu_config.character),
 
         }
+        print(f"{score_dict}")
         # score_queue.put(score_dict)
         # print("last before send")
         if args.mode == "train":
@@ -831,7 +832,7 @@ def score_queue_process(score_queue: Queue):
     while True:
         score = score_queue.get()
         id = score["id"]
-        # print(f"process: {id} {score}")
+        
         requests.post(
             "http://192.168.0.100:8080/score",
             json={
@@ -990,7 +991,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 16)]
-        for z in np.linspace(-0.9, 0.0, round(3))
+        for z in np.linspace(-0.9, 0.0, round(8))
     ]
     output_width = 5
     output_height = 1
