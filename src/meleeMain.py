@@ -251,6 +251,8 @@ class Agent:
         self.agent_configuration = agent_configuration
         self.controller = controller
         self.task_network = task_network
+        self.input_count = 0
+        self.prev_input = (.5, .5, .5, .5, 0.0, False, False, False, False)
 
     def player(self, game_state: GameState) -> PlayerState:
         return game_state.players[self.agent_configuration.port]
@@ -281,6 +283,7 @@ class AgentScore:
         self.damage_received = damage_received
         self.center_advantage = center_advantage
         self.unique_actions = set()
+        
 
 
 class AgentScoreDelta:
@@ -451,6 +454,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
+        
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
@@ -572,6 +576,7 @@ class MeleeSimulation:
             buttons, analog, c_analog = output_tensor_to_controller_tensors(
                 torch.sigmoid(output)
             )
+            
             threshold = 0.5
             press_a: bool = buttons[0, 0] > threshold
             press_b: bool = buttons[0, 1] > threshold
@@ -602,6 +607,11 @@ class MeleeSimulation:
                 },
                 agents[0].controller,
             )
+            new_input = (main_stick_x, main_stick_y, c_analog_x, c_analog_y, left_shoulder, press_a, press_b, press_y, press_z)
+            input_delta = 0
+            input_delta = sum(1 for new, prev in zip(new_input, agents[0].prev_input) if new != prev)
+            agents[0].prev_input = new_input
+            agents[0].input_count += input_delta
 
 
 def simulation(
@@ -685,6 +695,7 @@ def simulation(
             "center_advantage": agent_score.center_advantage,
             "unique_action_count": len(agent_score.unique_actions),
             "total_frames" : int(game_state.frame),
+            "input_count": agents[0].input_count,
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
             "character" : characterToString(agent_config.character),
@@ -844,6 +855,7 @@ def score_queue_process(score_queue: Queue):
                 "damageTaken": score["damage_received"],
                 "centerAdvantage": score["center_advantage"],
                 "uniqueActionCount": score["unique_action_count"],
+                "inputCount": score["input_count"],
                 "totalFrames": score["total_frames"],
                 "cpuLevel": score["cpu_level"],
                 "stage": score["stage"],
@@ -1029,7 +1041,7 @@ def main():
     manager = Manager()
     queue = manager.Queue(num_instances * 2)
     score_queue = manager.Queue(num_instances * 5)
-    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestFromMap/20"
+    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestFromMap/300"
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
