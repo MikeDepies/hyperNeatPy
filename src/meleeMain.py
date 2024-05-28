@@ -844,7 +844,7 @@ def score_queue_process(score_queue: Queue):
     while True:
         score = score_queue.get()
         id = score["id"]
-        print(score)
+        # print(score)
         requests.post(
             "http://192.168.0.100:8080/score",
             json={
@@ -855,7 +855,7 @@ def score_queue_process(score_queue: Queue):
                 "damageTaken": score["damage_received"],
                 "centerAdvantage": score["center_advantage"],
                 "uniqueActionCount": score["unique_action_count"],
-                "inputCount": score["input_count"],
+                "totalInputs": score["input_count"],
                 "totalFrames": score["total_frames"],
                 "cpuLevel": score["cpu_level"],
                 "stage": score["stage"],
