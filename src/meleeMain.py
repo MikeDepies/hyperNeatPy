@@ -55,6 +55,7 @@ class MeleeArgs:
         dolphin_executable_path,
         connect_code,
         iso,
+        best_sample_size,
     ):
         self.mode = mode
         self.num_instances = num_instances
@@ -66,11 +67,18 @@ class MeleeArgs:
         self.dolphin_executable_path = dolphin_executable_path
         self.connect_code = connect_code
         self.iso = iso
+        self.best_sample_size = best_sample_size
 
 
 def parseArgs():
     parser = argparse.ArgumentParser(description="Melee")
-
+    parser.add_argument(
+        "--sample_size",
+        "-s",
+        type=int,
+        help="The number of best samples to use to use for stream",
+        default=20,
+    )
     parser.add_argument(
         "--mode",
         "-m",
@@ -136,7 +144,7 @@ def parseArgs():
         dolphin_executable_path=args.dolphin_executable_path,
         connect_code=args.connect_code,
         iso=args.iso,
-        
+        best_sample_size=args.sample_size,
     )
 
 
@@ -1041,7 +1049,7 @@ def main():
     manager = Manager()
     queue = manager.Queue(num_instances * 2)
     score_queue = manager.Queue(num_instances * 5)
-    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else "http://192.168.0.100:8080/bestFromMap/300"
+    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else f"http://192.168.0.100:8080/bestFromMap/{args.best_sample_size}"
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
