@@ -827,7 +827,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.6)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.0)
             network = TaskNetwork2(substrate, cppn_query_instance)
             queue.put(
                 [
