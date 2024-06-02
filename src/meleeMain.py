@@ -542,7 +542,7 @@ class ActionTracker:
             if is_unique:
                 self.unique_action_set.append(action)
                 self.actions.append(action)
-                print(len(self.actions))
+                # print(len(self.actions))
 
     def get_actions(self):
         
@@ -831,7 +831,7 @@ def simulation(
             "total_frames": int(game_state.frame),
             "input_count": agents[0].input_count,
             "rolling_action_count": len(
-                meleeSimulation.action_tracker.unique_action_set
+                meleeSimulation.action_tracker.actions
             ),
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
