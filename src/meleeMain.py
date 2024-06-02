@@ -544,6 +544,7 @@ class ActionTracker:
                 self.actions.append(action)
 
     def get_actions(self):
+        print(len(self.actions))
         return self.actions
 
 
