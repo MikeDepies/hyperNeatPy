@@ -537,7 +537,7 @@ class ActionTracker:
             is_unique = action not in self.unique_action_set
             self.unique_action_set.add(action)
             if len(self.unique_action_set) > self.unique_size:
-                self.unique_action_set.pop()
+                self.unique_action_set.pop(0)
             if is_unique:
                 self.actions.append(action)
 
