@@ -542,7 +542,7 @@ class ActionTracker:
             if is_unique:
                 self.unique_action_set.append(action)
                 self.actions.append(action)
-                print(len(self.actions))
+                # print(len(self.actions))
 
     def get_actions(self):
         
