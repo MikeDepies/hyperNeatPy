@@ -542,7 +542,7 @@ class ActionTracker:
             if is_unique:
                 self.unique_action_set.append(action)
                 self.actions.append(action)
-                # print(len(self.actions))
+                print(len(self.actions))
 
     def get_actions(self):
         
@@ -820,6 +820,7 @@ def simulation(
                 meleeCore.controller.release_all()
                 break
         # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
+        print(meleeSimulation.action_tracker.actions)
         score_dict = {
             "id": id,
             "kill_count": agent_score.kill_count,
