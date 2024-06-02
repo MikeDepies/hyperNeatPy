@@ -212,7 +212,6 @@ class MeleeCore:
     def stop(self):
         self.console.stop()
         print("=>>>>>>>>>>>>>>>>SHUTTING DOWN<<<<<<<<<<<<<<<<<=")
-        
 
     def next_step(self):
         return self.console.step()
@@ -260,7 +259,7 @@ class Agent:
         self.controller = controller
         self.task_network = task_network
         self.input_count = 0
-        self.prev_input = (.5, .5, .5, .5, 0.0, False, False, False, False)
+        self.prev_input = (0.5, 0.5, 0.5, 0.5, 0.0, False, False, False, False)
 
     def player(self, game_state: GameState) -> PlayerState:
         return game_state.players[self.agent_configuration.port]
@@ -282,7 +281,7 @@ class AgentScore:
         death_count: int,
         damage_dealt: float,
         damage_received: float,
-        center_advantage: float
+        center_advantage: float,
     ):
         self.agent = agent
         self.kill_count = kill_count
@@ -291,7 +290,6 @@ class AgentScore:
         self.damage_received = damage_received
         self.center_advantage = center_advantage
         self.unique_actions = set()
-        
 
 
 class AgentScoreDelta:
@@ -302,7 +300,7 @@ class AgentScoreDelta:
         death_count_delta: int,
         damage_dealt_delta: float,
         damage_received_delta: float,
-        center_advantage_delta: float
+        center_advantage_delta: float,
     ):
         self.agent = agent
         self.kill_count_delta = kill_count_delta
@@ -352,7 +350,7 @@ class GameStateDeltaProcessor:
                 # implement tests to see if player1 is actually damaging player2
                 agent1_score_delta.damage_dealt_delta = player2_percent_change
             agent1_score_delta.action = player1.action
-            
+
             delta_scores.append(agent1_score_delta)
         return delta_scores
 
@@ -410,7 +408,8 @@ class MeleeConfiguration:
 
 from enum import Enum
 
-def stageToString(stage : melee.Stage):
+
+def stageToString(stage: melee.Stage):
     if stage == melee.Stage.FINAL_DESTINATION:
         return "FINALDESTINATION"
     elif stage == melee.Stage.BATTLEFIELD:
@@ -424,7 +423,8 @@ def stageToString(stage : melee.Stage):
     elif stage == melee.Stage.YOSHIS_STORY:
         return "YOSHISSTORY"
 
-def characterToString(character : melee.Character):
+
+def characterToString(character: melee.Character):
     if character == melee.Character.DOC:
         return "DOC"
     elif character == melee.Character.DK:
@@ -444,25 +444,106 @@ def characterToString(character : melee.Character):
     elif character == melee.Character.YOSHI:
         return "YOSHI"
 
+
 class SimulationState(Enum):
     RUNNING = 0
     GAME_OVER = 1
     MENU = 2
+
 
 class ActionTracker:
     def __init__(self, unique_size: int):
         self.unique_size = unique_size
         self.unique_action_set = set()
         self.actions = []
-    
+        self.excluded_actons = [
+            melee.Action.SHIELD_BREAK_FALL,
+            melee.Action.SHIELD_BREAK_DOWN_D,
+            melee.Action.SHIELD_BREAK_DOWN_U,
+            melee.Action.SHIELD_BREAK_TEETER,
+            melee.Action.SHIELD_BREAK_FLY,
+            melee.Action.SHIELD_BREAK_STAND_D,
+            melee.Action.SHIELD_BREAK_STAND_U,
+            melee.Action.CROUCH_START,
+            melee.Action.CROUCH_END,
+            melee.Action.GROUND_ROLL_SPOT_DOWN,
+            melee.Action.GROUND_SPOT_UP,
+            melee.Action.DAMAGE_AIR_1,
+            melee.Action.DAMAGE_AIR_2,
+            melee.Action.DAMAGE_AIR_3,
+            melee.Action.REBOUND,
+            melee.Action.REBOUND_STOP,
+            melee.Action.LANDING_SPECIAL,
+            melee.Action.SHIELD_STUN,
+            melee.Action.DAMAGE_FLY_HIGH,
+            melee.Action.DAMAGE_FLY_LOW,
+            melee.Action.DAMAGE_FLY_NEUTRAL,
+            melee.Action.DAMAGE_FLY_ROLL,
+            melee.Action.DAMAGE_FLY_TOP,
+            melee.Action.DAMAGE_GROUND,
+            melee.Action.DAMAGE_HIGH_1,
+            melee.Action.DAMAGE_HIGH_2,
+            melee.Action.DAMAGE_HIGH_3,
+            melee.Action.DAMAGE_ICE,
+            melee.Action.DAMAGE_ICE_JUMP,
+            melee.Action.DAMAGE_LOW_1,
+            melee.Action.DAMAGE_LOW_2,
+            melee.Action.DAMAGE_LOW_3,
+            melee.Action.DAMAGE_NEUTRAL_1,
+            melee.Action.DAMAGE_NEUTRAL_2,
+            melee.Action.DAMAGE_NEUTRAL_3,
+            melee.Action.DAMAGE_SCREW,
+            melee.Action.DAMAGE_SCREW_AIR,
+            melee.Action.GRABBED,
+            melee.Action.GRABBED_WAIT_HIGH,
+            melee.Action.GRAB_PUMMELED,
+            melee.Action.LYING_GROUND_DOWN,
+            melee.Action.LYING_GROUND_UP_HIT,
+            melee.Action.LYING_GROUND_UP,
+            melee.Action.FALLING,
+            melee.Action.ON_HALO_DESCENT,
+            melee.Action.ON_HALO_WAIT,
+            melee.Action.THROWN_BACK,
+            melee.Action.THROWN_F_HIGH,
+            melee.Action.THROWN_F_LOW,
+            melee.Action.THROWN_DOWN,
+            melee.Action.THROWN_DOWN_2,
+            melee.Action.THROWN_FB,
+            melee.Action.THROWN_FF,
+            melee.Action.THROWN_UP,
+            melee.Action.THROWN_FORWARD,
+            melee.Action.TUMBLING,
+            melee.Action.SHIELD_START,
+            melee.Action.SHIELD_RELEASE,
+            melee.Action.LOOPING_ATTACK_MIDDLE,
+            melee.Action.LOOPING_ATTACK_END,
+            melee.Action.LANDING,
+            melee.Action.FAIR_LANDING,
+            melee.Action.BAIR_LANDING,
+            melee.Action.LANDING_SPECIAL,
+            melee.Action.NAIR_LANDING,
+            melee.Action.DAIR_LANDING,
+            melee.Action.UAIR_LANDING,
+            melee.Action.DEAD_FALL,
+            melee.Action.FALLING,
+            melee.Action.FALLING_BACKWARD,
+            melee.Action.FALLING_BACKWARD,
+            melee.Action.SPECIAL_FALL_BACK,
+            melee.Action.SPECIAL_FALL_FORWARD,
+        ]
+
     def add_action(self, action: int):
-        self.unique_action_set.add(action)
-        if len(self.unique_action_set) > self.unique_size:
-            self.unique_action_set.pop()
-            self.actions.append(action)
-    
+        if action not in self.excluded_actions:
+            is_unique = action not in self.unique_action_set
+            self.unique_action_set.add(action)
+            if len(self.unique_action_set) > self.unique_size:
+                self.unique_action_set.pop()
+            if is_unique:
+                self.actions.append(action)
+
     def get_actions(self):
         return self.actions
+
 
 class MeleeSimulation:
 
@@ -477,7 +558,6 @@ class MeleeSimulation:
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
         self.action_tracker = ActionTracker(30)
-        
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
@@ -599,7 +679,7 @@ class MeleeSimulation:
             buttons, analog, c_analog = output_tensor_to_controller_tensors(
                 torch.sigmoid(output)
             )
-            
+
             threshold = 0.5
             press_a: bool = buttons[0, 0] > threshold
             press_b: bool = buttons[0, 1] > threshold
@@ -630,16 +710,32 @@ class MeleeSimulation:
                 },
                 agents[0].controller,
             )
-            new_input = (main_stick_x, main_stick_y, c_analog_x, c_analog_y, left_shoulder, press_a, press_b, press_y, press_z)
+            new_input = (
+                main_stick_x,
+                main_stick_y,
+                c_analog_x,
+                c_analog_y,
+                left_shoulder,
+                press_a,
+                press_b,
+                press_y,
+                press_z,
+            )
             input_delta = 0
-            input_delta = sum(1 for new, prev in zip(new_input, agents[0].prev_input) if new != prev)
+            input_delta = sum(
+                1 for new, prev in zip(new_input, agents[0].prev_input) if new != prev
+            )
             agents[0].prev_input = new_input
             agents[0].input_count += input_delta
             self.action_tracker.add_action(agents[0].player(game_state).action.value)
 
 
 def simulation(
-    queue: Queue, score_queue: Queue, args: MeleeArgs, use_action_coords: bool, instance_num: int
+    queue: Queue,
+    score_queue: Queue,
+    args: MeleeArgs,
+    use_action_coords: bool,
+    instance_num: int,
 ):
     meleeCore = createMelee(args, instance_num)
     meleeCore.run()
@@ -656,7 +752,7 @@ def simulation(
     network: TaskNetwork2
     agent_config: AgentConfiguration
     cpu_config: AgentConfiguration
-    stage : melee.Stage
+    stage: melee.Stage
     # fetch from queue
     while True:
         # print("get next network")
@@ -665,14 +761,12 @@ def simulation(
             agent_config,
             cpu_config,
         ]
-        melee_config = MeleeConfiguration(
-            agent_configuration_list, stage
-        )
+        melee_config = MeleeConfiguration(agent_configuration_list, stage)
         meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
         agents = [
-                Agent(meleeCore, agent_config, meleeCore.controller, network),
-                Agent(meleeCore, cpu_config, meleeCore.controller_opponent, None),
-            ]
+            Agent(meleeCore, agent_config, meleeCore.controller, network),
+            Agent(meleeCore, cpu_config, meleeCore.controller_opponent, None),
+        ]
         game_state_evaluator = GameStateEvaluator(
             meleeCore,
             agents,
@@ -681,16 +775,28 @@ def simulation(
         agent_score: AgentScore
         first_step = True
         print(f"start loop {instance_num}")
-        if agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
+        if (
+            agent_config.character == melee.Character.CPTFALCON
+            and cpu_config.character == melee.Character.CPTFALCON
+        ):
             continue
         while True:
             game_state = meleeCore.next_step()
             if first_step:
-                print(f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}")
+                print(
+                    f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}"
+                )
                 first_step = False
-            if game_state.frame > 60*60*4: #agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
-                if game_state.frame % (60 * 10) == 0 and game_state.menu_state == melee.Menu.IN_GAME:
-                    print(f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}")
+            if (
+                game_state.frame > 60 * 60 * 4
+            ):  # agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
+                if (
+                    game_state.frame % (60 * 10) == 0
+                    and game_state.menu_state == melee.Menu.IN_GAME
+                ):
+                    print(
+                        f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}"
+                    )
             # print(game_state)
             # print(agent_config.character)
             # print(cpu_config.character)
@@ -699,7 +805,7 @@ def simulation(
                 print("Game state is None")
                 meleeCore.stop()
                 # simulation(queue, score_queue, args, use_action_coords, instance_num)
-                
+
                 break
             (score, state) = meleeSimulation.simulation_step(
                 game_state, game_state_evaluator, menu_helper
@@ -718,14 +824,15 @@ def simulation(
             "damage_received": agents[0].player(game_state).percent,
             "center_advantage": agent_score.center_advantage,
             "unique_action_count": len(agent_score.unique_actions),
-            "total_frames" : int(game_state.frame),
+            "total_frames": int(game_state.frame),
             "input_count": agents[0].input_count,
-            "rolling_action_count": len(meleeSimulation.action_tracker.unique_action_set),
+            "rolling_action_count": len(
+                meleeSimulation.action_tracker.unique_action_set
+            ),
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
-            "character" : characterToString(agent_config.character),
-            "opponent_character" : characterToString(cpu_config.character),
-
+            "character": characterToString(agent_config.character),
+            "opponent_character": characterToString(cpu_config.character),
         }
         # print(f"{score_dict}")
         # score_queue.put(score_dict)
@@ -733,7 +840,7 @@ def simulation(
         if args.mode == "train":
             score_queue.put(score_dict)
         # print("last after send")
-    
+
         # else:
         #     score_queue.put((id, agent_score))
     # simulation.simulation_step(game_state, game_state_evaluator, menu_helper)
@@ -852,7 +959,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
                     network,
                     task.agent_task.agent_config,
                     task.cpu_task.agent_config,
-                    task.stage
+                    task.stage,
                 ]
             )
 
@@ -891,6 +998,7 @@ def score_queue_process(score_queue: Queue):
         )
         # print("send request!")
 
+
 def stageToInt(stage: melee.Stage):
     if stage == melee.Stage.FINAL_DESTINATION:
         return 0
@@ -904,6 +1012,7 @@ def stageToInt(stage: melee.Stage):
         return 4
     elif stage == melee.Stage.YOSHIS_STORY:
         return 5
+
 
 def characterToInt(character: melee.Character):
     if character == melee.Character.MARIO:
@@ -961,6 +1070,7 @@ def characterToInt(character: melee.Character):
     elif character == melee.Character.ROY:
         return 26
 
+
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
@@ -1017,7 +1127,7 @@ def main():
     height = 2
     action_width = 386
     action_height = 2
-    bias_coords = [(0, 0, .3)]
+    bias_coords = [(0, 0, 0.3)]
     input_coords = [
         (y, x, -1)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
@@ -1067,12 +1177,16 @@ def main():
     manager = Manager()
     queue = manager.Queue(num_instances * 2)
     score_queue = manager.Queue(num_instances * 5)
-    api_url = "http://192.168.0.100:8080/networkGenome" if mode == "train" else f"http://192.168.0.100:8080/bestFromMap/{args.best_sample_size}"
+    api_url = (
+        "http://192.168.0.100:8080/networkGenome"
+        if mode == "train"
+        else f"http://192.168.0.100:8080/bestFromMap/{args.best_sample_size}"
+    )
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
     for i in range(round(num_instances)):
-        
+
         queueProcess = Process(
             target=fetch_network_genome,
             args=(
