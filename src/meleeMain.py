@@ -1,4 +1,5 @@
 import argparse
+from collections import deque
 from enum import Enum
 import json
 
@@ -454,7 +455,7 @@ class SimulationState(Enum):
 class ActionTracker:
     def __init__(self, unique_size: int):
         self.unique_size = unique_size
-        self.unique_action_set = set()
+        self.unique_action_set = deque(maxlen=unique_size)
         self.actions = []
         self.excluded_actions = [
             melee.Action.SHIELD_BREAK_FALL,
@@ -535,9 +536,9 @@ class ActionTracker:
     def add_action(self, action: int):
         if action not in self.excluded_actions:
             is_unique = action not in self.unique_action_set
-            self.unique_action_set.add(action)
-            if len(self.unique_action_set) > self.unique_size:
-                self.unique_action_set.pop(0)
+            self.unique_action_set.append(action)
+            # if len(self.unique_action_set) > self.unique_size:
+            #     self.unique_action_set.
             if is_unique:
                 self.actions.append(action)
 
