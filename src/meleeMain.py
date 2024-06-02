@@ -536,10 +536,11 @@ class ActionTracker:
     def add_action(self, action: int):
         if action not in self.excluded_actions:
             is_unique = action not in self.unique_action_set
-            self.unique_action_set.append(action)
+            
             # if len(self.unique_action_set) > self.unique_size:
             #     self.unique_action_set.
             if is_unique:
+                self.unique_action_set.append(action)
                 self.actions.append(action)
 
     def get_actions(self):
