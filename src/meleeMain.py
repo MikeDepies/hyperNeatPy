@@ -476,7 +476,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
-        self.action_tracker = ActionTracker(20)
+        self.action_tracker = ActionTracker(30)
         
 
     def set_config(self, melee_config: MeleeConfiguration):
@@ -1030,7 +1030,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
+        [(y, x, z) for y in np.linspace(-1, 1, 20) for x in np.linspace(-1, 1, 20)]
         for z in np.linspace(-0.9, 0.0, round(1))
     ]
     output_width = 5
