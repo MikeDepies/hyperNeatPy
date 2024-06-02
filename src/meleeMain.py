@@ -449,6 +449,20 @@ class SimulationState(Enum):
     GAME_OVER = 1
     MENU = 2
 
+class ActionTracker:
+    def __init__(self, unique_size: int):
+        self.unique_size = unique_size
+        self.unique_action_set = set()
+        self.actions = []
+    
+    def add_action(self, action: int):
+        self.unique_action_set.add(action)
+        if len(self.unique_action_set) > self.unique_size:
+            self.unique_action_set.pop()
+            self.actions.append(action)
+    
+    def get_actions(self):
+        return self.actions
 
 class MeleeSimulation:
 
@@ -462,6 +476,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
+        self.action_tracker = ActionTracker(20)
         
 
     def set_config(self, melee_config: MeleeConfiguration):
@@ -620,6 +635,7 @@ class MeleeSimulation:
             input_delta = sum(1 for new, prev in zip(new_input, agents[0].prev_input) if new != prev)
             agents[0].prev_input = new_input
             agents[0].input_count += input_delta
+            self.action_tracker.add_action(agents[0].player(game_state).action.value)
 
 
 def simulation(
@@ -704,6 +720,7 @@ def simulation(
             "unique_action_count": len(agent_score.unique_actions),
             "total_frames" : int(game_state.frame),
             "input_count": agents[0].input_count,
+            "rolling_action_count": len(meleeSimulation.action_tracker.unique_action_set),
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
             "character" : characterToString(agent_config.character),
@@ -864,6 +881,7 @@ def score_queue_process(score_queue: Queue):
                 "centerAdvantage": score["center_advantage"],
                 "uniqueActionCount": score["unique_action_count"],
                 "totalInputs": score["input_count"],
+                "rollingActionCount": score["rolling_action_count"],
                 "totalFrames": score["total_frames"],
                 "cpuLevel": score["cpu_level"],
                 "stage": score["stage"],
@@ -1012,7 +1030,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 5) for x in np.linspace(-1, 1, 5)]
+        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
         for z in np.linspace(-0.9, 0.0, round(1))
     ]
     output_width = 5
