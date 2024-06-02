@@ -456,7 +456,7 @@ class ActionTracker:
         self.unique_size = unique_size
         self.unique_action_set = set()
         self.actions = []
-        self.excluded_actons = [
+        self.excluded_actions = [
             melee.Action.SHIELD_BREAK_FALL,
             melee.Action.SHIELD_BREAK_DOWN_D,
             melee.Action.SHIELD_BREAK_DOWN_U,
