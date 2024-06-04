@@ -1076,7 +1076,9 @@ def characterToInt(character: melee.Character):
     elif character == melee.Character.ROY:
         return 26
 
-
+# -246, 246, 188, -140
+def scale_to_custom_range(data, min_val, max_val):
+    return (data - min_val) / (max_val - min_val) * 2 - 1
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
@@ -1085,9 +1087,9 @@ def game_state_to_tensor(
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
-        input_tensor[i, 2] = player.x / 100
-        input_tensor[i, 3] = player.y / 100
-        input_tensor[i, 4] = 1 if player.facing == True else -1
+        input_tensor[i, 2] = scale_to_custom_range(player.x, -246, 246)
+        input_tensor[i, 3] = scale_to_custom_range(player.y, -140, 188)
+        input_tensor[i, 4] = 1 if player.facing == True else 0
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
         input_tensor[i, 7] = stageToInt(game_state.stage) / 6
@@ -1106,9 +1108,9 @@ def game_state_to_tensor_action_normalized(
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
-        input_tensor[i, 2] = player.x / 100
-        input_tensor[i, 3] = player.y / 100
-        input_tensor[i, 4] = 1 if player.facing == True else -1
+        input_tensor[i, 2] = scale_to_custom_range(player.x, -246, 246)
+        input_tensor[i, 3] = scale_to_custom_range(player.y, -140, 188)
+        input_tensor[i, 4] = 1 if player.facing == True else 0
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
         input_tensor[i, 7] = min(385, player.action.value) / 385
