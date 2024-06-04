@@ -765,6 +765,7 @@ def simulation(
             agent_config,
             cpu_config,
         ]
+        print("id", id)
         melee_config = MeleeConfiguration(agent_configuration_list, stage)
         meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
         agents = [
@@ -1145,8 +1146,8 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 20) for x in np.linspace(-1, 1, 20)]
-        for z in np.linspace(-0.9, 0.0, round(1))
+        [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
+        for z in np.linspace(-0.9, 0.0, round(5))
     ]
     output_width = 5
     output_height = 1
