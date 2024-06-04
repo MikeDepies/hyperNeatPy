@@ -826,8 +826,8 @@ def simulation(
             "id": id,
             "kill_count": agent_score.kill_count,
             "death_count": agent_score.death_count,
-            "damage_dealt": agents[1].player(game_state).percent,
-            "damage_received": agents[0].player(game_state).percent,
+            "damage_dealt": agent_score.damage_dealt,#agents[1].player(game_state).percent,
+            "damage_received": agent_score.damage_received,#agents[0].player(game_state).percent,
             "center_advantage": agent_score.center_advantage,
             "unique_action_count": len(agent_score.unique_actions),
             "total_frames": int(game_state.frame),
@@ -957,7 +957,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.0)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
             network = TaskNetwork2(substrate, cppn_query_instance)
             queue.put(
                 [
