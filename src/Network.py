@@ -12,7 +12,14 @@ from typing import Callable, List, Dict
 from math import exp, tanh, sin, cos, sqrt
 
 from SelfAttention import SelfAttention
-from activations import cos_activation, gauss_activation, relu_activation, sigmoid_activation, sin_activation, tanh_activation
+from activations import (
+    cos_activation,
+    gauss_activation,
+    relu_activation,
+    sigmoid_activation,
+    sin_activation,
+    tanh_activation,
+)
 
 ActivationFunctionType = Callable[[float], float]
 
@@ -37,9 +44,13 @@ class Node:
             self.output_value = self.input_value
         else:
             try:
-                self.output_value = self.activation_function(self.input_value + self.bias)
+                self.output_value = self.activation_function(
+                    self.input_value + self.bias
+                )
             except Exception as e:
-                print(f"Error activating node {self.id} - {self.input_value} - {self.bias}: {e}")
+                print(
+                    f"Error activating node {self.id} - {self.input_value} - {self.bias}: {e}"
+                )
         # self.input_value = 0.0
 
 
@@ -51,7 +62,12 @@ class Connection:
 
 
 class Network:
-    def __init__(self, nodes: 'list[Node]', connections: 'list[Connection]', compute_layers: 'list[set[int]]'):
+    def __init__(
+        self,
+        nodes: "list[Node]",
+        connections: "list[Connection]",
+        compute_layers: "list[set[int]]",
+    ):
         self.nodes = nodes
         self.connections = connections
         self.compute_layers = compute_layers
@@ -108,12 +124,18 @@ class NetworkProcessor:
         raise NotImplementedError
 
 
-def required_for_output(inputs : 'list[int]', outputs : 'list[int]', connections : 'list[Connection]') -> 'set[int]':
+def required_for_output(
+    inputs: "list[int]", outputs: "list[int]", connections: "list[Connection]"
+) -> "set[int]":
     required = set(outputs)
     s = set(outputs)
     while 1:
         # Find nodes not in s whose output is consumed by a node in s.
-        t = set(connection.input_node_id for connection in connections if connection.output_node_id in s and connection.input_node_id not in s)
+        t = set(
+            connection.input_node_id
+            for connection in connections
+            if connection.output_node_id in s and connection.input_node_id not in s
+        )
 
         if not t:
             break
@@ -128,7 +150,9 @@ def required_for_output(inputs : 'list[int]', outputs : 'list[int]', connections
     return required
 
 
-def feed_forward_layers(inputs : 'list[int]', outputs : 'list[int]', connections : 'list[Connection]') -> 'list[set[int]]':
+def feed_forward_layers(
+    inputs: "list[int]", outputs: "list[int]", connections: "list[Connection]"
+) -> "list[set[int]]":
     """
     Collect the layers whose members can be evaluated in parallel in a feed-forward network.
     :param inputs: list of the network input nodes
@@ -147,13 +171,21 @@ def feed_forward_layers(inputs : 'list[int]', outputs : 'list[int]', connections
     while 1:
         # Find candidate nodes c for the next layer.  These nodes should connect
         # a node in s to a node not in s.
-        c = set(connection.output_node_id for connection in connections if connection.input_node_id in s and connection.output_node_id not in s)
-        
+        c = set(
+            connection.output_node_id
+            for connection in connections
+            if connection.input_node_id in s and connection.output_node_id not in s
+        )
+
         # Keep only the used nodes whose entire input set is contained in s.
         t = set()
         for n in c:
-            
-            if n in required and all(connection.input_node_id in s for connection in connections if connection.output_node_id == n):
+
+            if n in required and all(
+                connection.input_node_id in s
+                for connection in connections
+                if connection.output_node_id == n
+            ):
                 # print("added", n)
                 t.add(n)
 
@@ -164,6 +196,7 @@ def feed_forward_layers(inputs : 'list[int]', outputs : 'list[int]', connections
         s = s.union(t)
 
     return layers
+
 
 class NetworkProcessorSimple(NetworkProcessor):
     def __init__(self, network: Network):
@@ -183,7 +216,7 @@ class NetworkProcessorSimple(NetworkProcessor):
         }
         self.node_map = {node.id: node for node in network.nodes}
 
-    def feedforward(self, input_values: 'list[float]') -> 'list[float]':
+    def feedforward(self, input_values: "list[float]") -> "list[float]":
         for node in self.network.nodes:
             node.input_value = 0.0
 
@@ -194,13 +227,16 @@ class NetworkProcessorSimple(NetworkProcessor):
         for layer in self.network.compute_layers:
             for node_id in layer:
                 node = self.node_map.get(node_id)
-                for connection in self.input_connections_by_output_node_id.get(node.id, []):
+                for connection in self.input_connections_by_output_node_id.get(
+                    node.id, []
+                ):
                     input_node = self.node_map.get(connection.input_node_id)
                     if input_node:
                         node.input_value += input_node.output_value * connection.weight
                 node.activate()
 
         return [node.output_value for node in self.output_nodes]
+
 
 # class PyTorchNetwork(nn.Module):
 #     def __init__(self, network):
@@ -216,7 +252,7 @@ class NetworkProcessorSimple(NetworkProcessor):
 #             next_layer = list(network.compute_layers[i + 1])
 #             # Initialize weight matrix with zeros
 #             weight_matrix = torch.zeros((len(next_layer), len(current_layer)), dtype=torch.float32)
-            
+
 #             # Map node IDs to indices for matrix placement
 #             current_layer_index = {node_id: idx for idx, node_id in enumerate(current_layer)}
 #             next_layer_index = {node_id: idx for idx, node_id in enumerate(next_layer)}
@@ -239,7 +275,8 @@ class NetworkProcessorSimple(NetworkProcessor):
 #             x = torch.matmul(x, weights.t())  # Apply weights
 #             x = activation(x)  # Apply activation function
 #         return x
-    
+
+
 class NetworkProcessorTensor(NetworkProcessor):
     def __init__(self, network: Network):
         self.network = network
@@ -262,7 +299,9 @@ class NetworkProcessorTensor(NetworkProcessor):
         previous_layer = input_values
         for layer in network.compute_layers:
             hidden_values = torch.zeros(len(layer))
-            hidden_weights = torch.zeros(len(layer), len(previous_layer) if previous_layer else len(layer))
+            hidden_weights = torch.zeros(
+                len(layer), len(previous_layer) if previous_layer else len(layer)
+            )
             previous_layer = layer
             for node_index, node in enumerate(layer):
                 node = self.node_map.get(node)
@@ -272,10 +311,8 @@ class NetworkProcessorTensor(NetworkProcessor):
                     if input_node:
                         hidden_weights[connection_index, node_index] = connection.weight
                         # hidden_values[node_index] += input_node.output_value * connection.weight
-                
-            
 
-    def feedforward(self, input_values: 'list[float]') -> 'list[float]':
+    def feedforward(self, input_values: "list[float]") -> "list[float]":
         for node in self.network.nodes:
             node.input_value = 0.0
 
@@ -286,7 +323,9 @@ class NetworkProcessorTensor(NetworkProcessor):
         for layer in self.network.compute_layers:
             for node_id in layer:
                 node = self.node_map.get(node_id)
-                for connection in self.input_connections_by_output_node_id.get(node.id, []):
+                for connection in self.input_connections_by_output_node_id.get(
+                    node.id, []
+                ):
                     input_node = self.node_map.get(connection.input_node_id)
                     if input_node:
                         node.input_value += input_node.output_value * connection.weight
@@ -687,7 +726,7 @@ class TaskNetwork2(torch.nn.Module):
         self.substrate = substrate
         # self.self_attention = SelfAttention(weights_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_q=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])), weights_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[0], substrate.hidden_coords[0].shape[1])), bias_k=torch.nn.Parameter(torch.randn(substrate.hidden_coords[0].shape[1])))
         # Get connection matrices with weights potentially being zero
-        
+
         self.input_hidden_weights = substrate.get_layer_connections(
             substrate.input_coords, substrate.hidden_coords[0], cppn_query
         )
@@ -710,7 +749,12 @@ class TaskNetwork2(torch.nn.Module):
         self.output_bias_weights = substrate.get_layer_connections(
             substrate.bias_coords, substrate.output_coords, cppn_query
         )
-        # self.hidden_recurrent_weights = [substrate.get_recurrent_layer_connections(substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query) for i in range(len(substrate.hidden_coords))]
+        self.hidden_recurrent_weights = [
+            substrate.get_recurrent_layer_connections(
+                substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query
+            )
+            for i in range(len(substrate.hidden_coords))
+        ]
         # self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
         self.outputs = torch.zeros(
             self.output_bias_weights.shape[0], self.output_bias_weights.shape[1]
@@ -723,7 +767,7 @@ class TaskNetwork2(torch.nn.Module):
             for i in range(len(self.hidden_bias_weights))
         ]
 
-    def forward(self, inputs : torch.Tensor):
+    def forward(self, inputs: torch.Tensor):
         # print(inputs)
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
@@ -748,10 +792,22 @@ class TaskNetwork2(torch.nn.Module):
         )  # Activation function
         for i in range(len(self.substrate.hidden_coords) - 1):
             # print("no loop")  + torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1])
-            self.hidden_activations[i + 1] = (
-                torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i])
-                + self.hidden_bias_weights[i + 1]
-            )  # + torch.matmul(self.hidden_activations[i+1], self.hidden_recurrent_weights[i+1])
+            if i == len(self.substrate.hidden_coords) - 1:
+                self.hidden_activations[i + 1] = (
+                    torch.matmul(
+                        self.hidden_activations[i], self.hidden_hidden_weights[i]
+                    )
+                    + self.hidden_bias_weights[i + 1]
+                ) + torch.matmul(
+                    self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
+                )
+            else:
+                self.hidden_activations[i + 1] = (
+                    torch.matmul(
+                        self.hidden_activations[i], self.hidden_hidden_weights[i]
+                    )
+                    + self.hidden_bias_weights[i + 1]
+                )
             self.hidden_activations[i + 1] = torch.sigmoid(
                 self.hidden_activations[i + 1]
             )  # Activation function
