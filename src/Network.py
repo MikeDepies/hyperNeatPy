@@ -798,7 +798,7 @@ class TaskNetwork2(torch.nn.Module):
                 )
                 + self.hidden_bias_weights[i + 1]
             )
-            if i == len(self.substrate.hidden_coords) - 2:
+            if (i+ 1)  % 4 == 0:
                 self.hidden_activations[i + 1] += torch.matmul(
                     self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
                 )
