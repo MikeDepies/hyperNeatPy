@@ -825,7 +825,7 @@ def simulation(
             game_state = meleeCore.next_step()
             if first_step:
                 print(
-                    f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character}"
+                    f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character} {cpu_config.cpu_level}"
                 )
                 first_step = False
             if (
@@ -1185,19 +1185,19 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.9, 0.0, round(20))
+        for z in np.linspace(-0.9, 0.9, round(20))
     ]
     output_width = 5
     output_height = 1
-    analog_width = 10
-    analog_height = 10
+    analog_width = 7
+    analog_height = 7
     analog_coords = [
-        (y, x, 0.6)
+        (y, x, 0.95)
         for y in np.linspace(-1, 0, analog_height)
         for x in np.linspace(-1, 0, analog_width)
     ]
     c_analog_coords = [
-        (y, x, 0.6)
+        (y, x, 0.95)
         for y in np.linspace(0, 1, analog_height)
         for x in np.linspace(0, 1, analog_width)
     ]
