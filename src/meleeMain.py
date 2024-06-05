@@ -267,7 +267,7 @@ class Agent:
 
     def create_action(self, input: Tensor):
         if self.task_network is None:
-            return
+            return None
         # print(input.shape)
         output = self.task_network.forward(input)
         # print(output.shape)
@@ -597,7 +597,8 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
-        self.action_tracker = ActionTracker(20)
+        self.action_tracker = [ActionTracker(20), ActionTracker(20)]
+        
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
@@ -702,72 +703,69 @@ class MeleeSimulation:
 
     def handle_game_step(self, game_state: GameState, agents: List[Agent]):
         task_input: Tensor
-        if self.use_action_coords:
-            input_tensor, input_action_tensor = game_state_to_tensor(
-                game_state, agents[0].player(game_state), agents[1].player(game_state)
-            )
-            task_input = torch.cat(
-                (input_tensor.flatten(), input_action_tensor.flatten())
-            )
-        else:
-            input_tensor = game_state_to_tensor_action_normalized(
-                game_state, agents[0].player(game_state), agents[1].player(game_state)
-            )
-            task_input = input_tensor.flatten()
-        output = agents[0].create_action(task_input)
-        if output is not None:
-            buttons, analog, c_analog = output_tensor_to_controller_tensors(
-                output #torch.sigmoid(output)
-            )
-            buttons = torch.sigmoid(buttons)
-            threshold = 0.5
-            press_a: bool = buttons[0, 0] > threshold
-            press_b: bool = buttons[0, 1] > threshold
-            press_y: bool = buttons[0, 2] > threshold
-            press_z: bool = buttons[0, 3] > threshold
-            left_shoulder = (
-                (buttons[0, 4].item() - threshold) / (1 - threshold)
-                if buttons[0, 4].item() > threshold
-                else 0.0
-            )
-            main_stick_x, main_stick_y = self.controller_helper.processAnalog(analog)
-            c_analog_x, c_analog_y = self.controller_helper.processAnalog(c_analog)
-            # print(f"main stick x: {main_stick_x}")
-            # print(f"main stick y: {main_stick_y}")
-            # print(f"c stick x: {c_analog_x}")
-            # print(f"c stick y: {c_analog_y}")
-            self.controller_helper.processMessage(
-                {
-                    "a": press_a,
-                    "b": press_b,
-                    "y": press_y,
-                    "z": press_z,
-                    "leftShoulder": left_shoulder,
-                    "mainStickX": main_stick_x,
-                    "mainStickY": main_stick_y,
-                    "cStickX": c_analog_x,
-                    "cStickY": c_analog_y,
-                },
-                agents[0].controller,
-            )
-            new_input = (
-                main_stick_x,
-                main_stick_y,
-                c_analog_x,
-                c_analog_y,
-                left_shoulder,
-                press_a,
-                press_b,
-                press_y,
-                press_z,
-            )
-            input_delta = 0
-            input_delta = sum(
-                1 for new, prev in zip(new_input, agents[0].prev_input) if new != prev
-            )
-            agents[0].prev_input = new_input
-            agents[0].input_count += input_delta
-            self.action_tracker.add_action(agents[0].player(game_state).action.value)
+        for i, agent in enumerate(agents):
+            if self.use_action_coords:
+                input_tensor, input_action_tensor = game_state_to_tensor(
+                    game_state, agent.player(game_state), agents[1].player(game_state) if agent == agents[0] else agents[0].player(game_state)
+                )
+                task_input = torch.cat(
+                    (input_tensor.flatten(), input_action_tensor.flatten())
+                )
+            else:
+                input_tensor = game_state_to_tensor_action_normalized(
+                    game_state, agent.player(game_state), agents[1].player(game_state) if agent == agents[0] else agents[0].player(game_state)
+                )
+                task_input = input_tensor.flatten()
+            output = agent.create_action(task_input)
+            if output is not None:
+                buttons, analog, c_analog = output_tensor_to_controller_tensors(
+                    output #torch.sigmoid(output)
+                )
+                buttons = torch.sigmoid(buttons)
+                threshold = 0.5
+                press_a: bool = buttons[0, 0] > threshold
+                press_b: bool = buttons[0, 1] > threshold
+                press_y: bool = buttons[0, 2] > threshold
+                press_z: bool = buttons[0, 3] > threshold
+                left_shoulder = (
+                    (buttons[0, 4].item() - threshold) / (1 - threshold)
+                    if buttons[0, 4].item() > threshold
+                    else 0.0
+                )
+                main_stick_x, main_stick_y = self.controller_helper.processAnalog(analog)
+                c_analog_x, c_analog_y = self.controller_helper.processAnalog(c_analog)
+                self.controller_helper.processMessage(
+                    {
+                        "a": press_a,
+                        "b": press_b,
+                        "y": press_y,
+                        "z": press_z,
+                        "leftShoulder": left_shoulder,
+                        "mainStickX": main_stick_x,
+                        "mainStickY": main_stick_y,
+                        "cStickX": c_analog_x,
+                        "cStickY": c_analog_y,
+                    },
+                    agent.controller,
+                )
+                new_input = (
+                    main_stick_x,
+                    main_stick_y,
+                    c_analog_x,
+                    c_analog_y,
+                    left_shoulder,
+                    press_a,
+                    press_b,
+                    press_y,
+                    press_z,
+                )
+                input_delta = 0
+                input_delta = sum(
+                    1 for new, prev in zip(new_input, agent.prev_input) if new != prev
+                )
+                agent.prev_input = new_input
+                agent.input_count += input_delta
+                self.action_tracker[i].add_action(agent.player(game_state).action.value)
 
 
 def simulation(
@@ -857,7 +855,7 @@ def simulation(
                 meleeCore.controller.release_all()
                 break
         # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
-        print(meleeSimulation.action_tracker.actions)
+        print(meleeSimulation.action_tracker[0].actions)
         score_dict = {
             "id": id,
             "kill_count": agent_score.kill_count,
@@ -869,7 +867,7 @@ def simulation(
             "total_frames": int(game_state.frame),
             "input_count": agents[0].input_count,
             "rolling_action_count": len(
-                meleeSimulation.action_tracker.actions
+                meleeSimulation.action_tracker[0].actions
             ),
             "cpu_level": cpu_config.cpu_level,
             "stage": stageToString(melee_config.stage),
