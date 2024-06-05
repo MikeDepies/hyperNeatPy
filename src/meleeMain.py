@@ -794,17 +794,18 @@ def simulation(
     # fetch from queue
     while True:
         # print("get next network")
-        (id, network, agent_config, cpu_config, stage) = queue.get()
+        (id, network, network2, agent_config, cpu_config, stage) = queue.get()
         agent_configuration_list = [
             agent_config,
             cpu_config,
         ]
         print("id", id)
+        
         melee_config = MeleeConfiguration(agent_configuration_list, stage)
         meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
         agents = [
             Agent(meleeCore, agent_config, meleeCore.controller, network),
-            Agent(meleeCore, cpu_config, meleeCore.controller_opponent, None),
+            Agent(meleeCore, cpu_config, meleeCore.controller_opponent, network2),
         ]
         game_state_evaluator = GameStateEvaluator(
             meleeCore,
@@ -993,10 +994,18 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             )
             cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
             network = TaskNetwork2(substrate, cppn_query_instance)
+            network2 = None
+            if task.cpu_task.network_genome is not None:
+                network_processor2 = network_processor_factory.createProcessor(
+                    task.cpu_task.network_genome
+                )
+                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.3)
+                network2 = TaskNetwork2(substrate, cppn_query_instance2)
             queue.put(
                 [
                     data["id"],
                     network,
+                    network2,
                     task.agent_task.agent_config,
                     task.cpu_task.agent_config,
                     task.stage,
