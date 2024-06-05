@@ -717,9 +717,9 @@ class MeleeSimulation:
         output = agents[0].create_action(task_input)
         if output is not None:
             buttons, analog, c_analog = output_tensor_to_controller_tensors(
-                torch.sigmoid(output)
+                output #torch.sigmoid(output)
             )
-
+            buttons = torch.sigmoid(buttons)
             threshold = 0.5
             press_a: bool = buttons[0, 0] > threshold
             press_b: bool = buttons[0, 1] > threshold
