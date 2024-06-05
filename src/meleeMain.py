@@ -486,6 +486,7 @@ class SimulationState(Enum):
     RUNNING = 0
     GAME_OVER = 1
     MENU = 2
+    SUDDEN_DEATH = 3
 
 
 class ActionTracker:
@@ -614,8 +615,9 @@ class MeleeSimulation:
             melee.enums.Menu.SUDDEN_DEATH,
         ]:
             agent_scores = game_state_evaluator.score_agents(game_state)
-            if self.isGameOver(game_state, agent_scores)[0]:
-                return (game_state_evaluator.agent_scores, SimulationState.GAME_OVER)
+            game_over = self.isGameOver(game_state, agent_scores)
+            if game_over[0]:
+                return (game_state_evaluator.agent_scores, SimulationState.GAME_OVER if game_over[1] != -1 else SimulationState.SUDDEN_DEATH)
             else:
                 self.handle_game_step(game_state, game_state_evaluator.agents)
                 return (game_state_evaluator.agent_scores, SimulationState.RUNNING)
@@ -697,7 +699,7 @@ class MeleeSimulation:
             map(lambda x: (agent_scores[x].agent.player(game_state), x), agent_scores)
         )
         if game_state.frame / (60 * 60) >= 8:
-            return (True, 1)
+            return (True, -1)
         for player, index in players:
             if player.stock <= 0:
                 return (True, index)
@@ -816,6 +818,7 @@ def simulation(
         )
         agent_score: AgentScore
         first_step = True
+        state = SimulationState.MENU
         print(f"start loop {instance_num}")
         if (
             agent_config.character == melee.Character.CPTFALCON
@@ -859,29 +862,31 @@ def simulation(
                 break
         # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
         print(meleeSimulation.action_tracker[0].actions)
-        score_dict = {
-            "id": id,
-            "kill_count": agent_score.kill_count,
-            "death_count": agent_score.death_count,
-            "damage_dealt": agent_score.damage_dealt,#agents[1].player(game_state).percent,
-            "damage_received": agent_score.damage_received,#agents[0].player(game_state).percent,
-            "center_advantage": agent_score.center_advantage,
-            "unique_action_count": len(agent_score.unique_actions),
-            "total_frames": int(game_state.frame),
-            "input_count": agents[0].input_count,
-            "rolling_action_count": len(
-                meleeSimulation.action_tracker[0].actions
-            ),
-            "cpu_level": cpu_config.cpu_level,
-            "stage": stageToString(melee_config.stage),
-            "character": characterToString(agent_config.character),
-            "opponent_character": characterToString(cpu_config.character),
-        }
+        if state == SimulationState.GAME_OVER:
+            
+            score_dict = {
+                "id": id,
+                "kill_count": agent_score.kill_count,
+                "death_count": agent_score.death_count,
+                "damage_dealt": agent_score.damage_dealt,#agents[1].player(game_state).percent,
+                "damage_received": agent_score.damage_received,#agents[0].player(game_state).percent,
+                "center_advantage": agent_score.center_advantage,
+                "unique_action_count": len(agent_score.unique_actions),
+                "total_frames": int(game_state.frame),
+                "input_count": agents[0].input_count,
+                "rolling_action_count": len(
+                    meleeSimulation.action_tracker[0].actions
+                ),
+                "cpu_level": cpu_config.cpu_level,
+                "stage": stageToString(melee_config.stage),
+                "character": characterToString(agent_config.character),
+                "opponent_character": characterToString(cpu_config.character),
+            }
         # print(f"{score_dict}")
         # score_queue.put(score_dict)
         # print("last before send")
-        if args.mode == "train":
-            score_queue.put(score_dict)
+            if args.mode == "train":
+                score_queue.put(score_dict)
         # print("last after send")
 
         # else:
