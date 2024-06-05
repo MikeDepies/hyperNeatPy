@@ -1171,7 +1171,7 @@ def main():
     height = 2
     action_width = 386
     action_height = 2
-    bias_coords = [(0, 0, 0.3)]
+    bias_coords = [(0, 0, -2.0)]
     input_coords = [
         (y, x, -1)
         for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
@@ -1185,7 +1185,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.9, 0.9, round(20))
+        for z in np.linspace(-0.9, 0.9, round(5))
     ]
     output_width = 5
     output_height = 1
