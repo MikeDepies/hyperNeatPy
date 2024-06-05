@@ -444,6 +444,42 @@ def characterToString(character: melee.Character):
         return "MARIO"
     elif character == melee.Character.YOSHI:
         return "YOSHI"
+    elif character == melee.Character.LUIGI:
+        return "LUIGI"
+    elif character == melee.Character.PIKACHU:
+        return "PIKACHU"
+    elif character == melee.Character.KIRBY:
+        return "KIRBY"
+    elif character == melee.Character.BOWSER:
+        return "BOWSER"
+    elif character == melee.Character.SHEIK:
+        return "SHEIK"
+    elif character == melee.Character.NESS:
+        return "NESS"
+    elif character == melee.Character.PEACH:
+        return "PEACH"
+    elif character == melee.Character.POPO:
+        return "POPO"
+    elif character == melee.Character.NANA:
+        return "NANA"
+    elif character == melee.Character.SAMUS:
+        return "SAMUS"
+    elif character == melee.Character.JIGGLYPUFF:
+        return "JIGGLYPUFF"
+    elif character == melee.Character.MEWTWO:
+        return "MEWTWO"
+    elif character == melee.Character.MARTH:
+        return "MARTH"
+    elif character == melee.Character.ZELDA:
+        return "ZELDA"
+    elif character == melee.Character.YLINK:
+        return "YLINK"
+    elif character == melee.Character.PICHU:
+        return "PICHU"
+    elif character == melee.Character.GAMEANDWATCH:
+        return "GAMEANDWATCH"
+    elif character == melee.Character.ROY:
+        return "ROY"
 
 
 class SimulationState(Enum):
