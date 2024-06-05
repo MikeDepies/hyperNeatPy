@@ -696,7 +696,7 @@ class MeleeSimulation:
         players: List[Tuple[PlayerState, int]] = list(
             map(lambda x: (agent_scores[x].agent.player(game_state), x), agent_scores)
         )
-        if game_state.frame / (60 * 60) >= 7.99:
+        if game_state.frame / (60 * 60) >= 8:
             return (True, 1)
         for player, index in players:
             if player.stock <= 0:
