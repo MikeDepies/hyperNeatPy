@@ -568,12 +568,35 @@ class ActionTracker:
             melee.Action.FALLING_BACKWARD.value,
             melee.Action.SPECIAL_FALL_BACK.value,
             melee.Action.SPECIAL_FALL_FORWARD.value,
+            melee.Action.EDGE_JUMP_1_QUICK.value,
+            melee.Action.EDGE_JUMP_1_SLOW.value,
+            melee.Action.EDGE_JUMP_2_QUICK.value,
+            melee.Action.EDGE_JUMP_2_SLOW.value,
+            melee.Action.ROLL_BACKWARD.value,
+            melee.Action.ROLL_FORWARD.value,
+            melee.Action.ENTRY.value,
+            melee.Action.ENTRY_START.value,
+            melee.Action.ENTRY_END.value,
+            melee.Action.SLIDING_OFF_EDGE.value,
+            melee.Action.DEAD_FALL.value,
+            melee.Action.DEAD_DOWN.value,
+            melee.Action.DEAD_LEFT.value,
+            melee.Action.DEAD_RIGHT.value,
+            melee.Action.DEAD_UP.value,
+            melee.Action.DEAD_FLY_STAR.value,
+            melee.Action.DEAD_FLY_STAR_ICE.value,
+            melee.Action.DEAD_FLY.value,
+            melee.Action.DEAD_FLY_SPLATTER.value,
+            melee.Action.DEAD_FLY_SPLATTER_FLAT.value,
+            melee.Action.DEAD_FLY_SPLATTER_ICE.value,
+            melee.Action.DEAD_FLY_SPLATTER_FLAT_ICE.value,
+            melee.Action.SPOTDODGE.value,
         ]
 
     def add_action(self, action: int):
         if action not in self.excluded_actions:
             is_unique = action not in self.unique_action_set
-            
+
             # if len(self.unique_action_set) > self.unique_size:
             #     self.unique_action_set.
             if is_unique:
@@ -582,7 +605,7 @@ class ActionTracker:
                 # print(len(self.actions))
 
     def get_actions(self):
-        
+
         return self.actions
 
 
@@ -598,8 +621,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
-        self.action_tracker = [ActionTracker(20), ActionTracker(20)]
-        
+        self.action_tracker = [ActionTracker(10), ActionTracker(10)]
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
@@ -617,7 +639,14 @@ class MeleeSimulation:
             agent_scores = game_state_evaluator.score_agents(game_state)
             game_over = self.isGameOver(game_state, agent_scores)
             if game_over[0]:
-                return (game_state_evaluator.agent_scores, SimulationState.GAME_OVER if game_over[1] != -1 else SimulationState.SUDDEN_DEATH)
+                return (
+                    game_state_evaluator.agent_scores,
+                    (
+                        SimulationState.GAME_OVER
+                        if game_over[1] != -1
+                        else SimulationState.SUDDEN_DEATH
+                    ),
+                )
             else:
                 self.handle_game_step(game_state, game_state_evaluator.agents)
                 return (game_state_evaluator.agent_scores, SimulationState.RUNNING)
@@ -710,20 +739,32 @@ class MeleeSimulation:
         for i, agent in enumerate(agents):
             if self.use_action_coords:
                 input_tensor, input_action_tensor = game_state_to_tensor(
-                    game_state, agent.player(game_state), agents[1].player(game_state) if agent == agents[0] else agents[0].player(game_state)
+                    game_state,
+                    agent.player(game_state),
+                    (
+                        agents[1].player(game_state)
+                        if agent == agents[0]
+                        else agents[0].player(game_state)
+                    ),
                 )
                 task_input = torch.cat(
                     (input_tensor.flatten(), input_action_tensor.flatten())
                 )
             else:
                 input_tensor = game_state_to_tensor_action_normalized(
-                    game_state, agent.player(game_state), agents[1].player(game_state) if agent == agents[0] else agents[0].player(game_state)
+                    game_state,
+                    agent.player(game_state),
+                    (
+                        agents[1].player(game_state)
+                        if agent == agents[0]
+                        else agents[0].player(game_state)
+                    ),
                 )
                 task_input = input_tensor.flatten()
             output = agent.create_action(task_input)
             if output is not None:
                 buttons, analog, c_analog = output_tensor_to_controller_tensors(
-                    output #torch.sigmoid(output)
+                    output  # torch.sigmoid(output)
                 )
                 buttons = torch.sigmoid(buttons)
                 threshold = 0.5
@@ -736,7 +777,9 @@ class MeleeSimulation:
                     if buttons[0, 4].item() > threshold
                     else 0.0
                 )
-                main_stick_x, main_stick_y = self.controller_helper.processAnalog(analog)
+                main_stick_x, main_stick_y = self.controller_helper.processAnalog(
+                    analog
+                )
                 c_analog_x, c_analog_y = self.controller_helper.processAnalog(c_analog)
                 self.controller_helper.processMessage(
                     {
@@ -804,7 +847,7 @@ def simulation(
             cpu_config,
         ]
         print("id", id)
-        
+
         melee_config = MeleeConfiguration(agent_configuration_list, stage)
         meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
         agents = [
@@ -856,7 +899,10 @@ def simulation(
                 game_state, game_state_evaluator, menu_helper
             )
             agent_score = score[1]
-            if state == SimulationState.GAME_OVER or state == SimulationState.SUDDEN_DEATH:
+            if (
+                state == SimulationState.GAME_OVER
+                or state == SimulationState.SUDDEN_DEATH
+            ):
                 # print("Game Over")
                 meleeCore.controller.release_all()
                 meleeCore.controller_opponent.release_all()
@@ -864,28 +910,26 @@ def simulation(
         # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
         print(meleeSimulation.action_tracker[0].actions)
         if state == SimulationState.GAME_OVER:
-            
+
             score_dict = {
                 "id": id,
                 "kill_count": agent_score.kill_count,
                 "death_count": agent_score.death_count,
-                "damage_dealt": agent_score.damage_dealt,#agents[1].player(game_state).percent,
-                "damage_received": agent_score.damage_received,#agents[0].player(game_state).percent,
+                "damage_dealt": agent_score.damage_dealt,  # agents[1].player(game_state).percent,
+                "damage_received": agent_score.damage_received,  # agents[0].player(game_state).percent,
                 "center_advantage": agent_score.center_advantage,
                 "unique_action_count": len(agent_score.unique_actions),
                 "total_frames": int(game_state.frame),
                 "input_count": agents[0].input_count,
-                "rolling_action_count": len(
-                    meleeSimulation.action_tracker[0].actions
-                ),
+                "rolling_action_count": len(meleeSimulation.action_tracker[0].actions),
                 "cpu_level": cpu_config.cpu_level,
                 "stage": stageToString(melee_config.stage),
                 "character": characterToString(agent_config.character),
                 "opponent_character": characterToString(cpu_config.character),
             }
-        # print(f"{score_dict}")
-        # score_queue.put(score_dict)
-        # print("last before send")
+            # print(f"{score_dict}")
+            # score_queue.put(score_dict)
+            # print("last before send")
             if args.mode == "train":
                 score_queue.put(score_dict)
         # print("last after send")
@@ -1127,9 +1171,12 @@ def characterToInt(character: melee.Character):
     elif character == melee.Character.ROY:
         return 26
 
+
 # -246, 246, 188, -140
 def scale_to_custom_range(data, min_val, max_val):
     return (data - min_val) / (max_val - min_val) * 2 - 1
+
+
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
@@ -1138,8 +1185,12 @@ def game_state_to_tensor(
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
-        input_tensor[i, 2] = player.x / 100 #scale_to_custom_range(player.x, -246, 246)
-        input_tensor[i, 3] = player.y / 100 #scale_to_custom_range(player.y, -140, 188)
+        input_tensor[i, 2] = (
+            player.x / 100
+        )  # scale_to_custom_range(player.x, -246, 246)
+        input_tensor[i, 3] = (
+            player.y / 100
+        )  # scale_to_custom_range(player.y, -140, 188)
         input_tensor[i, 4] = 1 if player.facing == True else 0
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
@@ -1159,8 +1210,12 @@ def game_state_to_tensor_action_normalized(
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
-        input_tensor[i, 2] = player.x / 100 #scale_to_custom_range(player.x, -246, 246)
-        input_tensor[i, 3] = player.y / 100 #scale_to_custom_range(player.y, -140, 188)
+        input_tensor[i, 2] = (
+            player.x / 100
+        )  # scale_to_custom_range(player.x, -246, 246)
+        input_tensor[i, 3] = (
+            player.y / 100
+        )  # scale_to_custom_range(player.y, -140, 188)
         input_tensor[i, 4] = 1 if player.facing == True else -1
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
@@ -1200,7 +1255,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.9, 0.9, round(30))
+        for z in np.linspace(-0.9, 0.9, round(100))
     ]
     output_width = 5
     output_height = 1
