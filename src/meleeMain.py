@@ -1138,8 +1138,8 @@ def game_state_to_tensor(
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
-        input_tensor[i, 2] = scale_to_custom_range(player.x, -246, 246)
-        input_tensor[i, 3] = scale_to_custom_range(player.y, -140, 188)
+        input_tensor[i, 2] = player.x / 100 #scale_to_custom_range(player.x, -246, 246)
+        input_tensor[i, 3] = player.y / 100 #scale_to_custom_range(player.y, -140, 188)
         input_tensor[i, 4] = 1 if player.facing == True else 0
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
@@ -1181,7 +1181,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 
 def main():
     args = parseArgs()
-    use_action_coords = True
+    use_action_coords = False
     width = 10 if use_action_coords else 11
     height = 2
     action_width = 386
@@ -1199,7 +1199,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 5) for x in np.linspace(-1, 1, 5)]
+        [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
         for z in np.linspace(-0.9, 0.9, round(30))
     ]
     output_width = 5
