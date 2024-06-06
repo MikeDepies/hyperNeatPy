@@ -859,6 +859,7 @@ def simulation(
             if state == SimulationState.GAME_OVER or state == SimulationState.SUDDEN_DEATH:
                 # print("Game Over")
                 meleeCore.controller.release_all()
+                meleeCore.controller_opponent.release_all()
                 break
         # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
         print(meleeSimulation.action_tracker[0].actions)
