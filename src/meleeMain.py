@@ -1000,14 +1000,14 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.0)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
                 network_processor2 = network_processor_factory.createProcessor(
                     task.cpu_task.network_genome
                 )
-                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.3)
+                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.0)
                 network2 = TaskNetwork2(substrate, cppn_query_instance2)
             queue.put(
                 [
@@ -1159,15 +1159,15 @@ def game_state_to_tensor_action_normalized(
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
-        input_tensor[i, 2] = scale_to_custom_range(player.x, -246, 246)
-        input_tensor[i, 3] = scale_to_custom_range(player.y, -140, 188)
-        input_tensor[i, 4] = 1 if player.facing == True else 0
+        input_tensor[i, 2] = player.x / 100 #scale_to_custom_range(player.x, -246, 246)
+        input_tensor[i, 3] = player.y / 100 #scale_to_custom_range(player.y, -140, 188)
+        input_tensor[i, 4] = 1 if player.facing == True else -1
         input_tensor[i, 5] = player.jumps_left / 2
         input_tensor[i, 6] = player.shield_strength / 60
         input_tensor[i, 7] = min(385, player.action.value) / 385
         input_tensor[i, 8] = stageToInt(game_state.stage) / 6
         input_tensor[i, 9] = characterToInt(player.character) / 26
-        input_tensor[i, 10] = player.action_frame / 60
+        input_tensor[i, 10] = player.action_frame / 120
 
     return input_tensor
 
