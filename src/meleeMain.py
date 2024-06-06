@@ -856,7 +856,7 @@ def simulation(
                 game_state, game_state_evaluator, menu_helper
             )
             agent_score = score[1]
-            if state == SimulationState.GAME_OVER:
+            if state == SimulationState.GAME_OVER or state == SimulationState.SUDDEN_DEATH:
                 # print("Game Over")
                 meleeCore.controller.release_all()
                 break
