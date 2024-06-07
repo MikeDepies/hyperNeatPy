@@ -606,7 +606,12 @@ class ActionTracker:
             melee.Action.GROUND_ROLL_BACKWARD_UP.value,
             melee.Action.GROUND_ROLL_FORWARD_DOWN.value,
             melee.Action.GROUND_ROLL_FORWARD_UP.value,
-            
+            melee.Action.EDGE_ATTACK_SLOW.value,
+            melee.Action.EDGE_ATTACK_QUICK.value,
+            melee.Action.PUMMELED_HIGH.value,
+            melee.Action.JUMPING_ARIAL_BACKWARD.value,
+            melee.Action.JUMPING_ARIAL_FORWARD.value,
+            melee.Action.GRAB_PULLING_HIGH.value
         ]
 
     def add_action(self, action: int):
