@@ -1199,6 +1199,8 @@ def game_state_to_tensor(
         input_tensor[i, 7] = stageToInt(game_state.stage) / 6
         input_tensor[i, 8] = characterToInt(player.character) / 26
         input_tensor[i, 9] = player.action_frame / 60
+        input_tensor[i, 10] = 1 if player.on_ground else 0
+        input_tensor[i, 11] = 1 if player.off_stage else 0
         input_action_tensor[i, min(385, player.action.value)] = 1
 
     return input_tensor, input_action_tensor
@@ -1225,6 +1227,8 @@ def game_state_to_tensor_action_normalized(
         input_tensor[i, 8] = stageToInt(game_state.stage) / 6
         input_tensor[i, 9] = characterToInt(player.character) / 26
         input_tensor[i, 10] = player.action_frame / 120
+        input_tensor[i, 11] = 1 if player.on_ground else 0
+        input_tensor[i, 12] = 1 if player.off_stage else 0
 
     return input_tensor
 
@@ -1239,7 +1243,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 def main():
     args = parseArgs()
     use_action_coords = True
-    width = 10 if use_action_coords else 11
+    width = 12 if use_action_coords else 11
     height = 2
     action_width = 386
     action_height = 2
