@@ -593,6 +593,20 @@ class ActionTracker:
             melee.Action.SPOTDODGE.value,
             melee.Action.TECH_MISS_DOWN.value,
             melee.Action.TECH_MISS_UP.value,
+            melee.Action.EDGE_TEETERING.value,
+            melee.Action.EDGE_TEETERING_START.value,
+            melee.Action.EDGE_HANGING.value,
+            melee.Action.EDGE_ROLL_SLOW.value,
+            melee.Action.EDGE_ROLL_QUICK.value,
+            melee.Action.EDGE_CATCHING.value,
+            melee.Action.GRAB_PULL.value,
+            melee.Action.GRAB_FOOT.value,
+            melee.Action.GRAB_NECK.value,
+            melee.Action.GROUND_ROLL_BACKWARD_DOWN.value,
+            melee.Action.GROUND_ROLL_BACKWARD_UP.value,
+            melee.Action.GROUND_ROLL_FORWARD_DOWN.value,
+            melee.Action.GROUND_ROLL_FORWARD_UP.value,
+            
         ]
 
     def add_action(self, action: int):
@@ -623,7 +637,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
-        self.action_tracker = [ActionTracker(10), ActionTracker(10)]
+        self.action_tracker = [ActionTracker(5), ActionTracker(5)]
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
