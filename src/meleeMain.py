@@ -1182,7 +1182,7 @@ def scale_to_custom_range(data, min_val, max_val):
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 10))
+    input_tensor = torch.zeros((2, 12))
     input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -1209,7 +1209,7 @@ def game_state_to_tensor(
 def game_state_to_tensor_action_normalized(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 11))
+    input_tensor = torch.zeros((2, 13))
     # input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -1243,7 +1243,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 def main():
     args = parseArgs()
     use_action_coords = True
-    width = 12 if use_action_coords else 11
+    width = 12 if use_action_coords else 13
     height = 2
     action_width = 386
     action_height = 2
