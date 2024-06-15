@@ -1263,8 +1263,8 @@ def game_state_to_tensor_action_normalized(
 
 def output_tensor_to_controller_tensors(output_tensor: Tensor):
     buttons = output_tensor[:, :5].reshape(1, 5)
-    analog = output_tensor[:, 5:54].reshape(7, 7)
-    c_analog = output_tensor[:, 54:103].reshape(7, 7)
+    analog = output_tensor[:, 5:174].reshape(13, 13)  # Using 169 elements
+    c_analog = output_tensor[:, 174:343].reshape(13, 13)  # Using 169 elements
     return buttons, analog, c_analog
 
 
@@ -1288,13 +1288,13 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, 0) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(0.0, 0.6, round(5))
+        [(y, x, 0) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
+        for z in np.linspace(0.0, 0.6, round(1))
     ]
     output_width = 5
     output_height = 1
-    analog_width = 7
-    analog_height = 7
+    analog_width = 13
+    analog_height = 13
     analog_coords = [
         (y, x, 0.95)
         for y in np.linspace(-1, 0, analog_height)
