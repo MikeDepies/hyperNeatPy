@@ -952,6 +952,8 @@ def simulation(
                 "stage": stageToString(melee_config.stage),
                 "character": characterToString(agent_config.character),
                 "opponent_character": characterToString(cpu_config.character),
+                "l2_norm": network.calculate_l2_norm(),
+                "l1_norm": network.calculate_l1_norm(),
             }
             # print(f"{score_dict}")
             # score_queue.put(score_dict)
@@ -1121,6 +1123,8 @@ def score_queue_process(score_queue: Queue):
                 "stage": score["stage"],
                 "character": score["character"],
                 "opponentCharacter": score["opponent_character"],
+                "l2Norm": score["l2_norm"],
+                "l1Norm": score["l1_norm"],
             },
         )
         # print("send request!")
