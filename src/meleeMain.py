@@ -513,9 +513,10 @@ class GameStateEvaluator:
             self.agent_scores[
                 delta_score.agent.agent_configuration.port
             ].damage_received += delta_score.damage_received_delta
-            self.agent_scores[
-                delta_score.agent.agent_configuration.port
-            ].center_advantage += delta_score.center_advantage_delta
+            if delta_score.action not in self.excluded_actions:
+                self.agent_scores[
+                    delta_score.agent.agent_configuration.port
+                ].center_advantage += delta_score.center_advantage_delta
             if delta_score.action not in self.excluded_actions:
                 self.agent_scores[
                     delta_score.agent.agent_configuration.port
