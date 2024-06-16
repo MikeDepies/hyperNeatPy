@@ -129,10 +129,10 @@ def simulate_environment(
         # if tick_count % 20 * 1 == 0:
             # image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
         if color_channels == 1:
-            image = (rescale(rgb2gray(active_state), scale) / 127.5) - 1
+            image = (rescale(rgb2gray(active_state), scale) / 255.0)
             torch_input = torch.from_numpy(image).flatten().float()
         elif color_channels == 3:
-            image = (rescale(active_state, scale, channel_axis=2) / 127.5) - 1
+            image = (rescale(active_state, scale, channel_axis=2) / 255.0)
             torch_input = torch.from_numpy(image).permute(2,0, 1).flatten().float()
         # print(image.shape)
         
@@ -252,8 +252,8 @@ def simulation(
     input_depth: int,
     color_channels: int,
 ):
-    # env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
-    env = gym_super_mario_bros.make("SuperMarioBros-v3")
+    env = gym_super_mario_bros.make("SuperMarioBrosRandomStages-v0")
+    # env = gym_super_mario_bros.make("SuperMarioBros-v0")
     env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
     while True:
