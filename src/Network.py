@@ -813,7 +813,7 @@ class TaskNetwork2(torch.nn.Module):
             torch.matmul(inputs, self.input_hidden_weights)
             + self.hidden_bias_weights[0]
         )   #+ torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
-        self.hidden_activations[0] = torch.sigmoid(
+        self.hidden_activations[0] = torch.relu(
             self.hidden_activations[0]
         )  # Activation function
         for i in range(len(self.substrate.hidden_coords) - 1):
@@ -831,7 +831,7 @@ class TaskNetwork2(torch.nn.Module):
                     self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
                 )
             
-            self.hidden_activations[i + 1] = torch.sigmoid(
+            self.hidden_activations[i + 1] = torch.relu(
                 self.hidden_activations[i + 1]
             )  # Activation function
         # self.hidden_activations = hidden_activations
