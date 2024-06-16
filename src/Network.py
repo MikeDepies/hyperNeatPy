@@ -790,7 +790,7 @@ class TaskNetwork2(torch.nn.Module):
             self.hidden_recurrent_weights[-1],
             # *self.hidden_recurrent_weights,
         ]:
-            l1_norm += torch.norm(weight_matrix, p=.3).item()
+            l1_norm += torch.norm(weight_matrix, p=.8).item()
         return l1_norm
 
     def forward(self, inputs: torch.Tensor):

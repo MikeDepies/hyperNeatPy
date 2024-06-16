@@ -307,6 +307,7 @@ def simulation(
                 "averageTallStatusCount": float(average_tall_status_count),
                 "averageFireballStatusCount": float(average_fireball_status_count),
                 "actionChangeCount": float(action_change_count),
+                "l1Norm": float(network.calculate_l1_norm()),
             },
         )
         env.reset()
