@@ -787,6 +787,7 @@ class TaskNetwork2(torch.nn.Module):
             self.hidden_output_weights,
             *self.hidden_bias_weights,
             self.output_bias_weights,
+            self.hidden_recurrent_weights[-1],
             # *self.hidden_recurrent_weights,
         ]:
             l1_norm += torch.norm(weight_matrix, p=1).item()
@@ -824,12 +825,12 @@ class TaskNetwork2(torch.nn.Module):
                 + self.hidden_bias_weights[i + 1]
             )
             # print(f"{i} == {len(self.substrate.hidden_coords) - 1}")
-            # if (i + 2)  % 2 == 0:
-            #     # print("TESTTTTTTTTTTTTTTT")
-            #     self.hidden_activations[i + 1] += torch.matmul(
-            #         self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
-            #     )
-            # )
+            if (i + 2) == len(self.substrate.hidden_coords) - 1:
+                # print("TESTTTTTTTTTTTTTTT")
+                self.hidden_activations[i + 1] += torch.matmul(
+                    self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
+                )
+            
             self.hidden_activations[i + 1] = torch.sigmoid(
                 self.hidden_activations[i + 1]
             )  # Activation function
