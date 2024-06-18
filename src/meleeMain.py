@@ -610,6 +610,7 @@ class SimulationState(Enum):
     GAME_OVER = 1
     MENU = 2
     SUDDEN_DEATH = 3
+    GAME_ACTIVE_SIMULATION_END = 4
 
 
 class ActionTracker:
@@ -753,12 +754,13 @@ class MeleeSimulation:
         players: List[Tuple[PlayerState, int]] = list(
             map(lambda x: (agent_scores[x].agent.player(game_state), x), agent_scores)
         )
+        
         if game_state.frame / (60 * 60) >= 8:
-            return (True, -1)
+            return (True, -1, SimulationState.SUDDEN_DEATH)
         for player, index in players:
             if player.stock <= 0:
-                return (True, index)
-        return (False, None)
+                return (True, index, SimulationState.GAME_OVER)
+        return (False, None, SimulationState.RUNNING)
 
     def handle_game_step(self, game_state: GameState, agents: List[Agent]):
         task_input: Tensor
@@ -1072,14 +1074,14 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.9)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.9999)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
                 network_processor2 = network_processor_factory.createProcessor(
                     task.cpu_task.network_genome
                 )
-                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.9)
+                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.9999)
                 network2 = TaskNetwork2(substrate, cppn_query_instance2)
             queue.put(
                 [
