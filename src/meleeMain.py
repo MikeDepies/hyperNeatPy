@@ -647,7 +647,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
-        self.action_tracker = [ActionTracker(10), ActionTracker(10)]
+        self.action_tracker = [ActionTracker(20), ActionTracker(20)]
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
