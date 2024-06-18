@@ -1290,7 +1290,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, 0) for y in np.linspace(-1, 1, 5) for x in np.linspace(-1, 1, 5)]
+        [(y, x, z) for y in np.linspace(-1, 1, 5) for x in np.linspace(-1, 1, 5)]
         for z in np.linspace(0.0, 0.6, round(25))
     ]
     output_width = 5
