@@ -1074,14 +1074,14 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.9999)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.7)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
                 network_processor2 = network_processor_factory.createProcessor(
                     task.cpu_task.network_genome
                 )
-                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.9999)
+                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.7)
                 network2 = TaskNetwork2(substrate, cppn_query_instance2)
             queue.put(
                 [
