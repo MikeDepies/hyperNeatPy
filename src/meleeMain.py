@@ -926,7 +926,8 @@ def simulation(
             (score, state) = meleeSimulation.simulation_step(
                 game_state, game_state_evaluator, menu_helper
             )
-            agent_score = score[1]
+            ai_port = meleeCore.controller.port
+            agent_score = score[ai_port]
             if (
                 state == SimulationState.GAME_OVER
                 or state == SimulationState.SUDDEN_DEATH
