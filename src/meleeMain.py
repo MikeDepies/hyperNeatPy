@@ -898,7 +898,7 @@ def simulation(
             "rolling_action_count": 0,
         }
 
-        for game in range(total_games):
+        for game in range(total_games if args.mode == "train" else 1):
             melee_config = MeleeConfiguration(agent_configuration_list, stage)
             meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
             agents = [
