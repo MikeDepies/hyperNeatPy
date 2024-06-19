@@ -875,17 +875,7 @@ def simulation(
         ]
         print("id", id)
 
-        melee_config = MeleeConfiguration(agent_configuration_list, stage)
-        meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
-        agents = [
-            Agent(meleeCore, agent_config, meleeCore.controller, network),
-            Agent(meleeCore, cpu_config, meleeCore.controller_opponent, network2),
-        ]
-        game_state_evaluator = GameStateEvaluator(
-            meleeCore,
-            agents,
-            GameStateDeltaProcessor(),
-        )
+        
         agent_score: AgentScore
         first_step = True
         state = SimulationState.MENU
@@ -909,6 +899,17 @@ def simulation(
         }
 
         for game in range(total_games):
+            melee_config = MeleeConfiguration(agent_configuration_list, stage)
+            meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
+            agents = [
+                Agent(meleeCore, agent_config, meleeCore.controller, network),
+                Agent(meleeCore, cpu_config, meleeCore.controller_opponent, network2),
+            ]
+            game_state_evaluator = GameStateEvaluator(
+                meleeCore,
+                agents,
+                GameStateDeltaProcessor(),
+            )
             while True:
                 game_state = meleeCore.next_step()
                 if first_step:
