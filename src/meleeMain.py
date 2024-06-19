@@ -950,7 +950,7 @@ def simulation(
                     meleeCore.controller_opponent.release_all()
                     break
             # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
-            print(meleeSimulation.action_tracker[0].actions)
+            # print(meleeSimulation.action_tracker[0].actions)
             if state == SimulationState.GAME_OVER:
                 total_scores["kill_count"] += agent_score.kill_count
                 total_scores["death_count"] += agent_score.death_count
@@ -963,7 +963,7 @@ def simulation(
                 total_scores["rolling_action_count"] += len(meleeSimulation.action_tracker[0].actions)
 
         average_scores = {key: value / total_games for key, value in total_scores.items()}
-
+        print(f"average_scores: {average_scores}")
         score_dict = {
             "id": id,
             "kill_count": average_scores["kill_count"],
