@@ -964,6 +964,7 @@ def simulation(
 
         average_scores = {key: value / total_games for key, value in total_scores.items()}
         print(f"average_scores: {average_scores}")
+        print(f"total_scores: {total_scores}")
         score_dict = {
             "id": id,
             "kill_count": average_scores["kill_count"],
