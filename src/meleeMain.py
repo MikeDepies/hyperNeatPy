@@ -1157,7 +1157,7 @@ def score_queue_process(score_queue: Queue):
                 "l1Norm": score["l1_norm"],
             },
         )
-        # print("send request!")
+        print("send request!")
 
 
 def stageToInt(stage: melee.Stage):
