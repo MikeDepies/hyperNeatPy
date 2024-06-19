@@ -855,7 +855,7 @@ def simulation(
     signal_handler = MeleeSignalHandler(meleeCore)
     signal.signal(signal.SIGINT, signal_handler.signal_handler)
     print("Connecting...")
-    time.sleep(5)
+    # time.sleep(5)
     print("Connecting!")
     meleeCore.connect()
 
