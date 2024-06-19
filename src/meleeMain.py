@@ -1017,6 +1017,7 @@ def parseCharacter(character_string: str):
         "ylink": melee.Character.YLINK,
         "zelda": melee.Character.ZELDA,
         "popo": melee.Character.POPO,
+        "samus": melee.Character.SAMUS,
     }
     return character_table[character_string.lower()]
 
