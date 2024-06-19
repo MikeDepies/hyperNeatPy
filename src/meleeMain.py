@@ -842,7 +842,6 @@ class MeleeSimulation:
                 agent.input_count += input_delta
                 self.action_tracker[i].add_action(agent.player(game_state).action.value)
 
-
 def simulation(
     queue: Queue,
     score_queue: Queue,
@@ -896,73 +895,98 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        while True:
-            game_state = meleeCore.next_step()
-            if first_step:
-                print(
-                    f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character} {cpu_config.cpu_level}"
-                )
-                first_step = False
-            if (
-                game_state.frame > 60 * 60 * 4
-            ):  # agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
-                if (
-                    game_state.frame % (60 * 10) == 0
-                    and game_state.menu_state == melee.Menu.IN_GAME
-                ):
+        total_games = 5
+        total_scores = {
+            "kill_count": 0,
+            "death_count": 0,
+            "damage_dealt": 0.0,
+            "damage_received": 0.0,
+            "center_advantage": 0.0,
+            "unique_action_count": 0,
+            "total_frames": 0,
+            "input_count": 0,
+            "rolling_action_count": 0,
+        }
+
+        for game in range(total_games):
+            while True:
+                game_state = meleeCore.next_step()
+                if first_step:
                     print(
-                        f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}"
+                        f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character} {cpu_config.cpu_level}"
                     )
-            # print(game_state)
-            # print(agent_config.character)
-            # print(cpu_config.character)
-            # print(stage)
-            if game_state is None:
-                print("Game state is None")
-                meleeCore.stop()
-                # simulation(queue, score_queue, args, use_action_coords, instance_num)
+                    first_step = False
+                if (
+                    game_state.frame > 60 * 60 * 4
+                ):  # agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
+                    if (
+                        game_state.frame % (60 * 10) == 0
+                        and game_state.menu_state == melee.Menu.IN_GAME
+                    ):
+                        print(
+                            f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}"
+                        )
+                # print(game_state)
+                # print(agent_config.character)
+                # print(cpu_config.character)
+                # print(stage)
+                if game_state is None:
+                    print("Game state is None")
+                    meleeCore.stop()
+                    # simulation(queue, score_queue, args, use_action_coords, instance_num)
 
-                break
-            (score, state) = meleeSimulation.simulation_step(
-                game_state, game_state_evaluator, menu_helper
-            )
-            ai_port = meleeCore.controller.port
-            agent_score = score[ai_port]
-            if (
-                state == SimulationState.GAME_OVER
-                or state == SimulationState.SUDDEN_DEATH
-            ):
-                # print("Game Over")
-                meleeCore.controller.release_all()
-                meleeCore.controller_opponent.release_all()
-                break
-        # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
-        print(meleeSimulation.action_tracker[0].actions)
-        if state == SimulationState.GAME_OVER:
+                    break
+                (score, state) = meleeSimulation.simulation_step(
+                    game_state, game_state_evaluator, menu_helper
+                )
+                ai_port = meleeCore.controller.port
+                agent_score = score[ai_port]
+                if (
+                    state == SimulationState.GAME_OVER
+                    or state == SimulationState.SUDDEN_DEATH
+                ):
+                    # print("Game Over")
+                    meleeCore.controller.release_all()
+                    meleeCore.controller_opponent.release_all()
+                    break
+            # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
+            print(meleeSimulation.action_tracker[0].actions)
+            if state == SimulationState.GAME_OVER:
+                total_scores["kill_count"] += agent_score.kill_count
+                total_scores["death_count"] += agent_score.death_count
+                total_scores["damage_dealt"] += agent_score.damage_dealt
+                total_scores["damage_received"] += agent_score.damage_received
+                total_scores["center_advantage"] += agent_score.center_advantage
+                total_scores["unique_action_count"] += len(agent_score.unique_actions)
+                total_scores["total_frames"] += int(game_state.frame)
+                total_scores["input_count"] += agents[0].input_count
+                total_scores["rolling_action_count"] += len(meleeSimulation.action_tracker[0].actions)
 
-            score_dict = {
-                "id": id,
-                "kill_count": agent_score.kill_count,
-                "death_count": agent_score.death_count,
-                "damage_dealt": agent_score.damage_dealt,  # agents[1].player(game_state).percent,
-                "damage_received": agent_score.damage_received,  # agents[0].player(game_state).percent,
-                "center_advantage": agent_score.center_advantage,
-                "unique_action_count": len(agent_score.unique_actions),
-                "total_frames": int(game_state.frame),
-                "input_count": agents[0].input_count,
-                "rolling_action_count": len(meleeSimulation.action_tracker[0].actions),
-                "cpu_level": cpu_config.cpu_level,
-                "stage": stageToString(melee_config.stage),
-                "character": characterToString(agent_config.character),
-                "opponent_character": characterToString(cpu_config.character),
-                "l2_norm": network.calculate_l2_norm(),
-                "l1_norm": network.calculate_l1_norm(),
-            }
-            # print(f"{score_dict}")
-            # score_queue.put(score_dict)
-            # print("last before send")
-            if args.mode == "train":
-                score_queue.put(score_dict)
+        average_scores = {key: value / total_games for key, value in total_scores.items()}
+
+        score_dict = {
+            "id": id,
+            "kill_count": average_scores["kill_count"],
+            "death_count": average_scores["death_count"],
+            "damage_dealt": average_scores["damage_dealt"],  # agents[1].player(game_state).percent,
+            "damage_received": average_scores["damage_received"],  # agents[0].player(game_state).percent,
+            "center_advantage": average_scores["center_advantage"],
+            "unique_action_count": average_scores["unique_action_count"],
+            "total_frames": average_scores["total_frames"],
+            "input_count": average_scores["input_count"],
+            "rolling_action_count": average_scores["rolling_action_count"],
+            "cpu_level": cpu_config.cpu_level,
+            "stage": stageToString(melee_config.stage),
+            "character": characterToString(agent_config.character),
+            "opponent_character": characterToString(cpu_config.character),
+            "l2_norm": network.calculate_l2_norm(),
+            "l1_norm": network.calculate_l1_norm(),
+        }
+        # print(f"{score_dict}")
+        # score_queue.put(score_dict)
+        # print("last before send")
+        if args.mode == "train":
+            score_queue.put(score_dict)
         # print("last after send")
 
         # else:
@@ -1293,7 +1317,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.8, 0.9, round(30))
+        for z in np.linspace(-0.8, 0.9, round(3))
     ]
     output_width = 5
     output_height = 1
