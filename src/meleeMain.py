@@ -885,7 +885,7 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        total_games = 5
+        total_games = 3
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
@@ -1319,7 +1319,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
-        for z in np.linspace(-0.8, 0.9, round(3))
+        for z in np.linspace(-0.8, 0.8, round(3))
     ]
     output_width = 5
     output_height = 1
