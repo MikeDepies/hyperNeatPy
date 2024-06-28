@@ -766,7 +766,7 @@ class MeleeSimulation:
         task_input: Tensor
         for i, agent in enumerate(agents):
             if self.use_action_coords:
-                input_tensor, input_action_tensor = game_state_to_tensor(
+                input_tensor, input_action_tensor, input_action_tensor_2 = game_state_to_tensor(
                     game_state,
                     agent.player(game_state),
                     (
@@ -776,7 +776,7 @@ class MeleeSimulation:
                     ),
                 )
                 task_input = torch.cat(
-                    (input_tensor.flatten(), input_action_tensor.flatten())
+                    (input_tensor.flatten(), input_action_tensor.flatten(), input_action_tensor_2.flatten())
                 )
             else:
                 input_tensor = game_state_to_tensor_action_normalized(
@@ -1241,7 +1241,8 @@ def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
     input_tensor = torch.zeros((2, 14))
-    input_action_tensor = torch.zeros((2, 386))
+    input_action_tensor = torch.zeros(26, 15)
+    input_action_tensor_2 = torch.zeros(26, 15)
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
@@ -1261,9 +1262,15 @@ def game_state_to_tensor(
         input_tensor[i, 11] = 1 if player.off_stage else 0
         input_tensor[i, 12] = melee.stages.EDGE_POSITION[game_state.stage] / 100.0
         input_tensor[i, 13] = -melee.stages.EDGE_POSITION[game_state.stage] / 100.0
-        input_action_tensor[i, min(385, player.action.value)] = 1
-
-    return input_tensor, input_action_tensor
+    linear_index = min(385, agent_player.action.value)
+    row = linear_index // 15
+    col = linear_index % 15
+    input_action_tensor[row, col] = 1
+    linear_index = min(385, opponent_player.action.value)
+    row = linear_index // 15
+    col = linear_index % 15
+    input_action_tensor_2[row, col] = 1
+    return input_tensor, input_action_tensor, input_action_tensor_2
 
 
 def game_state_to_tensor_action_normalized(
@@ -1305,8 +1312,8 @@ def main():
     use_action_coords = True
     width = 14 if use_action_coords else 15
     height = 2
-    action_width = 386
-    action_height = 2
+    action_width = 15
+    action_height = 26
     bias_coords = [(0, 0, -2.0)]
     input_coords = [
         (y, x, -1)
@@ -1315,12 +1322,17 @@ def main():
     ]
     action_coords = [
         (y, x, -0.9)
-        for y in np.linspace(-1, 1, action_height)
-        for x in np.linspace(-1, 1, action_width)
+        for y in np.linspace(-1, 0, action_height)
+        for x in np.linspace(-1, 0, action_width)
+    ]
+    action_coords_2 = [
+        (y, x, -0.9)
+        for y in np.linspace(0, 1, action_height)
+        for x in np.linspace(0, 1, action_width)
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
+        [(y, x, z) for y in np.linspace(-1, 1, 16) for x in np.linspace(-1, 1, 16)]
         for z in np.linspace(-0.8, 0.8, round(3))
     ]
     output_width = 5
@@ -1344,7 +1356,7 @@ def main():
     ]
 
     all_input_coords = (
-        input_coords + action_coords if use_action_coords else input_coords
+        input_coords + (action_coords + action_coords_2) if use_action_coords else input_coords
     )
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
