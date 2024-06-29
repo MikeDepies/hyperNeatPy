@@ -1263,7 +1263,7 @@ def game_state_to_tensor(
         input_tensor[i, 12] = melee.stages.EDGE_POSITION[game_state.stage] / 100.0
         input_tensor[i, 13] = -melee.stages.EDGE_POSITION[game_state.stage] / 100.0
         input_tensor[i, 14] = player.hitstun_frames_left / 60
-        input_tensor[i, 15] = player.hitlag_frames_left / 60
+        input_tensor[i, 15] = player.hitlag_left / 60
     linear_index = min(385, agent_player.action.value)
     row = linear_index // 15
     col = linear_index % 15
