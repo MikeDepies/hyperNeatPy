@@ -1240,7 +1240,7 @@ def scale_to_custom_range(data, min_val, max_val):
 def game_state_to_tensor(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 16))
+    input_tensor = torch.zeros((2, 24))
     input_action_tensor = torch.zeros(26, 15)
     input_action_tensor_2 = torch.zeros(26, 15)
     for i, player in enumerate([agent_player, opponent_player]):
@@ -1264,6 +1264,16 @@ def game_state_to_tensor(
         input_tensor[i, 13] = -melee.stages.EDGE_POSITION[game_state.stage] / 100.0
         input_tensor[i, 14] = player.hitstun_frames_left / 60
         input_tensor[i, 15] = player.hitlag_left / 60
+        input_tensor[i, 16] = player.speed_x_attack / 5
+        input_tensor[i, 17] = player.speed_y_attack / 5
+        input_tensor[i, 18] = player.speed_ground_x_self / 5
+        input_tensor[i, 19] = player.speed_y_self / 5
+        input_tensor[i, 20] = player.speed_air_x_self / 5
+        input_tensor[i, 21] = 1 if player.moonwalkwarning else 0
+        input_tensor[i, 22] = 1 if player.invulnerable else 0
+        input_tensor[i, 23] = 1 if player.is_powershield else 0
+        
+
     linear_index = min(385, agent_player.action.value)
     row = linear_index // 15
     col = linear_index % 15
@@ -1272,7 +1282,7 @@ def game_state_to_tensor(
     row = linear_index // 15
     col = linear_index % 15
     input_action_tensor_2[row, col] = 1
-    return input_tensor[0, :].reshape(4, 4), input_tensor[1, :].reshape(4, 4), input_action_tensor, input_action_tensor_2
+    return input_tensor[0, :].reshape(4, 6), input_tensor[1, :].reshape(4, 6), input_action_tensor, input_action_tensor_2
 
 
 def game_state_to_tensor_action_normalized(
@@ -1312,7 +1322,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 def main():
     args = parseArgs()
     use_action_coords = True
-    width = 4 if use_action_coords else 15
+    width = 6 if use_action_coords else 15
     height = 4
     action_width = 15
     action_height = 26
