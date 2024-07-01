@@ -470,7 +470,7 @@ class GameStateDeltaProcessor:
             if player2_percent_change > 0:
                 # implement tests to see if player1 is actually damaging player2
                 agent1_score_delta.damage_dealt_delta = player2_percent_change
-            agent1_score_delta.action = player1.action
+            agent1_score_delta.action = player1.action.value
 
             delta_scores.append(agent1_score_delta)
         return delta_scores
@@ -521,6 +521,9 @@ class GameStateEvaluator:
                 self.agent_scores[
                     delta_score.agent.agent_configuration.port
                 ].unique_actions.add(delta_score.action)
+                # if delta_score.agent.agent_configuration.port == 1:
+                #     print(f"agent {delta_score.agent.agent_configuration.port} action: {delta_score.action} all actions: {self.agent_scores[delta_score.agent.agent_configuration.port].unique_actions}")
+
         return self.agent_scores
 
 
@@ -648,7 +651,7 @@ class MeleeSimulation:
         self.melee_config = melee_config
         self.controller_helper = ControllerHelper()
         self.use_action_coords = use_action_coords
-        self.action_tracker = [ActionTracker(20), ActionTracker(20)]
+        self.action_tracker = [ActionTracker(10), ActionTracker(10)]
 
     def set_config(self, melee_config: MeleeConfiguration):
         self.melee_config = melee_config
@@ -885,7 +888,7 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        total_games = 3
+        total_games = 3 if args.mode == "train" else 1
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
@@ -898,7 +901,7 @@ def simulation(
             "rolling_action_count": 0,
         }
 
-        for game in range(total_games if args.mode == "train" else 1):
+        for game in range(total_games):
             melee_config = MeleeConfiguration(agent_configuration_list, stage)
             meleeSimulation = MeleeSimulation(meleeCore, melee_config, use_action_coords)
             agents = [
