@@ -767,7 +767,11 @@ class MeleeSimulation:
 
     def handle_game_step(self, game_state: GameState, agents: List[Agent]):
         task_input: Tensor
-        for i, agent in enumerate(agents):
+        # print(agents[0].agent_configuration.type)
+        # print(agents[0].agent_configuration.type == AgentType.AI)
+        # print(agents[0].agent_configuration.type is AgentType.CPU)
+        # print(agents[0].agent_configuration.type == "AI")
+        for i, agent in enumerate(filter(lambda a: a.agent_configuration.type == "AI", agents)):
             if self.use_action_coords:
                 input_tensor, input_tensor_2, input_action_tensor, input_action_tensor_2 = game_state_to_tensor(
                     game_state,
@@ -781,6 +785,13 @@ class MeleeSimulation:
                 task_input = torch.cat(
                     (input_tensor.flatten(), input_tensor_2.flatten(), input_action_tensor.flatten(), input_action_tensor_2.flatten())
                 )
+                # if game_state.frame % (60 * 5) == 0:
+                #     print(input_tensor.flatten())
+                #     print(input_tensor_2.flatten())
+                #     non_zero_indices = torch.nonzero(input_action_tensor.flatten(), as_tuple=True)
+                #     print(non_zero_indices)
+                #     non_zero_indices_2 = torch.nonzero(input_action_tensor_2.flatten(), as_tuple=True)
+                #     print(non_zero_indices_2)
             else:
                 input_tensor = game_state_to_tensor_action_normalized(
                     game_state,
@@ -921,10 +932,10 @@ def simulation(
                     )
                     first_step = False
                 if (
-                    game_state.frame > 60 * 60 * 4
+                     args.mode != "train"
                 ):  # agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
                     if (
-                        game_state.frame % (60 * 10) == 0
+                        game_state.frame % (60 * 1) == 0
                         and game_state.menu_state == melee.Menu.IN_GAME
                     ):
                         print(
