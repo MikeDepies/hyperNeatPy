@@ -899,7 +899,7 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        total_games = 3 if args.mode == "train" else 1
+        total_games = 1 if args.mode == "train" else 1
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
