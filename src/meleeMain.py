@@ -276,6 +276,7 @@ def createMelee(args: MeleeArgs, instance_num: int):
             slippi_port=args.dolphin_port + instance_num,
             blocking_input=False,
             polling_mode=False,
+            save_replays=False,
         )
     else:
         console = Console(
@@ -285,8 +286,8 @@ def createMelee(args: MeleeArgs, instance_num: int):
             polling_mode=False,
             setup_gecko_codes=True,
             gfx_backend="Null",
-            use_exi_inputs=True,
-            enable_ffw=True,
+            use_exi_inputs=False,
+            enable_ffw=False,
             save_replays=False,
         )
     controller = Controller(
