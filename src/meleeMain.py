@@ -773,7 +773,7 @@ class MeleeSimulation:
         # print(agents[0].agent_configuration.type == "AI")
         for i, agent in enumerate(filter(lambda a: a.agent_configuration.type == "AI", agents)):
             if self.use_action_coords:
-                input_tensor, input_tensor_2, input_action_tensor, input_action_tensor_2 = game_state_to_tensor(
+                input_tensor, input_tensor_2, controller_tensor, input_action_tensor, input_action_tensor_2 = game_state_to_tensor(
                     game_state,
                     agent.player(game_state),
                     (
@@ -783,7 +783,7 @@ class MeleeSimulation:
                     ),
                 )
                 task_input = torch.cat(
-                    (input_tensor.flatten(), input_tensor_2.flatten(), input_action_tensor.flatten(), input_action_tensor_2.flatten())
+                    (input_tensor.flatten(), input_tensor_2.flatten(), controller_tensor.flatten(), input_action_tensor.flatten(), input_action_tensor_2.flatten())
                 )
                 # if game_state.frame % (60 * 5) == 0:
                 #     print(input_tensor.flatten())
@@ -1257,6 +1257,20 @@ def game_state_to_tensor(
     input_tensor = torch.zeros((2, 24))
     input_action_tensor = torch.zeros(26, 15)
     input_action_tensor_2 = torch.zeros(26, 15)
+    controller_tensor = torch.zeros(1, 9)
+    controller_tensor[0, 0] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_A] else 0
+    controller_tensor[0, 1] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_B] else 0
+    controller_tensor[0, 2] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_Y] else 0
+    controller_tensor[0, 3] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_Z] else 0
+    controller_tensor[0, 4] =1 if  agent_player.controller_state.l_shoulder else 0
+    main_stick = agent_player.controller_state.main_stick
+    c_stick = agent_player.controller_state.c_stick
+    controller_tensor[0, 5] = main_stick[0]
+    controller_tensor[0, 6] = main_stick[1]
+    controller_tensor[0, 7] = c_stick[0]
+    controller_tensor[0, 8] = c_stick[1]
+    
+    
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
         input_tensor[i, 1] = player.stock / 4
@@ -1296,7 +1310,7 @@ def game_state_to_tensor(
     row = linear_index // 15
     col = linear_index % 15
     input_action_tensor_2[row, col] = 1
-    return input_tensor[0, :].reshape(4, 6), input_tensor[1, :].reshape(4, 6), input_action_tensor, input_action_tensor_2
+    return input_tensor[0, :].reshape(4, 6), input_tensor[1, :].reshape(4, 6), controller_tensor, input_action_tensor, input_action_tensor_2
 
 
 def game_state_to_tensor_action_normalized(
@@ -1351,6 +1365,11 @@ def main():
         for y in np.linspace(0, 1, height)  # for z in np.linspace(-.1, .1, 3)
         for x in np.linspace(0, 1, width)
     ]
+    controller_coords = [
+        (y, x, -0.95)
+        for y in np.linspace(-1, 0, 1)
+        for x in np.linspace(-1, 0, 10)
+    ]
     action_coords = [
         (y, x, -0.9)
         for y in np.linspace(-1, 0, action_height)
@@ -1387,7 +1406,7 @@ def main():
     ]
 
     all_input_coords = (
-        input_coords + input_coords_2 + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2
+        input_coords + input_coords_2 + controller_coords + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 + controller_coords
     )
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
