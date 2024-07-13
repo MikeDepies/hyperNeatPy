@@ -1366,9 +1366,9 @@ def main():
         for x in np.linspace(0, 1, width)
     ]
     controller_coords = [
-        (y, x, -0.95)
-        for y in np.linspace(-1, 0, 1)
-        for x in np.linspace(-1, 0, 10)
+        (0, x, -0.95)
+        # for y in np.linspace(-1, 1, 1)
+        for x in np.linspace(-1, 1, 9)
     ]
     action_coords = [
         (y, x, -0.9)
