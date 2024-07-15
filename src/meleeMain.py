@@ -1392,12 +1392,12 @@ def main():
     analog_height = 7
     analog_coords = [
         (y, x, 0.95)
-        for y in np.linspace(-1, 0, analog_height)
+        for y in np.linspace(-1, 1, analog_height)
         for x in np.linspace(-1, 0, analog_width)
     ]
     c_analog_coords = [
         (y, x, 0.95)
-        for y in np.linspace(0, 1, analog_height)
+        for y in np.linspace(-1, 1, analog_height)
         for x in np.linspace(0, 1, analog_width)
     ]
     output_coords = [
