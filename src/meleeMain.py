@@ -1358,12 +1358,12 @@ def main():
     bias_coords = [(0, 0, -2.0)]
     input_coords = [
         (y, x, -1)
-        for y in np.linspace(-1, 0, height)  # for z in np.linspace(-.1, .1, 3)
+        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
         for x in np.linspace(-1, 0, width)
     ]
     input_coords_2 = [
         (y, x, -1)
-        for y in np.linspace(0, 1, height)  # for z in np.linspace(-.1, .1, 3)
+        for y in np.linspace(-1, 1, height)  # for z in np.linspace(-.1, .1, 3)
         for x in np.linspace(0, 1, width)
     ]
     controller_coords = [
@@ -1384,7 +1384,7 @@ def main():
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
         [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
-        for z in np.linspace(-0.8, 0.8, round(3))
+        for z in np.linspace(-0.8, 0.8, round(10))
     ]
     output_width = 5
     output_height = 1
