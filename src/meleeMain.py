@@ -784,7 +784,7 @@ class MeleeSimulation:
                     ),
                 )
                 task_input = torch.cat(
-                    (input_tensor.flatten(), input_tensor_2.flatten(), controller_tensor.flatten(), input_action_tensor.flatten(), input_action_tensor_2.flatten())
+                    (input_tensor.flatten(), input_tensor_2.flatten(),  input_action_tensor.flatten(), input_action_tensor_2.flatten())
                 )
                 # if game_state.frame % (60 * 5) == 0:
                 #     print(input_tensor.flatten())
@@ -1407,7 +1407,7 @@ def main():
     ]
 
     all_input_coords = (
-        input_coords + input_coords_2 + controller_coords + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 + controller_coords
+        input_coords + input_coords_2  + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 + controller_coords
     )
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
