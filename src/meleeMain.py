@@ -1282,17 +1282,17 @@ def game_state_to_tensor(
             player.y / 100
         )  # scale_to_custom_range(player.y, -140, 188)
         input_tensor[i, 4] = 1 if player.facing == True else 0
-        input_tensor[i, 5] = player.jumps_left / 2
-        input_tensor[i, 6] = player.shield_strength / 60
-        input_tensor[i, 7] = stageToInt(game_state.stage) / 6
-        input_tensor[i, 8] = characterToInt(player.character) / 26
+        input_tensor[i, 5] = player.jumps_left / 2.0
+        input_tensor[i, 6] = player.shield_strength / 60.0
+        input_tensor[i, 7] = stageToInt(game_state.stage) / 6.0
+        input_tensor[i, 8] = characterToInt(player.character) / 26.0
         input_tensor[i, 9] = player.action_frame / 60
         input_tensor[i, 10] = 1 if player.on_ground else 0
         input_tensor[i, 11] = 1 if player.off_stage else 0
         input_tensor[i, 12] = melee.stages.EDGE_POSITION[game_state.stage] / 100.0
         input_tensor[i, 13] = -melee.stages.EDGE_POSITION[game_state.stage] / 100.0
-        input_tensor[i, 14] = player.hitstun_frames_left / 60
-        input_tensor[i, 15] = player.hitlag_left / 60
+        input_tensor[i, 14] = player.hitstun_frames_left / 60.0
+        input_tensor[i, 15] = player.hitlag_left / 60.0
         input_tensor[i, 16] = player.speed_x_attack / 5
         input_tensor[i, 17] = player.speed_y_attack / 5
         input_tensor[i, 18] = player.speed_ground_x_self / 5
@@ -1383,7 +1383,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 8) for x in np.linspace(-1, 1, 8)]
+        [(y, x, z) for y in np.linspace(-1, 1, 20) for x in np.linspace(-1, 1, 20)]
         for z in np.linspace(-0.8, 0.8, round(5))
     ]
     output_width = 5
@@ -1391,12 +1391,12 @@ def main():
     analog_width = 7
     analog_height = 7
     analog_coords = [
-        (y, x, 0.95)
+        (y, x, 0.9)
         for y in np.linspace(-1, 1, analog_height)
         for x in np.linspace(-1, 0, analog_width)
     ]
     c_analog_coords = [
-        (y, x, 0.95)
+        (y, x, 0.9)
         for y in np.linspace(-1, 1, analog_height)
         for x in np.linspace(0, 1, analog_width)
     ]
