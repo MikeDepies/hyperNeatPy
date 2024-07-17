@@ -1117,14 +1117,14 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.3)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.1)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
                 network_processor2 = network_processor_factory.createProcessor(
                     task.cpu_task.network_genome
                 )
-                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.3)
+                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.1)
                 network2 = TaskNetwork2(substrate, cppn_query_instance2)
             queue.put(
                 [
@@ -1383,7 +1383,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 20) for x in np.linspace(-1, 1, 20)]
+        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
         for z in np.linspace(-0.8, 0.8, round(10))
     ]
     output_width = 5
