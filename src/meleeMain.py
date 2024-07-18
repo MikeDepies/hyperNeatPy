@@ -1411,8 +1411,8 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, 0) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
-        # for z in np.linspace(-0.8, 0.8, round(1))
+        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
+        for z in np.linspace(-0.3, 0.3, 3)
     ]
     output_width = 5
     output_height = 1
@@ -1446,8 +1446,8 @@ def main():
     print(mode)
     print(num_instances)
     manager = Manager()
-    queue = manager.Queue(num_instances *2)
-    score_queue = manager.Queue(num_instances * 5)
+    queue = manager.Queue(num_instances *4 if args.mode == "train" else num_instances)
+    score_queue = manager.Queue(num_instances * 5 if args.mode == "train" else num_instances)
     api_url = (
         "http://192.168.0.100:8080/networkGenome"
         if mode == "train"
@@ -1456,7 +1456,7 @@ def main():
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
-    for i in range(round(num_instances* 4)):
+    for i in range(round(num_instances* 4 if args.mode == "train" else num_instances)):
 
         queueProcess = Process(
             target=fetch_network_genome,
