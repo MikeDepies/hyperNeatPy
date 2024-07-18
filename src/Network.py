@@ -830,9 +830,13 @@ class TaskNetwork2(torch.nn.Module):
             # )
             
             if (i + 1) % 5 == 0:
+                self.hidden_activations[i + 1] += torch.matmul(
+                    self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
+                )
                 self.hidden_activations[i + 1] = torch.sigmoid(
                     self.hidden_activations[i + 1]
                 )  # Sigmoid activation every 5 layers
+                
             else:
                 self.hidden_activations[i + 1] = torch.relu(
                     self.hidden_activations[i + 1]
