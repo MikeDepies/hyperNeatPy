@@ -775,7 +775,7 @@ class TaskNetwork2(torch.nn.Module):
             self.hidden_output_weights,
             *self.hidden_bias_weights,
             self.output_bias_weights,
-            # *self.hidden_recurrent_weights,
+            *self.hidden_recurrent_weights,
         ]:
             l2_norm += torch.norm(weight_matrix, p=2).item()
         return l2_norm
@@ -788,7 +788,7 @@ class TaskNetwork2(torch.nn.Module):
             self.hidden_output_weights,
             *self.hidden_bias_weights,
             self.output_bias_weights,
-            # *self.hidden_recurrent_weights,
+            *self.hidden_recurrent_weights,
         ]:
             l1_norm += torch.norm(weight_matrix, p=1).item()
         return l1_norm
@@ -797,23 +797,11 @@ class TaskNetwork2(torch.nn.Module):
         # print(inputs)
         # Inputs should be a tensor of shape [batch_size, num_inputs]
         # Apply input to hidden connections
-        # + torch.matmul(self.outputs, self.output_hidden_weights)
-        # print(self.input_hidden_weights[self.input_hidden_weights > 1])
-        # print(self.input_hidden_weights[self.input_hidden_weights < -1])
-        # print(inputs)
-        # print("====>")
-        # print(self.hidden_activations[0])
-        # print(self.hidden_recurrent_weights[0])
-        # print( torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0]))
-        # print("<====")
-        # print(torch.matmul(inputs, self.input_hidden_weights))
-        # exit(0)
-        # + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
         self.hidden_activations[0] = (
             torch.matmul(inputs, self.input_hidden_weights)
             + self.hidden_bias_weights[0]
-        ) #+ torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
-        self.hidden_activations[0] = torch.relu(
+        ) + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
+        self.hidden_activations[0] = torch.sigmoid(
             self.hidden_activations[0]
         )  # Activation function
         for i in range(len(self.substrate.hidden_coords) - 1):
@@ -822,12 +810,6 @@ class TaskNetwork2(torch.nn.Module):
                 torch.matmul(self.hidden_activations[i], self.hidden_hidden_weights[i])
                 + self.hidden_bias_weights[i + 1]
             )
-            # print(f"{i} == {len(self.substrate.hidden_coords) - 1}")
-            # if (i + 2) == len(self.substrate.hidden_coords) - 1:
-            # print("TESTTTTTTTTTTTTTTT")
-            # self.hidden_activations[i + 1] += torch.matmul(
-            #     self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
-            # )
             
             if (i + 1) % 5 == 0:
                 self.hidden_activations[i + 1] += torch.matmul(
@@ -843,10 +825,6 @@ class TaskNetwork2(torch.nn.Module):
                 )  # ReLU activation for other layers
         # self.hidden_activations = hidden_activations
         # Apply hidden to output connections
-        # print(torch.matmul(self.outputs, self.output_recurrent_weights))
-        # print(self.input_hidden_weights)
-        # print(self.hidden_activations[-1])
-        # print(self.hidden_activations[0])
         outputs = (
             torch.matmul(self.hidden_activations[-1], self.hidden_output_weights)
             + self.output_bias_weights

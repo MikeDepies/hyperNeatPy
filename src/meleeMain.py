@@ -672,11 +672,7 @@ class MeleeSimulation:
             if game_over[0]:
                 return (
                     game_state_evaluator.agent_scores,
-                    (
-                        SimulationState.GAME_OVER
-                        if game_over[1] != -1
-                        else SimulationState.SUDDEN_DEATH
-                    ),
+                    game_over[2],
                 )
             else:
                 self.handle_game_step(game_state, game_state_evaluator.agents)
@@ -754,17 +750,19 @@ class MeleeSimulation:
 
         return (game_state_evaluator.agent_scores, SimulationState.MENU)
 
-    def isGameOver(self, game_state: GameState, agent_scores: List[AgentScore]):
+    def isGameOver(self, game_state: GameState, agent_scores: Dict[int, AgentScore]):
         players: List[Tuple[PlayerState, int]] = list(
             map(lambda x: (agent_scores[x].agent.player(game_state), x), agent_scores)
         )
         
         if game_state.frame / (60 * 60) >= 8:
             return (True, -1, SimulationState.SUDDEN_DEATH)
+        if agent_scores[1].agent.player(game_state).stock < 4:
+            return (True, agent_scores[1].agent.controller.port, SimulationState.GAME_ACTIVE_SIMULATION_END)
         for player, index in players:
             if player.stock <= 0:
                 return (True, index, SimulationState.GAME_OVER)
-        return (False, None, SimulationState.RUNNING)
+        return (False, -1, SimulationState.RUNNING)
 
     def handle_game_step(self, game_state: GameState, agents: List[Agent]):
         task_input: Tensor
@@ -965,9 +963,17 @@ def simulation(
                     meleeCore.controller.release_all()
                     meleeCore.controller_opponent.release_all()
                     break
+                if state == SimulationState.GAME_ACTIVE_SIMULATION_END:
+                    meleeCore.controller.release_all()
+                    meleeCore.controller_opponent.release_all()
+                    break
             # print((id, agent_score.kill_count, agent_score.death_count, agent_score.damage_dealt, agent_score.damage_received))
             # print(meleeSimulation.action_tracker[0].actions)
-            if state == SimulationState.GAME_OVER:
+            
+                
+                
+
+            if state == SimulationState.GAME_OVER or state == SimulationState.GAME_ACTIVE_SIMULATION_END:
                 total_scores["kill_count"] += agent_score.kill_count
                 total_scores["death_count"] += agent_score.death_count
                 total_scores["damage_dealt"] += agent_score.damage_dealt
@@ -977,6 +983,15 @@ def simulation(
                 total_scores["total_frames"] += int(game_state.frame)
                 total_scores["input_count"] += agents[0].input_count
                 total_scores["rolling_action_count"] += len(meleeSimulation.action_tracker[0].actions)
+
+        if state == SimulationState.GAME_ACTIVE_SIMULATION_END:
+            while(game_state.menu_state == melee.Menu.IN_GAME):
+                game_state = meleeCore.next_step()
+                meleeCore.controller.tilt_analog(melee.Button.BUTTON_MAIN,0, .5)
+                if game_state.frame % 2 == 0:
+                    meleeCore.controller.press_button(melee.Button.BUTTON_X)
+                else:
+                    meleeCore.controller.release_button(melee.Button.BUTTON_X)
 
         average_scores = {key: value / total_games for key, value in total_scores.items()}
         print(f"average_scores: {average_scores}")
@@ -1395,8 +1410,8 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
-        for z in np.linspace(-0.8, 0.8, round(10))
+        [(y, x, 0) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
+        # for z in np.linspace(-0.8, 0.8, round(1))
     ]
     output_width = 5
     output_height = 1
