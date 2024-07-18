@@ -662,13 +662,14 @@ class MeleeSimulation:
         game_state: GameState,
         game_state_evaluator: GameStateEvaluator,
         menu_helper: melee.menuhelper.MenuHelper,
+        trainMode : bool
     ):
         if game_state.menu_state in [
             melee.enums.Menu.IN_GAME,
             melee.enums.Menu.SUDDEN_DEATH,
         ]:
             agent_scores = game_state_evaluator.score_agents(game_state)
-            game_over = self.isGameOver(game_state, agent_scores)
+            game_over = self.isGameOver(game_state, agent_scores, trainMode)
             if game_over[0]:
                 return (
                     game_state_evaluator.agent_scores,
@@ -750,14 +751,14 @@ class MeleeSimulation:
 
         return (game_state_evaluator.agent_scores, SimulationState.MENU)
 
-    def isGameOver(self, game_state: GameState, agent_scores: Dict[int, AgentScore]):
+    def isGameOver(self, game_state: GameState, agent_scores: Dict[int, AgentScore], trainMode : bool):
         players: List[Tuple[PlayerState, int]] = list(
             map(lambda x: (agent_scores[x].agent.player(game_state), x), agent_scores)
         )
         
         if game_state.frame / (60 * 60) >= 8:
             return (True, -1, SimulationState.SUDDEN_DEATH)
-        if agent_scores[1].agent.player(game_state).stock < 4:
+        if agent_scores[1].agent.player(game_state).stock < 4 and trainMode:
             return (True, agent_scores[1].agent.controller.port, SimulationState.GAME_ACTIVE_SIMULATION_END)
         for player, index in players:
             if player.stock <= 0:
@@ -951,7 +952,7 @@ def simulation(
 
                     break
                 (score, state) = meleeSimulation.simulation_step(
-                    game_state, game_state_evaluator, menu_helper
+                    game_state, game_state_evaluator, menu_helper, args.mode == "train"
                 )
                 ai_port = meleeCore.controller.port
                 agent_score = score[ai_port]
@@ -984,14 +985,14 @@ def simulation(
                 total_scores["input_count"] += agents[0].input_count
                 total_scores["rolling_action_count"] += len(meleeSimulation.action_tracker[0].actions)
 
-        if state == SimulationState.GAME_ACTIVE_SIMULATION_END:
-            while(game_state.menu_state == melee.Menu.IN_GAME):
-                game_state = meleeCore.next_step()
-                meleeCore.controller.tilt_analog(melee.Button.BUTTON_MAIN,0, .5)
-                if game_state.frame % 2 == 0:
-                    meleeCore.controller.press_button(melee.Button.BUTTON_X)
-                else:
-                    meleeCore.controller.release_button(melee.Button.BUTTON_X)
+            if state == SimulationState.GAME_ACTIVE_SIMULATION_END and args.mode == "train":
+                while(game_state.menu_state == melee.Menu.IN_GAME):
+                    game_state = meleeCore.next_step()
+                    meleeCore.controller.tilt_analog(melee.Button.BUTTON_MAIN,0, .5)
+                    if game_state.frame % 2 == 0:
+                        meleeCore.controller.press_button(melee.Button.BUTTON_X)
+                    else:
+                        meleeCore.controller.release_button(melee.Button.BUTTON_X)
 
         average_scores = {key: value / total_games for key, value in total_scores.items()}
         print(f"average_scores: {average_scores}")
@@ -1455,7 +1456,7 @@ def main():
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
-    for i in range(round(num_instances)):
+    for i in range(round(num_instances* 2)):
 
         queueProcess = Process(
             target=fetch_network_genome,
