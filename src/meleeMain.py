@@ -1456,7 +1456,7 @@ def main():
     score_queue_process_p = Process(target=score_queue_process, args=(score_queue,))
     score_queue_process_p.start()
 
-    for i in range(round(num_instances* 2)):
+    for i in range(round(num_instances* 4)):
 
         queueProcess = Process(
             target=fetch_network_genome,
