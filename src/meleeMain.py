@@ -1317,7 +1317,7 @@ def game_state_to_tensor(
 def game_state_to_tensor_action_normalized(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
-    input_tensor = torch.zeros((2, 15))
+    input_tensor = torch.zeros((2, 25))
     # input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -1337,6 +1337,18 @@ def game_state_to_tensor_action_normalized(
         input_tensor[i, 10] = player.action_frame / 120
         input_tensor[i, 11] = 1 if player.on_ground else 0
         input_tensor[i, 12] = 1 if player.off_stage else 0
+        input_tensor[i, 13] = melee.stages.EDGE_POSITION[game_state.stage] / 100.0
+        input_tensor[i, 14] = -melee.stages.EDGE_POSITION[game_state.stage] / 100.0
+        input_tensor[i, 15] = player.hitstun_frames_left / 60.0
+        input_tensor[i, 16] = player.hitlag_left / 60.0
+        input_tensor[i, 17] = player.speed_x_attack / 5
+        input_tensor[i, 18] = player.speed_y_attack / 5
+        input_tensor[i, 19] = player.speed_ground_x_self / 5
+        input_tensor[i, 20] = player.speed_y_self / 5
+        input_tensor[i, 21] = player.speed_air_x_self / 5
+        input_tensor[i, 22] = 1 if player.moonwalkwarning else 0
+        input_tensor[i, 23] = 1 if player.invulnerable else 0
+        input_tensor[i, 24] = 1 if player.is_powershield else 0
 
     return input_tensor
 
@@ -1350,9 +1362,9 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 
 def main():
     args = parseArgs()
-    use_action_coords = True
-    width = 6 if use_action_coords else 15
-    height = 4
+    use_action_coords = False
+    width = 6 if use_action_coords else 5
+    height = 4 if use_action_coords else 5
     action_width = 15
     action_height = 26
     bias_coords = [(0, 0, -1.1)]
