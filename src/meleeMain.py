@@ -1395,7 +1395,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, z) for y in np.linspace(-1, 1, 20) for x in np.linspace(-1, 1, 20)]
+        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
         for z in np.linspace(-0.8, 0.8, round(10))
     ]
     output_width = 5
@@ -1430,7 +1430,7 @@ def main():
     print(mode)
     print(num_instances)
     manager = Manager()
-    queue = manager.Queue(num_instances )
+    queue = manager.Queue(num_instances *2)
     score_queue = manager.Queue(num_instances * 5)
     api_url = (
         "http://192.168.0.100:8080/networkGenome"
