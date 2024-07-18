@@ -1419,7 +1419,7 @@ def main():
     ]
 
     all_input_coords = (
-        input_coords + input_coords_2  + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 + controller_coords
+        input_coords + input_coords_2  + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 #+ controller_coords
     )
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
