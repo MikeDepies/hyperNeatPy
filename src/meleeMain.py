@@ -897,7 +897,7 @@ def simulation(
         if (
             agent_config.character == melee.Character.CPTFALCON
             and cpu_config.character == melee.Character.CPTFALCON
-        ):
+        ) or cpu_config.character == melee.Character.YLINK:
             continue
         total_games = 1 if args.mode == "train" else 1
         total_scores = {
