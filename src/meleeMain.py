@@ -802,7 +802,7 @@ class MeleeSimulation:
                         else agents[0].player(game_state)
                     ),
                 )
-                task_input = input_tensor.flatten() + controller_tensor.flatten()
+                task_input = torch.cat((input_tensor.flatten(), controller_tensor.flatten()))
             output = agent.create_action(task_input)
             if output is not None:
                 buttons, analog, c_analog = output_tensor_to_controller_tensors(
