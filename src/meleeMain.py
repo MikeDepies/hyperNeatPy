@@ -888,7 +888,6 @@ def simulation(
             cpu_config,
         ]
         print("id", id)
-
         
         agent_score: AgentScore
         first_step = True
@@ -897,9 +896,9 @@ def simulation(
         if (
             agent_config.character == melee.Character.CPTFALCON
             and cpu_config.character == melee.Character.CPTFALCON
-        ) or cpu_config.character == melee.Character.YLINK:
+        ):
             continue
-        total_games = 1 if args.mode == "train" else 1
+        total_games = 5 if args.mode == "train" else 1
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
