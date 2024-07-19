@@ -793,7 +793,7 @@ class MeleeSimulation:
                 #     non_zero_indices_2 = torch.nonzero(input_action_tensor_2.flatten(), as_tuple=True)
                 #     print(non_zero_indices_2)
             else:
-                input_tensor = game_state_to_tensor_action_normalized(
+                input_tensor, controller_tensor = game_state_to_tensor_action_normalized(
                     game_state,
                     agent.player(game_state),
                     (
@@ -802,7 +802,7 @@ class MeleeSimulation:
                         else agents[0].player(game_state)
                     ),
                 )
-                task_input = input_tensor.flatten()
+                task_input = input_tensor.flatten() + controller_tensor.flatten()
             output = agent.create_action(task_input)
             if output is not None:
                 buttons, analog, c_analog = output_tensor_to_controller_tensors(
@@ -1333,6 +1333,18 @@ def game_state_to_tensor_action_normalized(
     game_state: GameState, agent_player: PlayerState, opponent_player: PlayerState
 ):
     input_tensor = torch.zeros((2, 25))
+    controller_tensor = torch.zeros(1, 9)
+    controller_tensor[0, 0] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_A] else 0
+    controller_tensor[0, 1] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_B] else 0
+    controller_tensor[0, 2] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_Y] else 0
+    controller_tensor[0, 3] =1 if  agent_player.controller_state.button[melee.Button.BUTTON_Z] else 0
+    controller_tensor[0, 4] =1 if  agent_player.controller_state.l_shoulder else 0
+    main_stick = agent_player.controller_state.main_stick
+    c_stick = agent_player.controller_state.c_stick
+    controller_tensor[0, 5] = main_stick[0]
+    controller_tensor[0, 6] = main_stick[1]
+    controller_tensor[0, 7] = c_stick[0]
+    controller_tensor[0, 8] = c_stick[1]
     # input_action_tensor = torch.zeros((2, 386))
     for i, player in enumerate([agent_player, opponent_player]):
         input_tensor[i, 0] = player.percent / 100
@@ -1365,7 +1377,7 @@ def game_state_to_tensor_action_normalized(
         input_tensor[i, 23] = 1 if player.invulnerable else 0
         input_tensor[i, 24] = 1 if player.is_powershield else 0
 
-    return input_tensor
+    return input_tensor, controller_tensor
 
 
 def output_tensor_to_controller_tensors(output_tensor: Tensor):
@@ -1394,7 +1406,7 @@ def main():
         for x in np.linspace(0, 1, width)
     ]
     controller_coords = [
-        (0, x, -0.95)
+        (x, x, -0.95)
         # for y in np.linspace(-1, 1, 1)
         for x in np.linspace(-1, 1, 9)
     ]
@@ -1410,8 +1422,8 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, 0) for y in np.linspace(-1, 1, 20) for x in np.linspace(-1, 1, 20)]
-        # for z in np.linspace(-0.8, 0.8, round(1))
+        [(y, x, z) for y in np.linspace(-1, 1, 10) for x in np.linspace(-1, 1, 10)]
+        for z in np.linspace(-0.2, 0.2, round(5))
     ]
     output_width = 5
     output_height = 1
@@ -1434,8 +1446,8 @@ def main():
     ]
 
     all_input_coords = (
-        input_coords + input_coords_2  + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 #+ controller_coords
-    )
+        input_coords + input_coords_2  + (action_coords + action_coords_2) if use_action_coords else input_coords + input_coords_2 + controller_coords
+    ) 
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
         all_input_coords, hidden_coords, all_output_coords, bias_coords
