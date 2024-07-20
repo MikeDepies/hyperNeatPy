@@ -556,6 +556,8 @@ class CPPNConnectionQuery:
         r = c/abs(z1 - z2) if abs(z1 - z2) > 0 else c
         dynamic_threshold = min(d * r, 1)
         if output_abs > dynamic_threshold:
+            if (dynamic_threshold == 1):
+                print(output_abs, dynamic_threshold)
             normalized_output = (output_abs - dynamic_threshold) / (
                 1 - dynamic_threshold
             )
