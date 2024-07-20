@@ -566,9 +566,11 @@ class CPPNConnectionQuery:
         self.networkProcessor = networkProcessor
         self.connection_magnitude_multiplier = connection_magnitude_multiplier
         self.connection_threshold = connection_threshold
+        self.connections_created = 0
+        self.total_connection_queries = 0
 
     def query(self, x1, y1, z1, x2, y2, z2, d):
-
+        self.total_connection_queries += 1
         input_values = [x1, y1, z1, x2, y2, z2, d]
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
@@ -577,8 +579,9 @@ class CPPNConnectionQuery:
             print(x1, y1, z1, x2, y2, z2, d)
         c = .5
         r = c/abs(z1 - z2) if abs(z1 - z2) > 0 else c
-        dynamic_threshold = .3 #min(d * r, 1)
+        dynamic_threshold = self.connection_threshold #min(d * r, 1)
         if output_abs > dynamic_threshold:
+            self.connections_created += 1
             # if (dynamic_threshold == 1):
             # print(output_abs, dynamic_threshold)
             normalized_output = (output_abs - dynamic_threshold) / (
@@ -808,6 +811,7 @@ class TaskNetwork2(torch.nn.Module):
             )
             for i in range(len(self.hidden_bias_weights))
         ]
+        print(cppn_query.connections_created, cppn_query.total_connection_queries)
 
     def calculate_l2_norm(self):
         l2_norm = 0.0

@@ -898,7 +898,7 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        total_games = 5 if args.mode == "train" else 1
+        total_games = 1 if args.mode == "train" else 1
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
@@ -930,16 +930,16 @@ def simulation(
                         f"({instance_num}) agent {agent_config.character} vs cpu {cpu_config.character} {cpu_config.cpu_level}"
                     )
                     first_step = False
-                if (
-                     args.mode != "train"
-                ):  # agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
-                    if (
-                        game_state.frame % (60 * 1) == 0
-                        and game_state.menu_state == melee.Menu.IN_GAME
-                    ):
-                        print(
-                            f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}"
-                        )
+                # if (
+                #      args.mode != "train"
+                # ):  # agent_config.character == melee.Character.CPTFALCON and cpu_config.character == melee.Character.CPTFALCON:
+                #     if (
+                #         game_state.frame % (60 * 1) == 0
+                #         and game_state.menu_state == melee.Menu.IN_GAME
+                #     ):
+                #         print(
+                #             f"({instance_num})  agent {agent_config.character} vs cpu {cpu_config.character} frame: {game_state.frame} agent x: {agents[0].player(game_state).x} cpu x: {agents[1].player(game_state).x} agent percent: {agents[0].player(game_state).percent}"
+                #         )
                 # print(game_state)
                 # print(agent_config.character)
                 # print(cpu_config.character)
@@ -1132,14 +1132,14 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.1)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 3.0, 0.9)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
                 network_processor2 = network_processor_factory.createProcessor(
                     task.cpu_task.network_genome
                 )
-                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.1)
+                cppn_query_instance2 = CPPNConnectionQuery(network_processor2, 3.0, 0.9)
                 network2 = TaskNetwork2(substrate, cppn_query_instance2)
             queue.put(
                 [
