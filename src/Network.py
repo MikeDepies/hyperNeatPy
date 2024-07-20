@@ -550,7 +550,8 @@ class CPPNConnectionQuery:
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
         output_abs = abs(output_values[0])
-        if output_abs > d/2:
+        r = .5/abs(z1 - z2)
+        if output_abs > r:
             normalized_output = (output_abs - self.connection_threshold) / (
                 1 - self.connection_threshold
             )
@@ -800,7 +801,7 @@ class TaskNetwork2(torch.nn.Module):
         self.hidden_activations[0] = (
             torch.matmul(inputs, self.input_hidden_weights)
             + self.hidden_bias_weights[0]
-        ) + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
+        ) #+ torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
         self.hidden_activations[0] = torch.sigmoid(
             self.hidden_activations[0]
         )  # Activation function
@@ -812,9 +813,9 @@ class TaskNetwork2(torch.nn.Module):
             )
             
             if (i + 1) % 5 == 0:
-                self.hidden_activations[i + 1] += torch.matmul(
-                    self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
-                )
+                # self.hidden_activations[i + 1] += torch.matmul(
+                #     self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
+                # )
                 self.hidden_activations[i + 1] = torch.sigmoid(
                     self.hidden_activations[i + 1]
                 )  # Sigmoid activation every 5 layers
