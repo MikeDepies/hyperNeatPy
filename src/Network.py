@@ -550,8 +550,10 @@ class CPPNConnectionQuery:
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
         output_abs = abs(output_values[0])
+        if abs(z1 - z2) == 0:
+            print(x1, y1, z1, x2, y2, z2, d)
         r = .5/abs(z1 - z2) if abs(z1 - z2) > 0 else .5
-        if output_abs > r:
+        if output_abs > d * r:
             normalized_output = (output_abs - self.connection_threshold) / (
                 1 - self.connection_threshold
             )
@@ -750,12 +752,12 @@ class TaskNetwork2(torch.nn.Module):
         self.output_bias_weights = substrate.get_layer_connections(
             substrate.bias_coords, substrate.output_coords, cppn_query
         )
-        self.hidden_recurrent_weights = [
-            substrate.get_recurrent_layer_connections(
-                substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query
-            )
-            for i in range(len(substrate.hidden_coords))
-        ]
+        # self.hidden_recurrent_weights = [
+        #     substrate.get_recurrent_layer_connections(
+        #         substrate.hidden_coords[i], substrate.hidden_coords[i], cppn_query
+        #     )
+        #     for i in range(len(substrate.hidden_coords))
+        # ]
         # self.output_recurrent_weights = substrate.get_recurrent_layer_connections(substrate.output_coords, substrate.output_coords, cppn_query)
         self.outputs = torch.zeros(
             self.output_bias_weights.shape[0], self.output_bias_weights.shape[1]
@@ -776,7 +778,7 @@ class TaskNetwork2(torch.nn.Module):
             self.hidden_output_weights,
             *self.hidden_bias_weights,
             self.output_bias_weights,
-            *self.hidden_recurrent_weights,
+            # *self.hidden_recurrent_weights,
         ]:
             l2_norm += torch.norm(weight_matrix, p=2).item()
         return l2_norm
@@ -789,7 +791,7 @@ class TaskNetwork2(torch.nn.Module):
             self.hidden_output_weights,
             *self.hidden_bias_weights,
             self.output_bias_weights,
-            *self.hidden_recurrent_weights,
+            # *self.hidden_recurrent_weights,
         ]:
             l1_norm += torch.norm(weight_matrix, p=1).item()
         return l1_norm
