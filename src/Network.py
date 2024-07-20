@@ -549,7 +549,7 @@ class CPPNConnectionQuery:
         input_values = [x1, y1, z1, x2, y2, z2, d]
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
-        output_abs = abs(output_values[0])
+        output_abs = min(abs(output_values[0]), 1)
         if abs(z1 - z2) == 0:
             print(x1, y1, z1, x2, y2, z2, d)
         c = .5
