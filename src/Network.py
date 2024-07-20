@@ -96,7 +96,7 @@ class DefaultActivationFunctionMapper:
             ActivationFunction.COS: cos_activation,
             ActivationFunction.ABS: lambda x: abs(x),
             ActivationFunction.STEP: lambda x: 0.0 if x < 0 else 1.0,
-            ActivationFunction.SQRT: lambda x: x**0.5,
+            ActivationFunction.SQRT: lambda x: sqrt(x) if x >= 0 else 0,
             ActivationFunction.ELU: elu_activation,
             ActivationFunction.LELU: lelu_activation,
             ActivationFunction.SELU: selu_activation,
