@@ -552,10 +552,12 @@ class CPPNConnectionQuery:
         output_abs = abs(output_values[0])
         if abs(z1 - z2) == 0:
             print(x1, y1, z1, x2, y2, z2, d)
-        r = .5/abs(z1 - z2) if abs(z1 - z2) > 0 else .5
-        if output_abs > d * r:
-            normalized_output = (output_abs - self.connection_threshold) / (
-                1 - self.connection_threshold
+        c = .5
+        r = c/abs(z1 - z2) if abs(z1 - z2) > 0 else c
+        dynamic_threshold = max(d * r, 1)
+        if output_abs > dynamic_threshold:
+            normalized_output = (output_abs - dynamic_threshold) / (
+                1 - dynamic_threshold
             )
             connection_magnitude = (
                 self.connection_magnitude_multiplier * normalized_output * sign
