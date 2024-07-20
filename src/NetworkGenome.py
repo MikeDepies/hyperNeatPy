@@ -57,7 +57,18 @@ class ActivationFunction(Enum):
     COS = 7
     ABS = 8
     STEP = 9
-
+    SQRT = 10
+    ELU = 11
+    LELU = 12
+    SELU = 13
+    SOFTPLUS = 14
+    CLAMPED = 15
+    INV = 16
+    LOG = 17
+    EXP = 18
+    HAT = 19
+    SQUARE = 20
+    CUBE = 21
     @classmethod
     def cppn(cls):
         return [cls.IDENTITY, cls.SIGMOID, cls.TANH, cls.RELU, cls.GAUSSIAN, cls.SINE, cls.COS, cls.ABS, cls.STEP]

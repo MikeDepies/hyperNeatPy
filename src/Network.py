@@ -13,11 +13,22 @@ from math import exp, tanh, sin, cos, sqrt
 
 from SelfAttention import SelfAttention
 from activations import (
+    clamped_activation,
     cos_activation,
+    cube_activation,
+    elu_activation,
+    exp_activation,
     gauss_activation,
+    hat_activation,
+    inv_activation,
+    lelu_activation,
+    log_activation,
     relu_activation,
+    selu_activation,
     sigmoid_activation,
     sin_activation,
+    softplus_activation,
+    square_activation,
     tanh_activation,
 )
 
@@ -85,6 +96,18 @@ class DefaultActivationFunctionMapper:
             ActivationFunction.COS: cos_activation,
             ActivationFunction.ABS: lambda x: abs(x),
             ActivationFunction.STEP: lambda x: 0.0 if x < 0 else 1.0,
+            ActivationFunction.SQRT: lambda x: x**0.5,
+            ActivationFunction.ELU: elu_activation,
+            ActivationFunction.LELU: lelu_activation,
+            ActivationFunction.SELU: selu_activation,
+            ActivationFunction.SOFTPLUS: softplus_activation,
+            ActivationFunction.CLAMPED: clamped_activation,
+            ActivationFunction.INV: inv_activation,
+            ActivationFunction.LOG: log_activation,
+            ActivationFunction.EXP: exp_activation,
+            ActivationFunction.HAT: hat_activation,
+            ActivationFunction.SQUARE: square_activation,
+            ActivationFunction.CUBE: cube_activation,
         }[activationFunction]
 
 
@@ -549,7 +572,7 @@ class CPPNConnectionQuery:
         input_values = [x1, y1, z1, x2, y2, z2, d]
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
-        output_abs = min(abs(output_values[0]), 1)
+        output_abs = max(min(abs(output_values[0]), 1), -1)
         if abs(z1 - z2) == 0:
             print(x1, y1, z1, x2, y2, z2, d)
         c = .5
@@ -716,6 +739,18 @@ def parse_activation_function(activation_function_name: str) -> ActivationFuncti
         "COS": ActivationFunction.COS,
         "ABS": ActivationFunction.ABS,
         "STEP": ActivationFunction.STEP,
+        "SQRT": ActivationFunction.SQRT,
+        "ELU": ActivationFunction.ELU,
+        "LELU": ActivationFunction.LELU,
+        "SELU": ActivationFunction.SELU,
+        "SOFTPLUS": ActivationFunction.SOFTPLUS,
+        "CLAMPED": ActivationFunction.CLAMPED,
+        "INV": ActivationFunction.INV,
+        "LOG": ActivationFunction.LOG,
+        "EXP": ActivationFunction.EXP,
+        "HAT": ActivationFunction.HAT,
+        "SQUARE": ActivationFunction.SQUARE,
+        "CUBE": ActivationFunction.CUBE,
     }.get(activation_function_name, ActivationFunction.IDENTITY)
 
 
