@@ -550,7 +550,7 @@ class CPPNConnectionQuery:
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
         output_abs = abs(output_values[0])
-        r = .5/output_abs if output_abs > 0 else .5
+        r = .5/abs(z1 - z2) if abs(z1 - z2) > 0 else .5
         if output_abs > r:
             normalized_output = (output_abs - self.connection_threshold) / (
                 1 - self.connection_threshold
