@@ -577,9 +577,9 @@ class CPPNConnectionQuery:
         output_abs = max(min(abs(output_values[0]), 1), -1)
         # if abs(z1 - z2) == 0:
         #     print(x1, y1, z1, x2, y2, z2, d)
-        c = .5
+        c = .2
         r = c/abs(z1 - z2) if abs(z1 - z2) > 0 else c
-        dynamic_threshold = self.connection_threshold #min(d * r, 1)
+        dynamic_threshold = min(d * r, 1)
         if output_abs > dynamic_threshold:
             self.connections_created += 1
             # if (dynamic_threshold == 1):
