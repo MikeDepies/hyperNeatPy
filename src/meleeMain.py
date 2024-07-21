@@ -1389,7 +1389,7 @@ def output_tensor_to_controller_tensors(output_tensor: Tensor):
 
 def main():
     args = parseArgs()
-    use_action_coords = False
+    use_action_coords = True
     width = 6 if use_action_coords else 5
     height = 4 if use_action_coords else 5
     action_width = 15
