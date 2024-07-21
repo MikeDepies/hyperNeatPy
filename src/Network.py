@@ -568,6 +568,7 @@ class CPPNConnectionQuery:
         self.connection_threshold = connection_threshold
         self.connections_created = 0
         self.total_connection_queries = 0
+        self.total_connections_over_expected = 0
 
     def query(self, x1, y1, z1, x2, y2, z2, d):
         self.total_connection_queries += 1
@@ -577,9 +578,11 @@ class CPPNConnectionQuery:
         output_abs = max(min(abs(output_values[0]), 1), -1)
         # if abs(z1 - z2) == 0:
         #     print(x1, y1, z1, x2, y2, z2, d)
-        c = .2
+        c = .8
         r = c/abs(z1 - z2) if abs(z1 - z2) > 0 else c
         dynamic_threshold = min(d * r, 1)
+        if output_values[0] > self.connection_magnitude_multiplier or output_values[0] < -self.connection_magnitude_multiplier:
+            self.total_connections_over_expected += 1
         if output_abs > dynamic_threshold:
             self.connections_created += 1
             # if (dynamic_threshold == 1):
@@ -811,7 +814,7 @@ class TaskNetwork2(torch.nn.Module):
             )
             for i in range(len(self.hidden_bias_weights))
         ]
-        print(cppn_query.connections_created, cppn_query.total_connection_queries)
+        print(cppn_query.connections_created, cppn_query.total_connection_queries, cppn_query.total_connections_over_expected)
 
     def calculate_l2_norm(self):
         l2_norm = 0.0
