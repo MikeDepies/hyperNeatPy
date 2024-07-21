@@ -849,8 +849,8 @@ class TaskNetwork2(torch.nn.Module):
         self.hidden_activations[0] = (
             torch.matmul(inputs, self.input_hidden_weights)
             + self.hidden_bias_weights[0]
-        ) + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
-        self.hidden_activations[0] = torch.sigmoid(
+        ) # + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
+        self.hidden_activations[0] = torch.relu(
             self.hidden_activations[0]
         )  # Activation function
         for i in range(len(self.substrate.hidden_coords) - 1):
@@ -860,18 +860,18 @@ class TaskNetwork2(torch.nn.Module):
                 + self.hidden_bias_weights[i + 1]
             )
             
-            # if (i + 1) % 5 == 0:
-            self.hidden_activations[i + 1] += torch.matmul(
-                self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
-            )
-            self.hidden_activations[i + 1] = torch.sigmoid(
-                self.hidden_activations[i + 1]
-            )  # Sigmoid activation every 5 layers
+            if (i + 1) % 5 == 0:
+                # self.hidden_activations[i + 1] += torch.matmul(
+                #     self.hidden_activations[i + 1], self.hidden_recurrent_weights[i + 1]
+                # )
+                self.hidden_activations[i + 1] = torch.sigmoid(
+                    self.hidden_activations[i + 1]
+                )  # Sigmoid activation every 5 layers
                 
-            # else:
-            #     self.hidden_activations[i + 1] = torch.relu(
-            #         self.hidden_activations[i + 1]
-            #     )  # ReLU activation for other layers
+            else:
+                self.hidden_activations[i + 1] = torch.relu(
+                    self.hidden_activations[i + 1]
+                )  # ReLU activation for other layers
         # self.hidden_activations = hidden_activations
         # Apply hidden to output connections
         outputs = (
