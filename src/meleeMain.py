@@ -1445,9 +1445,8 @@ def main():
         for x in np.linspace(-1, 1, output_width)
     ]
 
-    all_input_coords = (
-        input_coords + input_coords_2  + (action_coords + action_coords_2) + controller_coords if use_action_coords else input_coords + input_coords_2 + controller_coords
-    ) 
+    all_input_coords = input_coords + input_coords_2  + action_coords + action_coords_2 + controller_coords if use_action_coords else input_coords + input_coords_2 + controller_coords
+    
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
         all_input_coords, hidden_coords, all_output_coords, bias_coords
