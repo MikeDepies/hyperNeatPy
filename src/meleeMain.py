@@ -286,8 +286,8 @@ def createMelee(args: MeleeArgs, instance_num: int):
             polling_mode=False,
             setup_gecko_codes=True,
             gfx_backend="Null",
-            use_exi_inputs=False,
-            enable_ffw=False,
+            use_exi_inputs=True,
+            enable_ffw=True,
             save_replays=False,
         )
     controller = Controller(
@@ -898,7 +898,7 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        total_games = 1 if args.mode == "train" else 1
+        total_games = 5 if args.mode == "train" else 1
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
@@ -1132,7 +1132,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 1.0, 0.3)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 1.0, 0.9)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
@@ -1422,8 +1422,8 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, 0) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
-        # for z in np.linspace(-0.8, 0.8, round(5))
+        [(y, x, z) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
+        for z in np.linspace(-0.8, 0.8, round(5))
     ]
     output_width = 5
     output_height = 1
