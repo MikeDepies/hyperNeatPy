@@ -898,7 +898,7 @@ def simulation(
             and cpu_config.character == melee.Character.CPTFALCON
         ):
             continue
-        total_games = 5 if args.mode == "train" else 1
+        total_games = 1 if args.mode == "train" else 1
         total_scores = {
             "kill_count": 0,
             "death_count": 0,
@@ -1132,7 +1132,7 @@ def fetch_network_genome(api_url, queue: Queue, substrate: Substrate):
             network_processor = network_processor_factory.createProcessor(
                 task.agent_task.network_genome
             )
-            cppn_query_instance = CPPNConnectionQuery(network_processor, 1.0, 0.5)
+            cppn_query_instance = CPPNConnectionQuery(network_processor, 1.0, 0.0)
             network = TaskNetwork2(substrate, cppn_query_instance)
             network2 = None
             if task.cpu_task.network_genome is not None:
