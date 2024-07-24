@@ -575,7 +575,7 @@ class CPPNConnectionQuery:
         input_values = [x1, y1, z1, x2, y2, z2, d]
         output_values = self.networkProcessor.feedforward(input_values)
         sign = output_values[0] / abs(output_values[0]) if output_values[0] != 0 else 0
-        output_abs = max(min(abs(output_values[0]), 1), -1)
+        output_abs = max(min(abs(output_values[0]), 3), -3)
         # if abs(z1 - z2) == 0:
         #     print(x1, y1, z1, x2, y2, z2, d)
         c = .3
@@ -757,7 +757,7 @@ def parse_activation_function(activation_function_name: str) -> ActivationFuncti
         "HAT": ActivationFunction.HAT,
         "SQUARE": ActivationFunction.SQUARE,
         "CUBE": ActivationFunction.CUBE,
-    }.get(activation_function_name, ActivationFunction.IDENTITY)
+    }.get(activation_function_name)
 
 
 def parse_node_type(node_type_name: str) -> NodeType:
@@ -849,7 +849,7 @@ class TaskNetwork2(torch.nn.Module):
         self.hidden_activations[0] = (
             torch.matmul(inputs, self.input_hidden_weights)
             + self.hidden_bias_weights[0]
-        ) + torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
+        ) #+ torch.matmul(self.hidden_activations[0], self.hidden_recurrent_weights[0])
         self.hidden_activations[0] = torch.sigmoid(
             self.hidden_activations[0]
         )  # Activation function
