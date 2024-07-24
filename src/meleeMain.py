@@ -783,7 +783,7 @@ class MeleeSimulation:
                     ),
                 )
                 task_input = torch.cat(
-                    (input_tensor.flatten(), input_tensor_2.flatten(),  input_action_tensor.flatten(), input_action_tensor_2.flatten(), controller_tensor.flatten())
+                    (input_tensor.flatten(), input_tensor_2.flatten(),  input_action_tensor.flatten(), input_action_tensor_2.flatten())
                 )
                 # if game_state.frame % (60 * 5) == 0:
                 #     print(input_tensor.flatten())
@@ -802,7 +802,7 @@ class MeleeSimulation:
                         else agents[0].player(game_state)
                     ),
                 )
-                task_input = torch.cat((input_tensor.flatten(), controller_tensor.flatten()))
+                task_input = torch.cat((input_tensor.flatten(),))
             output = agent.create_action(task_input)
             if output is not None:
                 buttons, analog, c_analog = output_tensor_to_controller_tensors(
@@ -1422,7 +1422,7 @@ def main():
     ]
     # for y in np.linspace(-1, 1, 1)
     hidden_coords = [
-        [(y, x, 0) for y in np.linspace(-1, 1, 12) for x in np.linspace(-1, 1, 12)]
+        [(y, x, 0) for y in np.linspace(-1, 1, 30) for x in np.linspace(-1, 1, 30)]
         # for z in np.linspace(-0.6, 0.6, round(5))
     ]
     output_width = 5
@@ -1445,7 +1445,7 @@ def main():
         for x in np.linspace(-1, 1, output_width)
     ]
 
-    all_input_coords = input_coords + input_coords_2 + action_coords + action_coords_2 + controller_coords if use_action_coords else input_coords + input_coords_2 + controller_coords
+    all_input_coords = input_coords + input_coords_2 + action_coords + action_coords_2 if use_action_coords else input_coords + input_coords_2 
     
     all_output_coords = output_coords + analog_coords + c_analog_coords
     substrate = Substrate(
